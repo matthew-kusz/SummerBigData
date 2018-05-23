@@ -11,13 +11,13 @@ data = scipy.io.loadmat('ex3data1.mat')
 x_vals = data['X']
 y_vals = data['y']
 
-test = np.random.randint(0, x_vals.shape[0], 10)
-test1 = x_vals[test]
+random_images = np.random.randint(0, x_vals.shape[0], 10)
+images = x_vals[random_images]
 
 image = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
 
-for i in range(len(test)):
-	temp = np.reshape(test1[i], (20, 20))
+for i in range(len(random_images)):
+	temp = np.reshape(images[i], (20, 20))
 	temp = np.transpose(temp)
 	image[i] = temp
 
