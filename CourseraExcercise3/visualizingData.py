@@ -11,9 +11,11 @@ data = scipy.io.loadmat('ex3data1.mat')
 x_vals = data['X']
 y_vals = data['y']
 
+# Set up a an array of random 10 images [a (10, 400) vector]
 random_images = np.random.randint(0, x_vals.shape[0], 10)
 images = x_vals[random_images]
 
+# Now reshape images back into (20, 20) matrices and transpose to flip images right-side up
 image = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
 
 for i in range(len(random_images)):
@@ -21,8 +23,10 @@ for i in range(len(random_images)):
 	temp = np.transpose(temp)
 	image[i] = temp
 
+# Put all the images together
 total_images = np.concatenate(image, axis = 1)
 
+# Plot the results
 plt.imshow(total_images, cmap = 'binary')
 plt.show()
 
