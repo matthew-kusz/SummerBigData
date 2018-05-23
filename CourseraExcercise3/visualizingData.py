@@ -12,7 +12,7 @@ x_vals = data['X']
 y_vals = data['y']
 
 # Set up a an array of random 10 images [a (10, 400) vector]
-random_images = np.random.randint(0, x_vals.shape[0], 10)
+random_images = np.random.randint(0, x_vals.shape[0] - 1, 10)
 images = x_vals[random_images]
 
 # Now reshape images back into (20, 20) matrices and transpose to flip images right-side up
