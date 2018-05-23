@@ -40,7 +40,7 @@ def cost_gradient(arr_theta, arr_x, arr_y, lambda1):
 
 ####### One-vs-all Classification #######
 lambda1 = 10.0
-# Add a column of ones to our vector of x_vals
+# Add a column of ones to our array of x_vals
 m = len(x_vals)   # Number of training examples (rows)
 arr_ones = np.ones((m, 1))
 x_vals = np.hstack((arr_ones, x_vals))
@@ -54,10 +54,8 @@ print y_vals.shape
 print theta_vals.shape
 '''
 
-# Set up a vector that will be either 1 or 0 depending on which number we are looking at
 y_vals_train = np.zeros((len(y_vals), 1))
 for i in range(10):
-	# Set up an array with the values that stand for each number (10 stands for 0)
 	arr_num = [10, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 	
 	for j in range(len(y_vals)):
@@ -67,11 +65,11 @@ for i in range(10):
 		else:
 			y_vals_train[j] = 0
 	
-	# Use scipys minimize function to compute the theta values
+	
 	minimum = scipy.optimize.minimize(fun = cost, x0 = theta_vals, method = 'BFGS', jac = cost_gradient, args = (x_vals, y_vals_train, lambda1))#, options = {'disp': True}
 	
-	# Create a new vector that consists of all of the new theta values
 	theta_new = np.reshape(minimum.x, (1, len(minimum.x)))
+	
 	prob = sigmoid(theta_new, x_vals)
 	prob = np.reshape(prob, (len(prob), 1))
 	
@@ -82,5 +80,4 @@ for i in range(10):
 
 	print "Iteration: %g" %(i)
 
-# Find the largest value in each column
-	
+
