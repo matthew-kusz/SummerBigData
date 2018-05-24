@@ -13,7 +13,6 @@ The x array is under the name 'X', the y array is under the name 'y'
 x_vals ia a (5000, 400) array and y_vals is a (5000, 1) array
 '''
 x_vals = data['X']
-x_vals1 = data['X']
 y_vals = data['y']
 
 '''
@@ -73,6 +72,18 @@ correct_guess = (correct_guess / 500) * 100
 # Check the results
 print correct_guess
 
+# Visualize the results
+x = [0, 1, 2 ,3 ,4 ,5 ,6 ,7 , 8 ,9]
+x = np.reshape(x, (len(x), 1))
+plt.bar(x , correct_guesses, align = 'center', color = 'red')
+plt.title("Accuracy of our Neural Network with Provided Weights")
+plt.xlim(left = -0.5, right = 9.5)
+plt.ylim(80)
+plt.xlabel("Number")
+plt.xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+plt.ylabel("Percentage of correct guesses")
+plt.show()	
+
 '''
 Let's try to visual the hidden layer now. Instead of an array that's (5000, 400) we will now
  have an array that's (5000, 25) so our image will be a 5 by 5 pixel image instead.
@@ -110,22 +121,5 @@ total_images = np.concatenate((image[0], white_space, image[1], white_space, ima
 
 # Plot the results
 plt.imshow(total_images, cmap = 'binary')
-plt.show()
-
-# Plotting 0 to 9 for the ctual numbers
-for i in range (len(image)):
-	temp = np.reshape(x_vals1[i * 500], (20, 20))
-	temp = temp.T
-	image2[i] = temp
-
-# Put all the images together
-total_images2 = np.concatenate(image2, axis = 1)
-
-# Plot the results
-plt.imshow(total_images2, cmap = 'binary')
-plt.show()
-
-combined_images = np.concatenate((total_images, total_images2), axis = 0)
-plt.imshow(combined_images, cmap = 'binary')
 plt.show()
 

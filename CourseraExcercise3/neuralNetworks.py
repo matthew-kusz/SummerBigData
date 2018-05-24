@@ -72,6 +72,18 @@ correct_guess = (correct_guess / 500) * 100
 # Check the results
 print correct_guess
 
+# Visualize the results
+x = [0, 1, 2 ,3 ,4 ,5 ,6 ,7 , 8 ,9]
+x = np.reshape(x, (len(x), 1))
+plt.bar(x , correct_guess, align = 'center', color = 'red')
+plt.title("Accuracy of our Neural Network with Provided Weights")
+plt.xlim(left = -0.5, right = 9.5)
+plt.ylim(80)
+plt.xlabel("Number")
+plt.xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+plt.ylabel("Percentage of correct guesses")
+plt.show()	
+
 '''
 Let's try to visual the hidden layer now. Instead of an array that's (5000, 400) we will now
  have an array that's (5000, 25) so our image will be a 5 by 5 pixel image instead.
