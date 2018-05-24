@@ -46,7 +46,14 @@ def reg_cost_gradient(arr_theta, arr_x, arr_y, lambda1):
 ####### One-vs-all Classification #######
 
 # Set up what lambda value we want to use
-lambda1 = 1.0
+lambda_all = [0, 0, 0, 0]
+lambda_all[0] = float(input('Enter the desired lambda1: '))
+lambda_all[1] = float(input('Enter the desired lambda2: '))
+lambda_all[2] = float(input('Enter the desired lambda3: '))
+lambda_all[3] = float(input('Enter the desired lambda4: '))
+
+# After each run the guesses will be stored in here
+correct_guesses = [[0],[0],[0],[0]]
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)    # Number of training examples (rows)
@@ -57,50 +64,70 @@ x_vals = np.hstack((arr_ones, x_vals))
 n = len(x_vals[0])  # Number of columns
 theta_vals = np.zeros((1, n))
 
-# Set up an array that will be either 1 or 0 depending on which number we are looking at
-y_vals_train = np.zeros((len(y_vals), 1))
-for i in range(10):
-	# Set up an array with the values that stand for each number (10 stands for 0)
-	arr_num = [10, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-	
-	for j in range(len(y_vals)):
-		if (y_vals[j] == arr_num[i]):
-			y_vals_train[j] = 1
+# Set up a for loop to go through each lambda case and record the guesses
+for k in range(len(lambda_all)):
+	# Set up an array that will be either 1 or 0 depending on which number we are looking at
+	y_vals_train = np.zeros((len(y_vals), 1))
+	for i in range(10):
+		# Set up an array with the values that stand for each number (10 stands for 0)
+		arr_num = [10, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 		
+		for j in range(len(y_vals)):
+			if (y_vals[j] == arr_num[i]):
+				y_vals_train[j] = 1
+			
+			else:
+				y_vals_train[j] = 0
+		
+		# Use scipys minimize function to compute the theta values
+		minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', jac = reg_cost_gradient, args = (x_vals, y_vals_train, lambda_all[k]))#, options = {'disp': True}
+		
+		# Create a new array that consists of all of the new theta values
+		theta_new = np.reshape(minimum.x, (1, len(minimum.x)))
+		prob = sigmoid(theta_new, x_vals)
+		prob = np.reshape(prob, (len(prob), 1))
+		
+		if (i == 0):
+			prob_all = prob
 		else:
-			y_vals_train[j] = 0
+			prob_all = np.hstack((prob_all, prob))	
 	
-	# Use scipys minimize function to compute the theta values
-	minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', jac = reg_cost_gradient, args = (x_vals, y_vals_train, lambda1))#, options = {'disp': True}
-	
-	# Create a new array that consists of all of the new theta values
-	theta_new = np.reshape(minimum.x, (1, len(minimum.x)))
-	prob = sigmoid(theta_new, x_vals)
-	prob = np.reshape(prob, (len(prob), 1))
-	
-	if (i == 0):
-		prob_all = prob
-	else:
-		prob_all = np.hstack((prob_all, prob))	
+		print "Iteration: %g" %(i + 1)
 
-	print "Iteration: %g" %(i + 1)
-
-# Find the largest value in each column
-best_prob = np.zeros((len(prob_all), 1))
-for i in range (len(prob_all)):
-	best_prob[i, 0] = np.argmax(prob_all[i, :])
-	 
-# Find how accurate our program was with identifying the correct number
-correct_guess = np.zeros((10, 1))
-for i in range(len(best_prob)):
-	if (best_prob[i] == y_vals[i]):
-		correct_guess[y_vals[i]] = correct_guess[y_vals[i]] + 1
+	# Find the largest value in each column
+	best_prob = np.zeros((len(prob_all), 1))
+	for i in range (len(prob_all)):
+		best_prob[i, 0] = np.argmax(prob_all[i, :])
+		 
+	# Find how accurate our program was with identifying the correct number
+	correct_guess = np.zeros((10, 1))
+	for i in range(len(best_prob)):
+		if (best_prob[i] == y_vals[i]):
+			correct_guess[y_vals[i]] = correct_guess[y_vals[i]] + 1
+		
+		if (best_prob[i] == 0 and y_vals[i] == 10):
+			correct_guess[0] = correct_guess[0] + 1
+		
+	# Calculate the percentage
+	correct_guess = (correct_guess / 500) * 100
 	
-	if (best_prob[i] == 0 and y_vals[i] == 10):
-		correct_guess[0] = correct_guess[0] + 1
+	# Check the results
+	print correct_guess
 	
-# Calculate the percentage
-correct_guess = (correct_guess / 500) * 100
+	correct_guesses[k] = correct_guess
 
-# Check the results
-print correct_guess		
+# Plot them to visualize results
+x = [0, 1, 2 ,3 ,4 ,5 ,6 ,7 , 8 ,9]
+x = np.reshape(x, (len(x), 1))
+plt.bar(x - 0.4, correct_guesses[0], width = 0.2, align = 'center', color = 'red')
+plt.bar(x - 0.2, correct_guesses[1], width = 0.2, align = 'center', color = 'blue')
+plt.bar(x , correct_guesses[2], width = 0.2, align = 'center', color = 'green')
+plt.bar(x + 0.2, correct_guesses[3], width = 0.2, align = 'center', color = 'black')
+plt.title("Accuracy with different lambda values")
+plt.xlim(left = -0.5, right = 9.5)
+plt.ylim(60)
+plt.xlabel("Number")
+plt.xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+plt.ylabel("Percentage of correct guesses")
+plt.legend([lambda_all[0], lambda_all[1], lambda_all[2], lambda_all[3]], prop = {'size': 8})
+plt.show()		
