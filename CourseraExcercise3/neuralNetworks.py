@@ -18,42 +18,47 @@ y_vals = data['y']
 '''
 The array for theta1 is under the name 'Theta1' and the array for theta2 is under the nam 'Theta2'
 theta1_vals is a (25, 401) array and theta2_vals is a (10, 26) array
+
 '''
 theta1_vals = data_thetas['Theta1']
 theta2_vals = data_thetas['Theta2']
 
-print theta2_vals
+
 
 # Sigmoid equation
 def sigmoid(arr_theta, arr_x):
-	return 1.0 / (1.0 + np.exp(-np.dot(arr_x, arr_theta.T)))
+	return 1.0 / (1.0 + np.exp(-np.dot( arr_theta, arr_x.T)))
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)    # Number of training examples (rows)
 arr_ones = np.ones((m, 1))
 x_vals = np.hstack((arr_ones, x_vals))
 
-print x_vals.shape
-
-# We will be running our sigmoid equation twice, once for the input and once for the hidden layer
+# We will be running our sigmoid equation twice
 hidden_prob = sigmoid(x_vals, theta1_vals)
 
+# This will be used later to visualize the middle layer
+hidden_prob_visual = sigmoid(x_vals, theta1_vals)
+
 # Add a column of ones to our array of x_vals
-hidden_prob = hidden_prob.T
 arr_ones = np.ones((m, 1))
 hidden_prob = np.hstack((arr_ones, hidden_prob))
 
+# Second run thru
 output_prob = sigmoid(hidden_prob, theta2_vals)
+output_prob = np.reshape(output_prob, (5000, 10))
 
-print output_prob
-
+# print output_prob[0:10]
 # Find the largest value in each column
 best_prob = np.zeros((len(output_prob), 1))
 for i in range (len(output_prob)):
 	best_prob[i, 0] = np.argmax(output_prob[i, :])
-	 
+
 # Find how accurate our program was with identifying the correct number
 correct_guess = np.zeros((10, 1))
+# index 0 represents 9, index 1 represents 0, index 2 represents 1, etc.
+best_prob = np.roll(best_prob, 4500)
+
 for i in range(len(best_prob)):
 	if (best_prob[i] == y_vals[i]):
 		correct_guess[y_vals[i]] = correct_guess[y_vals[i]] + 1
@@ -66,3 +71,43 @@ correct_guess = (correct_guess / 500) * 100
 
 # Check the results
 print correct_guess
+
+'''
+Let's try to visual the hidden layer now. Instead of an array that's (5000, 400) we will now
+ have an array that's (5000, 25) so our image will be a 5 by 5 pixel image instead.
+'''
+# Set up a an array of random 10 images [a (10, 25) vector]
+random_images = np.random.randint(0, len(hidden_prob_visual) - 1, 10)
+images = hidden_prob_visual[random_images]
+
+# Now reshape images back into (5, 5) matrices and transpose to flip images right-side up
+image = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
+image2 = image
+white_space = np.zeros((5,5))
+for i in range(len(random_images)):
+	temp = np.reshape(images[i], (5, 5))
+	temp = np.transpose(temp)
+	image[i] = temp
+
+# Put all the images together
+total_images = np.concatenate(image, axis = 1)
+
+
+# Plot the results
+plt.imshow(total_images, cmap = 'binary')
+plt.show()
+
+
+# Plotting 0 to 9 for our hidden layer
+for i in range (len(image)):
+	temp = np.reshape(hidden_prob_visual[i * 500], (5, 5))
+	temp = temp.T
+	image[i] = temp
+
+# Put all the images together
+total_images = np.concatenate((image[0], white_space, image[1], white_space, image[2], white_space,image[3], white_space,image[4], white_space,image[5], white_space,image[6], white_space,image[7], white_space,image[8], white_space,image[9], white_space), axis = 1)
+
+# Plot the results
+plt.imshow(total_images, cmap = 'binary')
+plt.show()
+

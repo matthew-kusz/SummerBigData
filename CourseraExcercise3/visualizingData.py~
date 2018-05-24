@@ -33,7 +33,7 @@ plt.imshow(total_images, cmap = 'binary')
 plt.show()
 
 # Plotting 0 to 9
-for i in range (len(image2)):
+for i in range (len(image)):
 	temp = np.reshape(x_vals[i * 500], (20, 20))
 	temp = temp.T
 	image2[i] = temp
