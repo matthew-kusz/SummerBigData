@@ -80,7 +80,7 @@ for k in range(len(lambda_all)):
 				y_vals_train[j] = 0
 		
 		# Use scipys minimize function to compute the theta values
-		minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', jac = reg_cost_gradient, args = (x_vals, y_vals_train, lambda_all[k]))#, options = {'disp': True}
+		minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'BFGS', jac = reg_cost_gradient, args = (x_vals, y_vals_train, lambda_all[k]))#, options = {'disp': True}
 		
 		# Create a new array that consists of all of the new theta values
 		theta_new = np.reshape(minimum.x, (1, len(minimum.x)))
