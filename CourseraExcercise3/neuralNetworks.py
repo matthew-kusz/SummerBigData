@@ -27,7 +27,7 @@ theta2_vals = data_thetas['Theta2']
 
 # Sigmoid equation
 def sigmoid(arr_theta, arr_x):
-	return 1.0 / (1.0 + np.exp(-np.dot( arr_theta, arr_x.T)))
+	return 1.0 / (1.0 + np.exp(-np.dot( arr_x, arr_theta.T)))
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)    # Number of training examples (rows)
@@ -35,17 +35,17 @@ arr_ones = np.ones((m, 1))
 x_vals = np.hstack((arr_ones, x_vals))
 
 # We will be running our sigmoid equation twice
-hidden_prob = sigmoid(x_vals, theta1_vals)
+hidden_prob = sigmoid(theta1_vals, x_vals)
 
 # This will be used later to visualize the middle layer
-hidden_prob_visual = sigmoid(x_vals, theta1_vals)
+hidden_prob_visual = sigmoid(theta1_vals, x_vals)
 
 # Add a column of ones to our array of x_vals
 arr_ones = np.ones((m, 1))
 hidden_prob = np.hstack((arr_ones, hidden_prob))
 
 # Second run thru
-output_prob = sigmoid(hidden_prob, theta2_vals)
+output_prob = sigmoid(theta2_vals, hidden_prob)
 output_prob = np.reshape(output_prob, (5000, 10))
 
 # print output_prob[0:10]

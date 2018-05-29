@@ -75,7 +75,7 @@ a2 = sigmoid(theta1_vals, x_vals).T
 arr_ones = np.ones((m, 1))
 a2 = np.hstack((arr_ones, a2))
 
-print a2
+print theta2_vals
 
 # Second run thru
 a3 = sigmoid(a2, theta2_vals)

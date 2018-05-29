@@ -28,7 +28,7 @@ theta2_vals = data_thetas['Theta2']
 
 # Sigmoid equation
 def sigmoid(arr_theta, arr_x):
-	return 1.0 / (1.0 + np.exp(-np.dot(arr_theta, arr_x.T)))
+	return 1.0 / (1.0 + np.exp(-np.dot(arr_x, arr_theta.T)))
 
 # Cost function
 def reg_cost(h, arr_x, arr_y):	
@@ -68,7 +68,7 @@ for i in range(10):
 			y_vals_train[j, i:] = 0
 
 # We will be running our sigmoid equation twice
-a2 = sigmoid(theta1_vals, x_vals).T
+a2 = sigmoid(theta1_vals, x_vals)
 
 
 # Add a column of ones to our array of a2
