@@ -4,6 +4,59 @@ import scipy.optimize
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Sigmoid function
+def sigmoid(value):
+	return 1.0 / (1.0 + np.exp(-value))
+
+# Regularized cost function
+def reg_cost(h, arr_x, arr_y, theta1, theta2, lambda1):	
+	first_half = np.multiply(arr_y, np.log(h))
+	second_half = np.multiply((1 - arr_y), np.log(1 - h))
+
+	cost1 = np.sum((-1.0 / m) * (first_half + second_half))
+	cost2 = (lambda1 / (2.0 * m)) * (np.sum(theta1 ** 2) - np.sum(theta1[:,0] ** 2))
+	cost3 = (lambda1 / (2.0 * m)) * (np.sum(theta2 ** 2) - np.sum(theta2[:,0] ** 2))
+	cost = cost1 + cost2 + cost3
+	return cost
+
+# Regularized cost function gradient
+def reg_cost_gradient(arr_theta, arr_x, arr_y):
+	# Scipy.optimize.minimize gives array_theta in 1D, so change it back into a 2D array
+	arr_theta = np.reshape(arr_theta, (1, len(arr_theta)))
+
+	h = sigmoid(arr_theta, arr_x).T
+	gradient = (1.0 / m) * np.add(np.dot((h - arr_y).T, arr_x), (lambda1 / m) * arr_theta)
+	return gradient.flatten()
+
+# Feedforward
+def feedforward(theta1, theta2, arr_x):
+	# We will be running our sigmoid function twice
+	a2 = sigmoid(np.dot(arr_x, theta1.T))
+	
+	# Add a column of ones to our array of a2
+	arr_ones = np.ones((m, 1))
+	a2 = np.hstack((arr_ones, a2))
+	
+	# Second run thru
+	a3 = sigmoid(np.dot(a2, theta2.T))
+
+	return a3
+
+# Sigmoid function gradient
+def sigmoid_gradient(value):
+	h = sigmoid(value)
+	return h * (1 - h)
+
+# Backpropagation
+####### Neural Network #######
+'''
+def Backprop(theta_rand, arr_x, arr_y, lambda1):
+	
+	for i in size(m):
+		
+	return
+'''	
+
 # Extract the provided data. We need to use scipy since the data is in a matlab file format
 data = scipy.io.loadmat('ex4data1.mat')
 data_thetas = scipy.io.loadmat('ex4weights.mat')
@@ -16,42 +69,20 @@ x_vals = data['X']
 y_vals = data['y']
 
 '''
-The array for theta1 is under the name 'Theta1' and the array for theta2 is under the nam 'Theta2'
+The array for theta1 is under the name 'Theta1' and the array for theta2 is under the name 'Theta2'
 theta1_vals is a (25, 401) array and theta2_vals is a (10, 26) array
 
 '''
-theta1_vals = data_thetas['Theta1']
-theta2_vals = data_thetas['Theta2']
+theta1_vals = data_thetas['Theta1'] # FIXME
+theta2_vals = data_thetas['Theta2'] # FIXME
 
-####### Logistic regression #######
-
-
-# Sigmoid equation
-def sigmoid(arr_theta, arr_x):
-	return 1.0 / (1.0 + np.exp(-np.dot(arr_x, arr_theta.T)))
-
-# Cost function
-def reg_cost(h, arr_x, arr_y):	
-	first_half = np.dot(arr_y.T, np.log(h))
-	second_half = np.dot((1 - arr_y).T, np.log(1 - h))
-
-	cost = np.sum((-1.0 / m) * (first_half + second_half))
-	print cost
-	return cost
-
-# Cost function gradient
-def reg_cost_gradient(arr_theta, arr_x, arr_y):
-	# Scipy.optimize.minimize gives array_theta in 1D, so change it back into a 2D array
-	arr_theta = np.reshape(arr_theta, (1, len(arr_theta)))
-
-	h = sigmoid(arr_theta, arr_x).T
-	gradient = (1.0 / m) * np.add(np.dot((h - arr_y).T, arr_x), (lambda1 / m) * arr_theta)
-	return gradient.flatten()
+#Set what lambda value we want to use
+lambda1 = 1
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)    # Number of training examples (rows)
 arr_ones = np.ones((m, 1))
-x_vals = np.hstack((arr_ones, x_vals))
+x_vals = np.hstack((arr_ones, x_vals))        # (5000, 401) matrix
 
 # Set up an array that will be either 1 or 0 depending on which number we are looking at
 y_vals_train = np.zeros((len(y_vals), 10))
@@ -67,20 +98,23 @@ for i in range(10):
 		else:
 			y_vals_train[j, i:] = 0
 
-# We will be running our sigmoid equation twice
-a2 = sigmoid(theta1_vals, x_vals)
+'''
+For testing cost and feedforward
+hypothesis = feedforward(theta1_vals, theta2_vals, x_vals)
+J_val = reg_cost(hypothesis, x_vals, y_vals_train, theta1_vals, theta2_vals, lambda1)
+J_val = 10.5
+This differs from the value in the intruction sheet
+'''
 
+####### Backpropagation ########
 
-# Add a column of ones to our array of a2
-arr_ones = np.ones((m, 1))
-a2 = np.hstack((arr_ones, a2))
+# Randomly initialize our theta values in a range [-0.12, 0.12]
+n = len(x_vals[0])   # Number of columns
+random_theta1 = np.random.rand(25, n)                    # (25, 401) matrix
+random_theta1 = random_theta1 * 2 * 0.12 - 0.12
 
-print theta2_vals
-
-# Second run thru
-a3 = sigmoid(a2, theta2_vals)
-
-J_val = reg_cost(a3, x_vals, y_vals_train)
+random_theta2 = np.random.rand(10, len(random_theta1) + 1)   # (10, 26) matrix
+random_theta2 = random_theta2 * 2 * 0.12 - 0.12
 
 '''	
 	# Use scipys minimize function to compute the theta values
