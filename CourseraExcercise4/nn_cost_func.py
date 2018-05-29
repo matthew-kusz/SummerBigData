@@ -9,7 +9,13 @@ def sigmoid(value):
 	return 1.0 / (1.0 + np.exp(-value))
 
 # Regularized cost function
-def reg_cost(h, arr_x, arr_y, theta1, theta2, lambda1):	
+def reg_cost(theta, arr_x, arr_y, lambda1):	
+	
+	theta1 = np.reshape(theta[0:25 * 401], (25, 401))
+	theta2 = np.reshape(theta[25 * 401: len(theta)], (10, 26))
+
+	h, nan = feedforward(theta1, theta2, x_vals)
+
 	first_half = np.multiply(arr_y, np.log(h))
 	second_half = np.multiply((1 - arr_y), np.log(1 - h))
 
@@ -19,15 +25,6 @@ def reg_cost(h, arr_x, arr_y, theta1, theta2, lambda1):
 	cost = cost1 + cost2 + cost3
 	return cost
 
-# Regularized cost function gradient
-def reg_cost_gradient(arr_theta, arr_x, arr_y):
-	# Scipy.optimize.minimize gives array_theta in 1D, so change it back into a 2D array
-	arr_theta = np.reshape(arr_theta, (1, len(arr_theta)))
-
-	h = sigmoid(arr_theta, arr_x).T
-	gradient = (1.0 / m) * np.add(np.dot((h - arr_y).T, arr_x), (lambda1 / m) * arr_theta)
-	return gradient.flatten()
-
 # Feedforward
 def feedforward(theta1, theta2, arr_x):
 	# We will be running our sigmoid function twice
@@ -35,12 +32,12 @@ def feedforward(theta1, theta2, arr_x):
 	
 	# Add a column of ones to our array of a2
 	arr_ones = np.ones((m, 1))
-	a2 = np.hstack((arr_ones, a2))
+	a2 = np.hstack((arr_ones, a2))        # (5000, 26) matrix
 	
-	# Second run thru
-	a3 = sigmoid(np.dot(a2, theta2.T))
+	# Second run
+	a3 = sigmoid(np.dot(a2, theta2.T))    # (5000, 10) matrix
 
-	return a3
+	return a3, a2
 
 # Sigmoid function gradient
 def sigmoid_gradient(value):
@@ -48,14 +45,44 @@ def sigmoid_gradient(value):
 	return h * (1 - h)
 
 # Backpropagation
-####### Neural Network #######
-'''
-def Backprop(theta_rand, arr_x, arr_y, lambda1):
-	
-	for i in size(m):
+def backprop(theta, arr_x, arr_y_train, lambda1):
+	# Change our theta values back into their original shape
+	theta_rand1 = np.reshape(theta[0:25 * 401], (25, 401))
+	theta_rand2 = np.reshape(theta[25 * 401: len(theta)], (10, 26))
+
+	a3, a2 = feedforward(theta_rand1, theta_rand2, arr_x)
+	Delta2 = 0
+	Delta1 = 0
+
+	for i in range(500): #FIXME
+		delta3 = a3[i] - arr_y_train[i]                   # Vector length 10
+		delta3 = np.reshape(delta3, (len(delta3), 1))     # (10, 1) matrix
+		temp_a2 = np.reshape(a2[i], (len(a2[i]), 1))      # (26, 1) matrix
+		delta2 = np.multiply(np.dot(theta_rand2.T, delta3), temp_a2 * (1 - temp_a2))
+
+		Delta2 = Delta2 + np.dot(delta3, temp_a2.T)       # (10, 26) matrix
+		temp_arr_x = np.reshape(arr_x[i], (len(arr_x[i]), 1))
+		# We need to remove delta2[0] from Delta1
+		Delta1 = Delta1 + np.delete(np.dot(delta2, temp_arr_x.T), 0, axis = 0) # (25, 401) matrix
 		
-	return
-'''	
+
+	# Compute the unregularized gradient
+	D1_temp = (1.0 / m) * Delta1 
+	D2_temp = (1.0 / m) * Delta2
+
+	# Compute the regularized gradient
+	D1 = (1.0 / m) * Delta1 + (lambda1 / m) * theta_rand1
+	D1[0:, 0:1] = D1_temp[0:, 0:1]    # (25, 401) matrix
+	D2 = (1.0 / m) * Delta2 + (lambda1 / m) * theta_rand2
+	D2[0:, 0:1] = D2_temp[0:, 0:1]    # (10, 26) matrix
+
+	D1 = np.ravel(D1)
+	D2 = np.ravel(D2)
+	D_vals = np.concatenate((D1, D2), axis = 1)
+
+	return D_vals
+
+####### Neural Network #######
 
 # Extract the provided data. We need to use scipy since the data is in a matlab file format
 data = scipy.io.loadmat('ex4data1.mat')
@@ -99,22 +126,35 @@ for i in range(10):
 			y_vals_train[j, i:] = 0
 
 '''
-For testing cost and feedforward
-hypothesis = feedforward(theta1_vals, theta2_vals, x_vals)
+#For testing cost and feedforward
+hypothesis, nan = feedforward(theta1_vals, theta2_vals, x_vals)
 J_val = reg_cost(hypothesis, x_vals, y_vals_train, theta1_vals, theta2_vals, lambda1)
-J_val = 10.5
-This differs from the value in the intruction sheet
+print J_val
+#J_val = 10.5
+#This differs from the value in the intruction sheet
 '''
 
 ####### Backpropagation ########
 
 # Randomly initialize our theta values in a range [-0.12, 0.12]
 n = len(x_vals[0])   # Number of columns
-random_theta1 = np.random.rand(25, n)                    # (25, 401) matrix
+random_theta1 = np.random.rand(25, n)                        # (25, 401) matrix
 random_theta1 = random_theta1 * 2 * 0.12 - 0.12
 
 random_theta2 = np.random.rand(10, len(random_theta1) + 1)   # (10, 26) matrix
 random_theta2 = random_theta2 * 2 * 0.12 - 0.12
+
+# Combine these into a 1-dimension vector
+random_theta1_1D = np.ravel(random_theta1)   # 10025 1-D vector
+random_theta2_1D = np.ravel(random_theta2)   # 260 1_D vector
+theta_vals = np.concatenate((random_theta1_1D, random_theta2_1D), axis = 1)
+print theta_vals.shape
+print random_theta1_1D.shape
+print random_theta2_1D.shape
+
+grad = backprop(theta_vals, x_vals, y_vals_train, lambda1)
+
+print scipy.optimize.check_grad(reg_cost, backprop, theta_vals, x_vals, y_vals_train, lambda1)
 
 '''	
 	# Use scipys minimize function to compute the theta values
