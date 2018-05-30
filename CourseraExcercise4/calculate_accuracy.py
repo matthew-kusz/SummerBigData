@@ -25,7 +25,7 @@ def feedforward(theta1, theta2, arr_x):
 
 
 # Import the theta valus that we found earlier
-theta = np.genfromtxt("finalThetasRandom500.out")
+theta = np.genfromtxt("finalThetasOrdered5000.out")
 theta_vals1 = np.reshape(theta[0:25 * 401], (25, 401))
 theta_vals2 = np.reshape(theta[25 * 401: len(theta)], (10, 26))
 
@@ -39,6 +39,16 @@ x_vals ia a (5000, 400) array and y_vals is a (5000, 1) array
 '''
 x_vals = data['X']
 y_vals = data['y']
+
+'''
+# Randomize our 5000 digits
+xy_vals = np.concatenate((x_vals, y_vals), axis = 1)
+np.random.shuffle(xy_vals)
+
+# Split xy_vals apart back into x and y arrays
+x_vals = xy_vals[:, :-1]
+y_vals = xy_vals[:, [400]]
+'''
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)                               # Number of training examples (rows)
@@ -56,10 +66,10 @@ for i in range (len(prob_all)):
 # Find how accurate our program was with identifying the correct number
 correct_guess = np.zeros((10, 1))
 for i in range(len(best_prob)):
-	if (best_prob[i] == y_vals[i]):
-		correct_guess[y_vals[i]] = correct_guess[y_vals[i]] + 1
+	if (best_prob[i] == int(y_vals[i])):
+		correct_guess[int(y_vals[i])] = correct_guess[int(y_vals[i])] + 1
 	
-	if (best_prob[i] == 0 and y_vals[i] == 10):
+	if (best_prob[i] == 0 and int(y_vals[i]) == 10):
 		correct_guess[0] = correct_guess[0] + 1
 	
 # Calculate the percentage
