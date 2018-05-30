@@ -25,7 +25,6 @@ def reg_cost(theta, arr_x, arr_y, lambda1):
 	cost2 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta1 ** 2) - np.sum(arr_theta1[:,0] ** 2))
 	cost3 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta2 ** 2) - np.sum(arr_theta2[:,0] ** 2))
 	cost = cost1 + cost2 + cost3
-	print cost
 	return cost
 
 # Feedforward
@@ -91,7 +90,7 @@ def rand_sample(arr_x, arr_y):
 	arr_order = np.concatenate((arr_xy[0:50], arr_xy[500:550], arr_xy[1000:1050], arr_xy[1500:1550], arr_xy[2000:2050], arr_xy[2500:2550], arr_xy[3000:3050], arr_xy[3500:3550], arr_xy[4000:4050], arr_xy[4500:4550]), axis = 0)
 
 	# Randomize these values 
-	# np.random.shuffle(arr_order)
+	np.random.shuffle(arr_order)
 
 	return arr_order
 
@@ -188,40 +187,5 @@ final_cost = reg_cost(theta_new, x_ordered, y_ordered, lambda1)
 print "Our final cost value is %g." %(final_cost)
 
 # Save the theta values to use later
-np.savetxt('finalThetasOrdered500.out', theta_new, delimiter = ',')
-'''
-	# Create a new array that consists of all of the new theta values
-	theta_new = np.reshape(minimum.x, (1, len(minimum.x)))
-	prob = sigmoid(theta_new, x_vals)
-	prob = np.reshape(prob, (len(prob), 1))
-	
-	if (i == 0):
-		prob_all = prob
-	else:
-		prob_all = np.hstack((prob_all, prob))	
-
-	print "Iteration: %g" %(i + 1)
-
-# Find the largest value in each column
-best_prob = np.zeros((len(prob_all), 1))
-for i in range (len(prob_all)):
-	best_prob[i, 0] = np.argmax(prob_all[i, :])
-	 
-# Find how accurate our program was with identifying the correct number
-correct_guess = np.zeros((10, 1))
-for i in range(len(best_prob)):
-	if (best_prob[i] == y_vals[i]):
-		correct_guess[y_vals[i]] = correct_guess[y_vals[i]] + 1
-	
-	if (best_prob[i] == 0 and y_vals[i] == 10):
-		correct_guess[0] = correct_guess[0] + 1
-	
-# Calculate the percentage
-correct_guess = (correct_guess / 500) * 100
-
-# Check the results
-print correct_guess
-
-correct_guesses[k] = correct_guess
-'''
+np.savetxt('finalThetasRandom500.out', theta_new, delimiter = ',')
 
