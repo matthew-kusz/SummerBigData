@@ -25,7 +25,7 @@ def feedforward(theta1, theta2, arr_x):
 
 
 # Import the theta valus that we found earlier
-theta = np.genfromtxt("finalThetasOrdered5000.out")
+theta = np.genfromtxt("finalThetasRandom5000.out")
 theta_vals1 = np.reshape(theta[0:25 * 401], (25, 401))
 theta_vals2 = np.reshape(theta[25 * 401: len(theta)], (10, 26))
 

@@ -25,7 +25,7 @@ def feedforward(theta1, theta2, arr_x):
 
 
 # Import the theta valus that we found earlier
-theta = np.genfromtxt("finalThetasRandom500.out")
+theta = np.genfromtxt("finalThetasRandom5000.out")
 theta_vals1 = np.reshape(theta[0:25 * 401], (25, 401))
 theta_vals2 = np.reshape(theta[25 * 401: len(theta)], (10, 26))
 
@@ -40,6 +40,7 @@ x_vals ia a (5000, 400) array and y_vals is a (5000, 1) array
 x_vals = data['X']
 y_vals = data['y']
 
+
 # Randomize our 5000 digits
 xy_vals = np.concatenate((x_vals, y_vals), axis = 1)
 np.random.shuffle(xy_vals)
@@ -47,6 +48,7 @@ np.random.shuffle(xy_vals)
 # Split xy_vals apart back into x and y arrays
 x_vals = xy_vals[:, :-1]
 y_vals = xy_vals[:, [400]]
+
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)                               # Number of training examples (rows)
