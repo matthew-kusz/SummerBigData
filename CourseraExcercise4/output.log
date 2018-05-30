@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "nn_cost_func.py", line 173, in <module>
+    minimum = scipy.optimize.minimize(fun = reg_cost, x0 = ordered_vals, method = 'CG', jac = backprop, args = (x_vals, y_vals_train, lambda1))#, options = {'disp': True}
+  File "/usr/local/anaconda/anaconda2/lib/python2.7/site-packages/scipy/optimize/_minimize.py", line 417, in minimize
+    return _minimize_cg(fun, x0, args, jac, callback, **options)
+  File "/usr/local/anaconda/anaconda2/lib/python2.7/site-packages/scipy/optimize/optimize.py", line 1139, in _minimize_cg
+    gfk = myfprime(x0)
+  File "/usr/local/anaconda/anaconda2/lib/python2.7/site-packages/scipy/optimize/optimize.py", line 281, in function_wrapper
+    return function(*(wrapper_args + args))
+  File "nn_cost_func.py", line 49, in backprop
+    arr_theta2 = np.reshape(theta[25 * 401: len(theta)], (10, 26))
+  File "/usr/local/anaconda/anaconda2/lib/python2.7/site-packages/numpy/core/fromnumeric.py", line 221, in reshape
+    return reshape(newshape, order=order)
+ValueError: total size of new array must be unchanged

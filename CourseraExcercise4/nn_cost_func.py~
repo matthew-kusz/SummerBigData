@@ -10,33 +10,34 @@ def sigmoid(value):
 
 # Regularized cost function
 def reg_cost(theta, arr_x, arr_y, lambda1):	
-
 	# Reshape our thetas back into their original shape 
 	arr_theta1 = np.reshape(theta[0:25 * 401], (25, 401))
 	arr_theta2 = np.reshape(theta[25 * 401: len(theta)], (10, 26))
 
 	# Find our hypothesis
-	h, nan = feedforward(arr_theta1, arr_theta2, x_vals)
+	h, nano = feedforward(arr_theta1, arr_theta2, arr_x)
 
 	# Calculate the cost
 	first_half = np.multiply(arr_y, np.log(h))
-	second_half = np.multiply((1 - arr_y), np.log(1 - h))
+	second_half = np.multiply((1.0 - arr_y), np.log(1.0 - h))
 
 	cost1 = np.sum((-1.0 / m) * (first_half + second_half))
 	cost2 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta1 ** 2) - np.sum(arr_theta1[:,0] ** 2))
 	cost3 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta2 ** 2) - np.sum(arr_theta2[:,0] ** 2))
 	cost = cost1 + cost2 + cost3
+	print cost
 	return cost
 
 # Feedforward
 def feedforward(theta1, theta2, arr_x):
+
 	# We will be running our sigmoid function twice
-	a2 = sigmoid(np.dot(arr_x, theta1.T))
-	
+	a2 = sigmoid(np.dot(arr_x, theta1.T))	
+
 	# Add a column of ones to our array of a2
 	arr_ones = np.ones((m, 1))
 	a2 = np.hstack((arr_ones, a2))        # (5000, 26) matrix
-	
+
 	# Second run
 	a3 = sigmoid(np.dot(a2, theta2.T))    # (5000, 10) matrix
 
@@ -68,7 +69,7 @@ def backprop(theta, arr_x, arr_y_train, lambda1):
 	# Compute the unregularized gradient
 	D1_temp = (1.0 / m) * Delta1 
 	D2_temp = (1.0 / m) * Delta2
-
+	
 	# Compute the regularized gradient
 	D1 = (1.0 / m) * Delta1 + (lambda1 / float(m)) * arr_theta1
 	D1[0:, 0:1] = D1_temp[0:, 0:1]    # (25, 401) matrix
@@ -78,7 +79,7 @@ def backprop(theta, arr_x, arr_y_train, lambda1):
 	# Changed the gradient into a one dimensional vector
 	D1 = np.ravel(D1)
 	D2 = np.ravel(D2)
-	D_vals = np.concatenate((D1, D2), axis = 1)
+	D_vals = np.concatenate((D1, D2))
 
 	return D_vals
 
@@ -90,10 +91,9 @@ def rand_sample(arr_x, arr_y):
 	arr_order = np.concatenate((arr_xy[0:50], arr_xy[500:550], arr_xy[1000:1050], arr_xy[1500:1550], arr_xy[2000:2050], arr_xy[2500:2550], arr_xy[3000:3050], arr_xy[3500:3550], arr_xy[4000:4050], arr_xy[4500:4550]), axis = 0)
 
 	# Randomize these values 
-	arr_random = arr_order
-	np.random.shuffle(arr_random)
+	# np.random.shuffle(arr_order)
 
-	return arr_order, arr_random
+	return arr_order
 
 ####### Neural Network #######
 
@@ -160,21 +160,36 @@ random_theta1_1D = np.ravel(random_theta1)   # 10025 1-D vector
 random_theta2_1D = np.ravel(random_theta2)   # 260 1_D vector
 theta_vals = np.concatenate((random_theta1_1D, random_theta2_1D), axis = 1)
 
-'''
+
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
-print scipy.optimize.check_grad(reg_cost, backprop, theta_vals, x_vals, y_vals_train, lambda1)
+# print scipy.optimize.check_grad(reg_cost, backprop, theta_vals, x_vals, y_vals_train, lambda1)
 # Recieved a value of 4.95e-06
-'''
+
 
 # Lets set up a smaller test sample to make sure everything runs smoothly
-ordered_vals, random_vals = rand_sample(x_vals, y_vals)
+ordered_vals = rand_sample(x_vals, y_vals_train)
+
+
+# Split the x and y arrays
+x_ordered = ordered_vals[:, :-10]
+y_ordered = ordered_vals[:, 401:411]
+m = len(x_ordered) 
+
+initial_cost = reg_cost(theta_vals, x_ordered, y_ordered, lambda1)
+print "Our initial cost value is %g." %(initial_cost)
 	
 # Use scipys minimize function to compute the theta values
-minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', jac = backprop, args = (x_vals, y_vals_train, lambda1]))#, options = {'disp': True}
+minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', tol = 1e-4, jac = backprop, args = (x_ordered, y_ordered, lambda1))#, options = {'disp': True}
 
+# Set up the new theta values we hav from our minimize function
 theta_new = minimum.x
+print theta_new.shape
 
-final_cost = 
+final_cost = reg_cost(theta_new, x_ordered, y_ordered, lambda1)
+print "Our final cost value is %g." %(final_cost)
+
+# Save the theta values to use later
+np.savetxt('finalThetasOrdered500.out', theta_new, delimiter = ',')
 '''
 	# Create a new array that consists of all of the new theta values
 	theta_new = np.reshape(minimum.x, (1, len(minimum.x)))
