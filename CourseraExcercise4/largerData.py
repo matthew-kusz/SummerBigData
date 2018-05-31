@@ -6,37 +6,7 @@ import scipy.optimize
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Reading in MNIST data files
-def read_images(filename, n=None):
-	f = gzip.open(filename)
-	f.seek(0)
-	magic_num = st.unpack('>4B', f.read(4))
-	num_img = st.unpack('>I', f.read(4))[0]
-	if not n is None:
-		num_img = n
-	num_row = st.unpack('>I', f.read(4))[0]
-	num_col = st.unpack('>I', f.read(4))[0]
-	
-	X = np.zeros((num_img, num_row * num_col))	
-	total_bytes = num_img * num_row * num_col
-	X = np.asarray(
-		st.unpack('>' + 'B'*total_bytes, f.read(total_bytes))).reshape((num_img, num_row * num_col))
-	f.close()
-	return X/255
-
-def read_labels(filename, n=None):
-	f = gzip.open(filename)
-	f.seek(0)
-	magic_num = st.unpack('>4B', f.read(4))
-	num_label = st.unpack('>I', f.read(4))[0]
-	if not n is None:
-		num_label = n
-	
-	y = np.asarray(
-		st.unpack('>' + 'B'*num_label, f.read(num_label)))
-	f.close()
-	return y	
-
+# Reading in MNIST data files	
 def read_idx(filename, n=None):
 	with gzip.open(filename) as f:
 		zero, dtype, dims = st.unpack('>HBB', f.read(4))
@@ -138,23 +108,25 @@ def rand_sample(arr_x, arr_y):
 
 	return arr_xy
 
-'''
-The x array is under the name 'X', the y array is under the name 'y'
-x_vals ia a (5000, 400) array and y_vals is a (5000, 1) array
-'''
-x_vals = read_images('data/train-images-idx3-ubyte.gz')
-y_vals = read_labels('data/train-labels-idx1-ubyte.gz')
+# Set up how large we want our data set (max of 60,000)
+size = 5000
+
+# Extract the MNIST training data sets
+x_vals = read_idx('data/train-images-idx3-ubyte.gz', size)
+x_vals = x_vals / 255.0
+x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
+y_vals = read_idx('data/train-labels-idx1-ubyte.gz', size)
 y_vals = np.reshape(y_vals, (len(y_vals), 1))
-x_vals_modified = x_vals[0:500]
-y_vals_modified = y_vals[0:500]
+print x_vals.shape
+print y_vals.shape
 
 #Set what lambda value we want to use
 lambda1 = 1
 
 # Add a column of ones to our array of x_vals
-m = len(x_vals_modified)                               # Number of training examples (rows)
+m = len(x_vals)                               # Number of training examples (rows)
 arr_ones = np.ones((m, 1))
-x_vals_modified = np.hstack((arr_ones, x_vals_modified))        # (5000, 401) matrix
+x_vals = np.hstack((arr_ones, x_vals))        # (5000, 401) matrix
 
 # Set up an array that will be either 1 or 0 depending on which number we are looking at
 y_vals_train = np.zeros((len(y_vals), 10))
@@ -190,15 +162,15 @@ print J_val
 
 # Randomly initialize our theta values in a range [-0.12, 0.12]
 n = len(x_vals[0])   # Number of columns
-random_theta1 = np.random.rand(25, n)                        # (25, 401) matrix
+random_theta1 = np.random.rand(25, n)                        # (25, 784) matrix
 random_theta1 = random_theta1 * 2 * 0.12 - 0.12
 
 random_theta2 = np.random.rand(10, len(random_theta1) + 1)   # (10, 26) matrix
 random_theta2 = random_theta2 * 2 * 0.12 - 0.12
 
 # Combine these into a 1-dimension vector
-random_theta1_1D = np.ravel(random_theta1)   # 10025 1-D vector
-random_theta2_1D = np.ravel(random_theta2)   # 260 1_D vector
+random_theta1_1D = np.ravel(random_theta1)   
+random_theta2_1D = np.ravel(random_theta2)   
 theta_vals = np.concatenate((random_theta1_1D, random_theta2_1D), axis = 1)
 
 
@@ -207,18 +179,18 @@ theta_vals = np.concatenate((random_theta1_1D, random_theta2_1D), axis = 1)
 # Recieved a value of 4.95e-06
 
 
-initial_cost = reg_cost(theta_vals, x_vals_modified, y_vals_train, lambda1)
+initial_cost = reg_cost(theta_vals, x_vals, y_vals_train, lambda1)
 print "Our initial cost value is %g." %(initial_cost)
 	
 # Use scipys minimize function to compute the theta values
-minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', tol = 1e-4, jac = backprop, args = (x_vals_modified, y_vals_train, lambda1))#, options = {'disp': True}
+minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', tol = 1e-4, jac = backprop, args = (x_vals, y_vals_train, lambda1))#, options = {'disp': True}
 
 # Set up the new theta values we hav from our minimize function
 theta_new = minimum.x
 
-final_cost = reg_cost(theta_new, x_vals_modified, y_vals_train, lambda1)
+final_cost = reg_cost(theta_new, x_vals, y_vals_train, lambda1)
 print "Our final cost value is %g." %(final_cost)
 
 # Save the theta values to use later
-np.savetxt('finalMNIST500.out', theta_new, delimiter = ',')
+np.savetxt('outputs/finalMNIST5000.out', theta_new, delimiter = ',')
 

@@ -1,4 +1,4 @@
-#PBS -N run_theta500
+#PBS -N run_MNIST_theta5000
 #PBS -l walltime=30:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u nn_cost_func.py >& output.log
+python -u largerData.py >& output.log

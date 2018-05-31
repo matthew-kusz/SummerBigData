@@ -1,0 +1,16 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/CourseraExcercise4
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=00:03:12
+walltime=00:03:18
+mem=1.173 GB
+vmem=1.706 GB
+-----------------------
+Resource units charged (estimate):
+0.022 RUs
+-----------------------
