@@ -44,14 +44,12 @@ x_vals = x_vals / 255.0
 x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
 y_vals = read_idx('data/t10k-labels-idx1-ubyte.gz', size)
 y_vals = np.reshape(y_vals, (len(y_vals), 1))
-print x_vals.shape
-print y_vals.shape
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)                               # Number of training examples (rows)
-n = len(x_vals[0])                            # Number of columns
 arr_ones = np.ones((m, 1))
 x_vals = np.hstack((arr_ones, x_vals))
+n = len(x_vals[0])                            # Number of columns
 
 # Import the theta valus that we found earlier
 theta = np.genfromtxt("outputs/finalMNIST500.out")
@@ -71,12 +69,17 @@ correct_guess = np.zeros((10, 1))
 for i in range(len(best_prob)):
 	if (best_prob[i] == int(y_vals[i])):
 		correct_guess[int(y_vals[i])] = correct_guess[int(y_vals[i])] + 1
-	
-	if (best_prob[i] == 0 and int(y_vals[i]) == 10):
-		correct_guess[0] = correct_guess[0] + 1
-	
+
+# Find how many of each number of our array y has
+y_digits = np.zeros((10, 1))
+for i in range(10):
+	for j in range(len(y_vals)):
+		if (y_vals[j] == i):
+			y_digits[i] = y_digits[i] + 1
+
 # Calculate the percentage
-correct_guess = (correct_guess / 500) * 100
+for i in range(len(correct_guess)):
+	correct_guess[i] = (correct_guess[i] / y_digits[i]) * 100
 
 # Check the results
 print correct_guess
