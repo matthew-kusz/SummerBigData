@@ -130,3 +130,19 @@ combined_images = np.concatenate((total_images2, total_images3, total_images4), 
 
 plt.imshow(combined_images, cmap = 'binary')
 plt.show()
+
+# Now lets visual our theta2
+theta_vals1_modified = theta_vals1[:, 1:26]
+
+image5 = image
+
+# Plotting 0 to 9
+for i in range (len(image5)):
+	temp = np.reshape(theta_vals1_modified[i], (5, 5))
+	temp = temp.T
+	image2[i] = temp
+
+total_images5 = np.concatenate((image5[0], white_space, image5[1], white_space, image5[2], white_space, image5[3], white_space,image5[4], white_space, image5[5], white_space, image5[6], white_space,image5[7], white_space,image5[8], white_space,image5[9], white_space), axis = 1)
+
+plt.imshow(image5[0], cmap = 'binary')
+plt.show()
