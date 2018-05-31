@@ -25,7 +25,6 @@ def reg_cost(theta, arr_x, arr_y, lambda1):
 	cost2 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta1 ** 2) - np.sum(arr_theta1[:,0] ** 2))
 	cost3 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta2 ** 2) - np.sum(arr_theta2[:,0] ** 2))
 	cost = cost1 + cost2 + cost3
-	print cost
 	return cost
 
 # Feedforward
@@ -164,7 +163,7 @@ theta_vals = np.concatenate((random_theta1_1D, random_theta2_1D), axis = 1)
 
 
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
-# print scipy.optimize.check_grad(reg_cost, backprop, theta_vals, x_vals, y_vals_train, lambda1)
+print scipy.optimize.check_grad(reg_cost, backprop, theta_vals, x_vals, y_vals_train, lambda1)
 # Recieved a value of 4.95e-06
 
 
@@ -179,7 +178,7 @@ initial_cost = reg_cost(theta_vals, x_vals, y_vals, lambda1)
 print "Our initial cost value is %g." %(initial_cost)
 	
 # Use scipys minimize function to compute the theta values
-minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', tol = 1e-4, jac = backprop, args = (x_vals, y_vals_train, lambda1))#, options = {'disp': True}
+# minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta_vals, method = 'CG', tol = 1e-4, jac = backprop, args = (x_vals, y_vals_train, lambda1))#, options = {'disp': True}
 
 # Set up the new theta values we hav from our minimize function
 theta_new = minimum.x
