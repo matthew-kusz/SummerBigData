@@ -44,8 +44,6 @@ x_vals = x_vals / 255.0
 x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
 y_vals = read_idx('data/t10k-labels-idx1-ubyte.gz', size)
 y_vals = np.reshape(y_vals, (len(y_vals), 1))
-print x_vals.shape
-print y_vals.shape
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)                               # Number of training examples (rows)
@@ -78,16 +76,7 @@ for i in range(10):
 	for j in range(len(y_vals)):
 		if (y_vals[j] == i):
 			y_digits[i] = y_digits[i] + 1
-print y_digits[0]
-print y_digits[1]
-print y_digits[2]
-print y_digits[3]
-print y_digits[4]
-print y_digits[5]
-print y_digits[6]
-print y_digits[7]
-print y_digits[8]
-print y_digits[9]
+
 # Calculate the percentage
 for i in range(len(correct_guess)):
 	correct_guess[i] = (correct_guess[i] / y_digits[i]) * 100
