@@ -83,4 +83,3 @@ for i in range(len(correct_guess)):
 
 # Check the results
 print correct_guess
-
