@@ -37,6 +37,12 @@ def reg_cost(theta, arr_x, arr_y, lambda1):
 	cost2 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta1 ** 2) - np.sum(arr_theta1[:,0] ** 2))
 	cost3 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta2 ** 2) - np.sum(arr_theta2[:,0] ** 2))
 	cost = cost1 + cost2 + cost3
+
+	# Incase we get booted early
+	if (global_iterations % 20 == 0):
+		print cost
+		np.savetxt(file_name, theta, delimiter = ',')
+
 	return cost
 
 # Feedforward
@@ -108,8 +114,14 @@ def rand_sample(arr_x, arr_y):
 
 	return arr_xy
 
+# Keep track of how many times our minimize function iterates
+global_iterations = 0
+
+# Change the file name here
+file_name = 'outputs/finalMNIST40000Hour3.out'
+
 # Set up how large we want our data set (max of 60,000)
-size = 5000
+size = 40000
 
 # Extract the MNIST training data sets
 x_vals = read_idx('data/train-images-idx3-ubyte.gz', size)
@@ -192,5 +204,5 @@ final_cost = reg_cost(theta_new, x_vals, y_vals_train, lambda1)
 print "Our final cost value is %g." %(final_cost)
 
 # Save the theta values to use later
-np.savetxt('outputs/finalMNIST5000.out', theta_new, delimiter = ',')
+np.savetxt(file_name, theta_new, delimiter = ',')
 

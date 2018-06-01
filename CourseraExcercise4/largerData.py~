@@ -6,37 +6,7 @@ import scipy.optimize
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Reading in MNIST data files
-def read_images(filename, n=None):
-	f = gzip.open(filename)
-	f.seek(0)
-	magic_num = st.unpack('>4B', f.read(4))
-	num_img = st.unpack('>I', f.read(4))[0]
-	if not n is None:
-		num_img = n
-	num_row = st.unpack('>I', f.read(4))[0]
-	num_col = st.unpack('>I', f.read(4))[0]
-	
-	X = np.zeros((num_img, num_row * num_col))	
-	total_bytes = num_img * num_row * num_col
-	X = np.asarray(
-		st.unpack('>' + 'B'*total_bytes, f.read(total_bytes))).reshape((num_img, num_row * num_col))
-	f.close()
-	return X/255
-
-def read_labels(filename, n=None):
-	f = gzip.open(filename)
-	f.seek(0)
-	magic_num = st.unpack('>4B', f.read(4))
-	num_label = st.unpack('>I', f.read(4))[0]
-	if not n is None:
-		num_label = n
-	
-	y = np.asarray(
-		st.unpack('>' + 'B'*num_label, f.read(num_label)))
-	f.close()
-	return y	
-
+# Reading in MNIST data files	
 def read_idx(filename, n=None):
 	with gzip.open(filename) as f:
 		zero, dtype, dims = st.unpack('>HBB', f.read(4))
@@ -67,6 +37,12 @@ def reg_cost(theta, arr_x, arr_y, lambda1):
 	cost2 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta1 ** 2) - np.sum(arr_theta1[:,0] ** 2))
 	cost3 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta2 ** 2) - np.sum(arr_theta2[:,0] ** 2))
 	cost = cost1 + cost2 + cost3
+
+	# Incase we get booted early
+	if (global_iterations % 20 == 0):
+		print cost
+		np.savetxt(file_name, theta, delimiter = ',')
+
 	return cost
 
 # Feedforward
@@ -138,12 +114,16 @@ def rand_sample(arr_x, arr_y):
 
 	return arr_xy
 
-'''
-The x array is under the name 'X', the y array is under the name 'y'
-x_vals ia a (5000, 400) array and y_vals is a (5000, 1) array
-'''
-size = 5000
+# Keep track of how many times our minimize function iterates
+global_iterations = 0
 
+# Change the file name here
+file_name = 'outputs/finalMNIST60000Hour3.out'
+
+# Set up how large we want our data set (max of 60,000)
+size = 60000
+
+# Extract the MNIST training data sets
 x_vals = read_idx('data/train-images-idx3-ubyte.gz', size)
 x_vals = x_vals / 255.0
 x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
@@ -194,15 +174,15 @@ print J_val
 
 # Randomly initialize our theta values in a range [-0.12, 0.12]
 n = len(x_vals[0])   # Number of columns
-random_theta1 = np.random.rand(25, n)                        # (25, 401) matrix
+random_theta1 = np.random.rand(25, n)                        # (25, 784) matrix
 random_theta1 = random_theta1 * 2 * 0.12 - 0.12
 
 random_theta2 = np.random.rand(10, len(random_theta1) + 1)   # (10, 26) matrix
 random_theta2 = random_theta2 * 2 * 0.12 - 0.12
 
 # Combine these into a 1-dimension vector
-random_theta1_1D = np.ravel(random_theta1)   # 10025 1-D vector
-random_theta2_1D = np.ravel(random_theta2)   # 260 1_D vector
+random_theta1_1D = np.ravel(random_theta1)   
+random_theta2_1D = np.ravel(random_theta2)   
 theta_vals = np.concatenate((random_theta1_1D, random_theta2_1D), axis = 1)
 
 
@@ -224,5 +204,5 @@ final_cost = reg_cost(theta_new, x_vals, y_vals_train, lambda1)
 print "Our final cost value is %g." %(final_cost)
 
 # Save the theta values to use later
-np.savetxt('outputs/finalMNIST5000.out', theta_new, delimiter = ',')
+np.savetxt(file_name, theta_new, delimiter = ',')
 

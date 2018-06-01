@@ -1,0 +1,17 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/CourseraExcercise4
+=>> PBS: job killed: walltime 10846 exceeded limit 10800
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=03:00:29
+walltime=03:00:55
+mem=0.442 GB
+vmem=0.972 GB
+-----------------------
+Resource units charged (estimate):
+1.206 RUs
+-----------------------
