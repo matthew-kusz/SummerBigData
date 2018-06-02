@@ -1,5 +1,5 @@
-#PBS -N run_MNIST_theta40000_2
-#PBS -l walltime=3:00:00
+#PBS -N run_MNIST_theta60000_L100
+#PBS -l walltime=1:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe

@@ -52,7 +52,7 @@ x_vals = np.hstack((arr_ones, x_vals))
 n = len(x_vals[0])                            # Number of columns
 
 # Import the theta valus that we found earlier
-theta = np.genfromtxt("outputs/finalMNIST60000Hour3.out")
+theta = np.genfromtxt("outputs/finalMNIST60000Hour1.out")
 theta_vals1 = np.reshape(theta[0:25 * n], (25, n))
 theta_vals2 = np.reshape(theta[25 * n: len(theta)], (10, 26))
 

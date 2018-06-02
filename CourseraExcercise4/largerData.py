@@ -118,10 +118,10 @@ def rand_sample(arr_x, arr_y):
 global_iterations = 0
 
 # Change the file name here
-file_name = 'outputs/finalMNIST40000Hour3.out'
+file_name = 'outputs/finalMNIST60000Hour1L100.out'
 
 # Set up how large we want our data set (max of 60,000)
-size = 40000
+size = 60000
 
 # Extract the MNIST training data sets
 x_vals = read_idx('data/train-images-idx3-ubyte.gz', size)
@@ -133,7 +133,7 @@ print x_vals.shape
 print y_vals.shape
 
 #Set what lambda value we want to use
-lambda1 = 1
+lambda1 = 100
 
 # Add a column of ones to our array of x_vals
 m = len(x_vals)                               # Number of training examples (rows)
