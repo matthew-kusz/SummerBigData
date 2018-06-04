@@ -1,0 +1,42 @@
+# Import the necessary packages
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.io
+import random
+
+####### Generate training set #######
+
+# Extract the provided data. We need to use scipy since the data is in a matlab file format
+images_data = scipy.io.loadmat('starter/IMAGES.mat')
+
+# The images that we need to extract are under the name 'IMAGES'
+images = images_data['IMAGES']
+print images.shape
+
+patch_size = 8       # We want to use 8x8 patches
+num_patches = 10000  # Total number of patches we will have
+
+# Set up an array of zeros for the patches (64, 10000)
+patches = np.zeros((patch_size ** 2, num_patches))
+
+# Let's look at one of the images
+pick_image = 0
+pick_image = int(input('Enter digit representing an image (0-9):'))
+while (pick_image > 9 or pick_image < 0):
+	pick_image = int(input('Please pick a digit in the range 0-9:'))
+
+image = images[:,:, pick_image]
+plt.imshow(image, cmap = 'binary')
+plt.show()
+
+# Now we want to break the image up into patches
+for i in range(len(patches[0])):
+	int_random = random.randint(0, 504)
+	temp = image[int_random: int_random + 8, int_random: int_random + 8]
+	temp = np.reshape(temp, (64, 1))
+	patches[:, i:i+1] = temp
+
+# Check to make sure our code is running correctly
+image2 = np.reshape(patches[:,0:1], (8, 8))
+plt.imshow(image2, cmap = 'binary', interpolation = 'none')
+plt.show()
