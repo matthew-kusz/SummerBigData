@@ -28,7 +28,7 @@ def feedforward(theta1, theta2, arr_x):
 
 
 # Import the theta valus that we found earlier
-theta = np.genfromtxt("output/finalThetasRandom5000.out")
+theta = np.genfromtxt("outputs/finalThetasRandom5000.out")
 theta_vals1 = np.reshape(theta[0:25 * 401], (25, 401))
 theta_vals2 = np.reshape(theta[25 * 401: len(theta)], (10, 26))
 
@@ -78,7 +78,7 @@ for i in range (len(image)):
 total_images = np.concatenate((image[0], white_space, image[1], white_space, image[2], white_space, image[3], white_space,image[4], white_space, image[5], white_space, image[6], white_space,image[7], white_space,image[8], white_space,image[9], white_space), axis = 1)
 
 # Plot the results
-plt.imshow(total_images, cmap = 'binary')
+plt.imshow(total_images, cmap = 'binary', interpolation = 'none')
 plt.show()
 
 # Let's look at what theta_vals1 looks like
@@ -101,7 +101,7 @@ for i in range (len(image2)):
 total_images2 = np.concatenate((image2[0], white_space2, image2[1], white_space2, image2[2], white_space2, image2[3], white_space2, image2[4], white_space2, image2[5], white_space2, image2[6], white_space2, image2[7], white_space2, image2[8], white_space2, image2[9], white_space2), axis = 1)
 
 # Plot the results
-plt.imshow(image2[0], cmap = 'binary')
+plt.imshow(image2[0], cmap = 'binary', interpolation = 'none')
 plt.show()
 
 # Set up an array thet holds the images
@@ -128,7 +128,7 @@ total_images4 = np.concatenate((image4[0], white_space2, image4[1], white_space2
 
 combined_images = np.concatenate((total_images2, total_images3, total_images4), axis = 0)
 
-plt.imshow(combined_images, cmap = 'binary')
+plt.imshow(combined_images, cmap = 'binary', interpolation = 'none')
 plt.show()
 
 # Now lets visual our theta2
@@ -144,5 +144,5 @@ for i in range (len(image5)):
 
 total_images5 = np.concatenate((image5[0], white_space, image5[1], white_space, image5[2], white_space, image5[3], white_space,image5[4], white_space, image5[5], white_space, image5[6], white_space,image5[7], white_space,image5[8], white_space,image5[9], white_space), axis = 1)
 
-plt.imshow(image5[0], cmap = 'binary')
+plt.imshow(image5[0], cmap = 'binary', interpolation = 'none')
 plt.show()
