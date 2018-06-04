@@ -50,11 +50,11 @@ y_vals = np.reshape(y_vals, (len(y_vals), 1))
 # Rotate the images (not working properly)
 for i in range(len(x_vals)):
 	temp = np.reshape(x_vals[i], (28, 28))
-	temp = scipy.ndimage.rotate(temp, 150, reshape = False)
+	temp = scipy.ndimage.rotate(temp, 30, reshape = False)
 	temp = np.ravel(temp)
 	x_vals[i] = temp
 
-
+print x_vals[0]
 # Add a column of ones to our array of x_vals
 m = len(x_vals)                               # Number of training examples (rows)
 arr_ones = np.ones((m, 1))
