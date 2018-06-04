@@ -10,7 +10,7 @@ def sigmoid(value):
 	return 1.0 / (1.0 + np.exp(-value))
 
 # Regularized cost function
-def reg_cost(theta, arr_x, arr_y, lambda1):	
+def reg_cost(theta, arr_x, arr_y):	
 	# Reshape our thetas back into their original shape  
 	arr_theta1 = np.reshape(theta[0:25 * n], (25, n))
 	arr_theta2 = np.reshape(theta[25 * n: len(theta)], (10, 26))
@@ -18,20 +18,24 @@ def reg_cost(theta, arr_x, arr_y, lambda1):
 	# Find our hypothesis
 	h, nano = feedforward(arr_theta1, arr_theta2, arr_x)
 
+	# Find the average activation of each hidden unit averaged over the training set
+	rho_hat = (1.0 / m) * 
+
 	# Calculate the cost
-	first_half = np.multiply(arr_y, np.log(h))
-	second_half = np.multiply((1.0 - arr_y), np.log(1.0 - h))
+	first_third = np.multiply(arr_y, np.log(h))
+	second_third = np.multiply((1.0 - arr_y), np.log(1.0 - h))
+	third_third = global_beta * (global_rho * log(global_rho / rho_hat) + (1 - global_rho) * log((1 - global_rho) / (1 - rho_hat)))
 
 	cost1 = np.sum((-1.0 / m) * (first_half + second_half))
 	cost2 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta1 ** 2) - np.sum(arr_theta1[:,0] ** 2))
 	cost3 = (lambda1 / (2.0 * m)) * (np.sum(arr_theta2 ** 2) - np.sum(arr_theta2[:,0] ** 2))
-	cost = cost1 + cost2 + cost3
-
+	cost = cost1 + cost2 + cost3 + third_third
+	'''
 	# Incase we get booted early
 	if (global_iterations % 20 == 0):
 		print cost
 		np.savetxt(file_name, theta, delimiter = ',')
-
+	'''
 	return cost
 
 # Feedforward
@@ -50,21 +54,26 @@ def feedforward(theta1, theta2, arr_x):
 	return a3, a2
 
 # Backpropagation
-def backprop(theta, arr_x, arr_y_train, lambda1):
+def backprop(theta, arr_x, arr_y_train):
 	# Change our theta values back into their original shape
-	arr_theta1 = np.reshape(theta[0:25 * n], (25, n))
-	arr_theta2 = np.reshape(theta[25 * n: len(theta)], (10, 26))
+	arr_theta1 = np.reshape(theta[0:global_hidden_size * n], (global_hidden_size, n))
+	arr_theta2 = np.reshape(theta[global_hidden_size * n: len(theta)], (10, 26))
 
 	a3, a2 = feedforward(arr_theta1, arr_theta2, arr_x)
 	Delta2 = 0
 	Delta1 = 0
-	
+
+	# Find the average activation of each hidden unit averaged over the training set
+	rho_hat = (1.0 / m) * 	
+
 	for i in range(len(arr_x)):
 		delta3 = a3[i] - arr_y_train[i]                   # Vector length 10
 		
 		delta3 = np.reshape(delta3, (len(delta3), 1))     # (10, 1) matrix
 		temp_a2 = np.reshape(a2[i], (len(a2[i]), 1))      # (26, 1) matrix
-		delta2 = np.multiply(np.dot(arr_theta2.T, delta3), temp_a2 * (1 - temp_a2))
+		# Add in sparsity parameter
+		KL_divergence = global_beta * (-(global_rho / rho_hat) + (1 - global_rho) / (1 - rho_hat)
+		delta2 = np.multiply((np.dot(arr_theta2.T, delta3) + KL_divergence), temp_a2 * (1 - temp_a2))
 
 		Delta2 = Delta2 + np.dot(delta3, temp_a2.T)       # (10, 26) matrix
 		temp_arr_x = np.reshape(arr_x[i], (len(arr_x[i]), 1))
@@ -77,9 +86,9 @@ def backprop(theta, arr_x, arr_y_train, lambda1):
 	D2_temp = (1.0 / m) * Delta2
 	
 	# Compute the regularized gradient
-	D1 = (1.0 / m) * Delta1 + (lambda1 / float(m)) * arr_theta1
+	D1 = (1.0 / m) * Delta1 + (global_lambda1 / float(m)) * arr_theta1
 	D1[0:, 0:1] = D1_temp[0:, 0:1]    # (25, 401) matrix
-	D2 = (1.0 / m) * Delta2 + (lambda1 / float(m)) * arr_theta2
+	D2 = (1.0 / m) * Delta2 + (global_lambda1 / float(m)) * arr_theta2
 	D2[0:, 0:1] = D2_temp[0:, 0:1]    # (10, 26) matrix
 
 	# Changed the gradient into a one dimensional vector
@@ -127,3 +136,27 @@ plt.imshow(image2, cmap = 'binary', interpolation = 'none')
 # plt.show()
 
 ####### Sparse autoencoder objective #######
+global_visible_size = 64
+global_hidden_size = 25
+global_lambda1 = 1
+global_beta = 3
+global_rho = 1              # Sparsity parameter
+
+# We need to add a row of ones onto patches
+
+
+# Initialize parameters randomly based on layer sizes.
+r  = sqrt(6) / sqrt(hiddenSize+visibleSize+1);   # We'll choose weights uniformly from the interval [-r, r]
+random_theta1 = np.random.rand(global_hidden_size, global_visible_size)      # (25, 64) matrix
+random_theta1 = random_theta1 * 2 * r - r
+random_theta2 = np.random.rand(global_visible_size + 1, global_hidden_size)      # (65, 25) matrix      
+random_theta2 = random_theta2 * 2 * r - r
+
+# Combine these into a 1-dimension vector
+random_theta1_1D = np.ravel(random_theta1)   
+random_theta2_1D = np.ravel(random_theta2)   
+theta_vals = np.concatenate((random_theta1_1D, random_theta2_1D), axis = 1)
+
+# Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
+# print scipy.optimize.check_grad(reg_cost, backprop, theta_vals, x_vals, y_vals_train)
+# Recieved a value of N/A
