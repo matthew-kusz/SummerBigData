@@ -41,13 +41,13 @@ plt.ylabel('Average accuracy')
 plt.show()
 
 # Plot with different lambdas for 60,000 training set
-x3 = [1, 2, 3, 4]
-averages2 = [95.58, 95.64, 95.8, 93.19]
+x3 = [1, 2, 3, 4, 5]
+averages2 = [95.84, 95.58, 95.64, 95.8, 93.19]
 plt.bar(x3, averages2, align = 'center', color = 'red')
 plt.title('Accuracy Using 60,000 Training Set with Different Lambda Values (1 hour)')
 plt.ylim(90)
 plt.xlabel('Lambda')
-plt.xticks(x3, [0.1, 1, 10, 100])
+plt.xticks(x3, [0.01, 0.1, 1, 10, 100])
 plt.ylabel('Average accuracy')
 plt.show()
 
