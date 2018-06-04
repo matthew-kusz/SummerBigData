@@ -29,21 +29,33 @@ y_vals = np.reshape(y_vals, (len(y_vals), 1))
 print x_vals.shape
 print y_vals.shape
 
+'''
 # Set up a an array of random 10 images [a (10, 400) vector]
 random_images = np.random.randint(0, x_vals.shape[0] - 1, 10)
 images = x_vals[random_images]
 print images.shape
+'''
 
-# Now reshape images back into (20, 20) matrices and transpose to flip images right-side up
+# Setting up an array of images from 0 to 9
+ordered = np.zeros((10,784))
+ordered[0] = x_vals[1]
+ordered[1] = x_vals[3]
+ordered[2] = x_vals[5]
+ordered[3] = x_vals[7]
+ordered[4] = x_vals[2]
+ordered[5] = x_vals[0]
+ordered[6] = x_vals[13]
+ordered[7] = x_vals[15]
+ordered[8] = x_vals[17]
+ordered[9] = x_vals[4]
+
+# Now reshape images back into (28, 28) matrices
 image = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
-image2 = image
 
 # Rotating the image
-for i in range(len(random_images)):
-	temp = np.reshape(images[i], (28, 28))
-	print temp.shape
-	temp = scipy.ndimage.rotate(temp, 45, reshape = False)
-	print temp.shape
+for i in range(len(ordered)):
+	temp = np.reshape(ordered[i], (28, 28))
+	temp = scipy.ndimage.rotate(temp, 180, reshape = False)
 	image[i] = temp
 
 # Put all the images together
