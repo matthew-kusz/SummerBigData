@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 # Set up the data
 train500 = [93.5, 96.7, 84.2, 82.4, 85.3, 70.7, 88.7, 88.6, 76.2, 78.2]
@@ -40,11 +41,11 @@ plt.xticks(x2, [500, 5000, 10000, 20000, 40000, 60000])
 plt.ylabel('Average accuracy')
 plt.show()
 
-# Plot with different lambdas for 60,000 training set
+# Plot with different lambdas for 30,000 training set
 x3 = [1, 2, 3, 4, 5]
-averages2 = [95.84, 95.58, 95.64, 95.8, 93.19]
+averages2 = [93.28, 94.72, 94.22, 95.08, 91.39]
 plt.bar(x3, averages2, align = 'center', color = 'red')
-plt.title('Accuracy Using 60,000 Training Set with Different Lambda Values (1 hour)')
+plt.title('Accuracy Using 30,000 Training Set with Different Lambda Values')
 plt.ylim(90)
 plt.xlabel('Lambda')
 plt.xticks(x3, [0.01, 0.1, 1, 10, 100])
@@ -63,3 +64,44 @@ plt.xlabel('Number')
 plt.ylabel('Percentage of correct guesses')
 plt.xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 plt.show()
+
+# Plotting the avergae accuracy for the rotated test points
+x5 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 150, 155, 160, 165, 170, 175, 180]
+avg_rot = [95.51, 95.23, 93.7, 90.17, 84.37, 75.65, 65.74, 55.16, 45.95, 37.42, 29.99, 24.73, 20.58, 18.2, 16.83, 16.14, 15.41, 14.47, 13.1, 12.97, 12, 11.48, 11.36, 12.11, 12.78, 14.02, 15.12, 16.08, 16.65, 17.67, 18.67, 20.49, 21.67, 22.96, 24.04, 24.67, 25.1]
+fig5 = plt.figure()
+ax = plt.axes()
+plt.bar(x5, avg_rot, width = 2, align = 'center', color = 'red')
+plt.title('Avg. Accuracy from 60,000 Training Set (Ran 3 Hours) on Rotated Test Sets')
+plt.xlim(left = -1, right = 181)
+plt.xlabel('Number')
+plt.ylabel('Average Accuracy')
+ax.xaxis.set_major_locator(ticker.MultipleLocator(15))
+plt.show()
+
+# Plotting the average accuracy for the rotated test points
+x6 = [0, 1, 2, 3, 4, 5, 6, 7, 8 ,9]
+x6 = np.reshape(x6, (len(x6), 1))
+acc0 = [97.86, 98.77, 94.48, 95.45, 95.82, 93.95, 96.45, 94.36, 94.46, 93.56]
+acc30 = [93.37, 68.19, 45.46, 72.38, 45.93, 66.14, 79.12, 46.98, 64.48, 75.32]
+acc60 = [62.35, 11.63, 3.29, 20.89, 12.63, 14.01, 20.88, 28.02, 11.5, 20.61]
+acc90 = [45, 0, 2.03, 3.66, 10.39, 4.04, 3.24, 41.54, 5.75, 16.25]
+acc120 = [49.49, 2.38, 7.66, 1.49, 8.66, 12.11, 1.04, 18.19, 17.04, 9.71]
+acc150 = [48.27, 43.08, 4.94, 0.79, 27.6, 29.48, 0, 1.95, 28.34, 2.27]
+acc180 = [51.33, 67.84, 17.73, 0.5, 23.01, 39.8, 0.1, 0.58, 49.59, 0.5]
+fig6 = plt.figure()
+plt.bar(x - 0.36, acc0, width = 0.12, align = 'center', color = 'goldenrod')
+plt.bar(x - 0.24, acc30, width = 0.12, align = 'center', color = 'blue')
+plt.bar(x - 0.12, acc60, width = 0.12, align = 'center', color = 'green')
+plt.bar(x, acc90, width = 0.12, align = 'center', color = 'lawngreen')
+plt.bar(x + 0.12, acc120, width = 0.12, align = 'center', color = 'black')
+plt.bar(x + 0.24, acc150, width = 0.12, align = 'center', color = 'purple') 
+plt.bar(x + 0.36, acc180, width = 0.12, align = 'center', color = 'firebrick')
+plt.xticks([0, 1, 2, 3, 4, 5, 6, 7, 8 ,9])
+plt.xlim(left = -0.5, right = 9.5)
+plt.xlabel("Number")
+plt.ylim( 0 ,105)
+plt.ylabel('Percentage of correct guesses')
+plt.legend([0, 30, 60, 90, 120, 150, 180], loc = 'upper right', ncol = 7, prop = {'size': 9})
+plt.title('Accuracy from 60,000 Training Set (Ran 3 Hours) on Rotated Test Sets')
+plt.show()
+

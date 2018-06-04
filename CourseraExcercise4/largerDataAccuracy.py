@@ -1,4 +1,5 @@
 # Import the necessary pachages
+import scipy.ndimage
 import struct as st
 import gzip
 import scipy.io
@@ -45,6 +46,15 @@ x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2]
 y_vals = read_idx('data/t10k-labels-idx1-ubyte.gz', size)
 y_vals = np.reshape(y_vals, (len(y_vals), 1))
 
+
+# Rotate the images (not working properly)
+for i in range(len(x_vals)):
+	temp = np.reshape(x_vals[i], (28, 28))
+	temp = scipy.ndimage.rotate(temp, 180, reshape = False)
+	temp = np.ravel(temp)
+	x_vals[i] = temp
+
+
 # Add a column of ones to our array of x_vals
 m = len(x_vals)                               # Number of training examples (rows)
 arr_ones = np.ones((m, 1))
@@ -52,7 +62,7 @@ x_vals = np.hstack((arr_ones, x_vals))
 n = len(x_vals[0])                            # Number of columns
 
 # Import the theta valus that we found earlier
-theta = np.genfromtxt("outputs/finalMNIST60000Hour1L0.01.out")
+theta = np.genfromtxt("outputs/finalMNIST60000Hour3.out")
 theta_vals1 = np.reshape(theta[0:25 * n], (25, n))
 theta_vals2 = np.reshape(theta[25 * n: len(theta)], (10, 26))
 
