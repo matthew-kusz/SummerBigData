@@ -151,9 +151,12 @@ pick_image = int(input('Enter digit representing an image (0-9):'))
 while (pick_image > 9 or pick_image < 0):
 	pick_image = int(input('Please pick a digit in the range 0-9:'))
 
+
 image = images[:,:, pick_image]
+'''
 plt.imshow(image, cmap = 'binary')
-# plt.show()
+plt.show()
+'''
 
 # Now we want to break the image up into patches
 for i in range(len(patches[0])):
@@ -162,10 +165,12 @@ for i in range(len(patches[0])):
 	temp = np.reshape(temp, (64, 1))
 	patches[:, i:i+1] = temp
 
+'''
 # Check to make sure our code is running correctly
 image2 = np.reshape(patches[:,0:1], (8, 8))
 plt.imshow(image2, cmap = 'binary', interpolation = 'none')
-# plt.show()
+plt.show()
+'''
 
 ####### Sparse autoencoder objective #######
 m = len(patches[0])
@@ -173,7 +178,7 @@ m = len(patches[0])
 # Tranpose patches the the dimension we want
 patches = patches.T                        # (10000, 64)
 y = patches
-
+print patches[0:5]
 # Create our weights and bias terms
 theta1 = weights_bias()
 

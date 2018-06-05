@@ -17,6 +17,7 @@ global_alpha = 1
 ####### Definitions #######
 # Sigmoid function
 def sigmoid(value):
+	print 1.0 / (1.0 + np.exp(-value))
 	return 1.0 / (1.0 + np.exp(-value))
 
 # Regularized cost function
@@ -140,7 +141,7 @@ images_data = scipy.io.loadmat('starter/IMAGES.mat')
 images = images_data['IMAGES']
 
 patch_size = 8       # We want to use 8x8 patches
-num_patches = 200  # Total number of patches we will have
+num_patches = 100  # Total number of patches we will have
 
 # Set up an array of zeros for the patches (64, 10000)
 patches = np.zeros((patch_size ** 2, num_patches))
@@ -151,9 +152,12 @@ pick_image = int(input('Enter digit representing an image (0-9):'))
 while (pick_image > 9 or pick_image < 0):
 	pick_image = int(input('Please pick a digit in the range 0-9:'))
 
+
 image = images[:,:, pick_image]
+'''
 plt.imshow(image, cmap = 'binary')
-# plt.show()
+plt.show()
+'''
 
 # Now we want to break the image up into patches
 for i in range(len(patches[0])):
@@ -162,10 +166,12 @@ for i in range(len(patches[0])):
 	temp = np.reshape(temp, (64, 1))
 	patches[:, i:i+1] = temp
 
+'''
 # Check to make sure our code is running correctly
 image2 = np.reshape(patches[:,0:1], (8, 8))
 plt.imshow(image2, cmap = 'binary', interpolation = 'none')
-# plt.show()
+plt.show()
+'''
 
 ####### Sparse autoencoder objective #######
 m = len(patches[0])
