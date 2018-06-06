@@ -67,6 +67,7 @@ for i in range(m):
 for i in range(m):
 	patches[i] = ((patches[i] - patches[i].min()) / (patches[i].max() - patches[i].min())) * (new_max - new_min) + new_min
 
+# Plot an image of a1 and a3 side by side to see how accurate the output is to the original
 blackspace = np.ones((8,1))
 blackspace2 = np.ones((1,17))
 all1 = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]

@@ -56,7 +56,7 @@ new_max = 1
 patches = ((patches - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
 
 # Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsL0.0001B3Rho0.01.out')
+theta_final = np.genfromtxt('outputs/finalWeightsL0.00001B3Rho0.01.out')
 
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 a3_final, a2_final = feedforward(W1_final, W2_final, b1_final, b2_final, patches)
