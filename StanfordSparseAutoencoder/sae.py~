@@ -7,11 +7,10 @@ import random
 import math
 
 ####### Global variables #######
-global_step = 0
 global_visible_size = 64
 global_hidden_size = 25
-global_lambda = 1
-global_beta = 1
+global_lambda = 0.00001
+global_beta = 3
 global_rho = 0.01              # Sparsity parameter
 
 ####### Definitions #######
@@ -135,10 +134,8 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
-####### Sparse autoencoder objective #######
 patches = np.genfromtxt('outputs/10KRandom8x8.out')
 patches = np.reshape(patches, (64, 10000))
-print patches.shape
 m = len(patches[0])
 
 # We need to values in patches to range from 0 to 1
@@ -146,7 +143,7 @@ old_min = -1
 old_max = 1
 new_min = 0
 new_max = 1
-patches = ((patches - old_min) / (old_max - old_min)) * (old_max - new_min) + new_min
+patches = ((patches - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
 
 # Tranpose patches to the dimension we want
 patches = patches.T                        # (10000, 64)
@@ -163,12 +160,16 @@ print cost_test
 
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
 print scipy.optimize.check_grad(reg_cost, backprop, theta1, patches, y)
-# Recieved a value of N/A
+# Recieved a value of 6e-6
 '''
 
 print 'Cost before minimization: %g' %(reg_cost(theta1, patches, y))
 
+# Minimize the cost value
 minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'CG', tol = 1e-4, jac = backprop, args = (patches, y))
 theta_new = minimum.x
 
 print 'Cost after minimization: %g' %(reg_cost(theta_new, patches, y))
+
+# Save to a file to use later
+np.savetxt('outputs/finalWeightsL0.00001B3Rho0.01.out', theta_new, delimiter = ',')
