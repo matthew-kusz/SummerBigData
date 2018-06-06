@@ -7,11 +7,12 @@ import random
 import math
 
 ####### Global variables #######
+global_step = 0
 global_visible_size = 64
 global_hidden_size = 25
 global_lambda = 1
 global_beta = 1
-global_rho = 0.05              # Sparsity parameter
+global_rho = 0.01              # Sparsity parameter
 
 ####### Definitions #######
 # Sigmoid function
@@ -37,7 +38,14 @@ def reg_cost(theta, arr_x, arr_y):
 	cost2 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W1, arr_W1)))
 	cost3 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W2, arr_W2)))
 	cost = cost1 + cost2 + cost3 + KL_divergence
-		
+	'''
+	# To keep track of our iterations
+	global_step += 1
+	if (global_step % 20 == 0):
+		print 'cost = %g' %(cost)
+		print 'Global step: %g' %(global_step)
+	'''	
+	
 	return cost
 
 # Feedforward
@@ -57,6 +65,7 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	return a3, a2
 
 # Backpropagation
+global_step = 0
 def backprop(theta, arr_x, arr_y):
 	# Change our weights and bias values back into their original shape
 	arr_W1, arr_W2, arr_b1, arr_b2 = reshape(theta)
@@ -74,29 +83,13 @@ def backprop(theta, arr_x, arr_y):
 	# Compute the partial derivatives
 	pd_W1 = np.dot(delta2.T, arr_x)  # (25, 64)
 	pd_W2 = np.dot(delta3.T, a2)     # (64, 25)
-	pd_b1 = np.sum(delta2, axis = 0) # (25,) vector
-	pd_b2 = np.sum(delta3, axis = 0) # (64,) vector
+	pd_b1 = np.mean(delta2, axis = 0) # (25,) vector
+	pd_b2 = np.mean(delta3, axis = 0) # (64,) vector
 
-	'''
-	# Computing the batch gradient
-	del_W1 = np.zeros((len(pd_W1), len(pd_W1[0])))
-	del_W2 = np.zeros((len(pd_W2), len(pd_W2[0])))
-	del_b1 = np.zeros((len(pd_b1), 1))
-	del_b2 = np.zeros((len(pd_b2), 1))
-	'''
-
-	del_W1 = (1.0 / m) * pd_W1
-	del_W2 = (1.0 / m) * pd_W2
-	del_b1 = (1.0 / m) * pd_b1
-	del_b2 = (1.0 / m) * pd_b2
-		
-	'''
-	# FIXME REMOVE THIS SECTION
-	arr_W1 = arr_W1 - global_alpha * ((1.0 / m) * del_W1 + global_lambda * arr_W1)
-	arr_W2 = arr_W2 - global_alpha * ((1.0 / m) * del_W2 + global_lambda * arr_W2)
-	arr_b1 = arr_b1 - global_alpha * ((1.0 / m) * del_b1)
-	arr_b2 = arr_b2 - global_alpha * ((1.0 / m) * del_b2)
-	'''
+	del_W1 = (1.0 / m) * pd_W1 + global_lambda * arr_W1
+	del_W2 = (1.0 / m) * pd_W2 + global_lambda * arr_W2
+	del_b1 = pd_b1
+	del_b2 = pd_b2
 
 	# Changed the gradients into a one dimensional vector
 	del_W1 = np.ravel(del_W1)
@@ -142,48 +135,9 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
-####### Generate training set #######
-
-# Extract the provided data. We need to use scipy since the data is in a matlab file format
-images_data = scipy.io.loadmat('starter/IMAGES.mat')
-
-# The images that we need to extract are under the name 'IMAGES'
-images = images_data['IMAGES']
-
-patch_size = 8       # We want to use 8x8 patches
-num_patches = 100    # Total number of patches we will have
-
-# Set up an array of zeros for the patches (64, 10000)
-patches = np.zeros((patch_size ** 2, num_patches))
-
-# Let's look at one of the images
-pick_image = 0
-pick_image = int(input('Enter digit representing an image (0-9):'))
-while (pick_image > 9 or pick_image < 0):
-	pick_image = int(input('Please pick a digit in the range 0-9:'))
-
-
-image = images[:,:, pick_image]
-'''
-plt.imshow(image, cmap = 'binary')
-plt.show()
-'''
-
-# Now we want to break the image up into patches
-for i in range(len(patches[0])):
-	int_random = random.randint(0, 504)
-	temp = image[int_random: int_random + 8, int_random: int_random + 8]
-	temp = np.reshape(temp, (64, 1))
-	patches[:, i:i+1] = temp
-
-'''
-# Check to make sure our code is running correctly
-image2 = np.reshape(patches[:,0:1], (8, 8))
-plt.imshow(image2, cmap = 'binary', interpolation = 'none')
-plt.show()
-'''
-
 ####### Sparse autoencoder objective #######
+patches = np.genfromtxt('outputs/10KRandom8x8.out')
+patches = np.reshape(patches, (64, 10000))
 m = len(patches[0])
 
 # We need to values in patches to range from 0 to 1
@@ -205,8 +159,15 @@ theta1 = weights_bias()
 cost_test = reg_cost(theta1, patches, y)
 print cost_test
 # We had a cost value of 21.7
-'''
 
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
 print scipy.optimize.check_grad(reg_cost, backprop, theta1, patches, y)
 # Recieved a value of N/A
+'''
+
+print 'Cost before minimization: %g' %(reg_cost(theta1, patches, y))
+
+minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'CG', tol = 1e-4, jac = backprop, args = (patches, y))
+theta_new = minimum.x
+
+print 'Cost after minimization: %g' %(reg_cost(theta_new, patches, y))
