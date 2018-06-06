@@ -44,6 +44,7 @@ def reshape(theta):
 patches = np.genfromtxt('outputs/10KRandom8x8.out')
 patches = np.reshape(patches, (64, 10000))
 m = len(patches[0])
+n = len(patches)
 
 # Tranpose patches to the dimension we want
 patches = patches.T                        # (10000, 64)
@@ -56,7 +57,7 @@ new_max = 1
 patches = ((patches - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
 
 # Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsL0.00001B3Rho0.01.out')
+theta_final = np.genfromtxt('outputs/finalWeightsL0.0001B3Rho0.01.out')
 
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 a3_final, a2_final = feedforward(W1_final, W2_final, b1_final, b2_final, patches)
@@ -66,6 +67,13 @@ for i in range(m):
 
 for i in range(m):
 	patches[i] = ((patches[i] - patches[i].min()) / (patches[i].max() - patches[i].min())) * (new_max - new_min) + new_min
+
+# Let's how accurate we were
+error = np.zeros((m, n))
+for i in range(m):
+	error[i] = np.abs(patches[i] - a3_final[i])
+
+print "The average difference between the output pixel and the input pixel is %g." %(np.mean(error))
 
 # Plot an image of a1 and a3 side by side to see how accurate the output is to the original
 blackspace = np.ones((8,1))
