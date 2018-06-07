@@ -9,7 +9,7 @@ import math
 ####### Global variables #######
 global_visible_size = 64
 global_hidden_size = 25
-global_lambda = 0.001
+global_lambda = 0.0001
 global_beta = 3
 global_rho = 0.01              # Sparsity parameter
 

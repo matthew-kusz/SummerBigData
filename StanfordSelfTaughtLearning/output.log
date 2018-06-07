@@ -1,0 +1,5 @@
+(60000, 784)
+(60000, 1)
+(29404, 784)
+Cost before minimization: 344.417
+Cost after minimization: 141.984
