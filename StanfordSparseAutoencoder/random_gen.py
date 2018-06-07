@@ -13,7 +13,7 @@ images_data = scipy.io.loadmat('starter/IMAGES.mat')
 images = images_data['IMAGES']
 
 patch_size = 8       # We want to use 8x8 patches
-num_patches = 10000    # Total number of patches we will have
+num_patches = 100    # Total number of patches we will have
 
 # Set up an array of zeros for the patches (64, 10000)
 patches = np.zeros((patch_size ** 2, num_patches))
@@ -36,4 +36,4 @@ plt.show()
 
 # Save our patches array to a file to be used later
 patches = np.ravel(patches)
-np.savetxt('outputs/10KRandom8x8.out', patches, delimiter = ',')
+np.savetxt('outputs/100Random8x8.out', patches, delimiter = ',')

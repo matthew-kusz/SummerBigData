@@ -34,5 +34,6 @@ plt.imshow(image2, cmap = 'binary', interpolation = 'none')
 plt.show()
 '''
 
+# Save our patches array to a file to be used later
 patches = np.ravel(patches)
 np.savetxt('outputs/10KRandom8x8.out', patches, delimiter = ',')

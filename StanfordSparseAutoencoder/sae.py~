@@ -9,7 +9,7 @@ import math
 ####### Global variables #######
 global_visible_size = 64
 global_hidden_size = 25
-global_lambda = 0.001
+global_lambda = 0.0001
 global_beta = 3
 global_rho = 0.01              # Sparsity parameter
 
@@ -101,7 +101,7 @@ def backprop(theta, arr_x, arr_y):
 def weights_bias():
 	# Initialize parameters randomly based on layer sizes.
 	# We'll choose weights uniformly from the interval [-r, r]
-	r  = 0.12
+	r  = math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1)
 	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
 	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (25, 64) matrix
 	random_weight1 = random_weight1 * 2 * r - r
@@ -109,10 +109,10 @@ def weights_bias():
 	random_weight2 = random_weight2 * 2 * r - r
 
 	# Set up our bias term
-	bias1 = np.random.rand(global_hidden_size, 1)     # (25, 1) matrix
-	bias1 = bias1 * 2 * r - r
-	bias2 = np.random.rand(global_visible_size, 1)    # (64, 1) matrix
-	bias2 = bias2 * 2 * r - r
+	bias1 = np.zeros((global_hidden_size, 1))     # (25, 1) matrix
+	# bias1 = bias1 * 2 * r - r
+	bias2 = np.zeros((global_visible_size, 1))    # (64, 1) matrix
+	# bias2 = bias2 * 2 * r - r
 
 	# Combine these into a 1-dimension vector
 	random_weight1_1D = np.ravel(random_weight1)
@@ -172,4 +172,4 @@ theta_new = minimum.x
 print 'Cost after minimization: %g' %(reg_cost(theta_new, patches, y))
 
 # Save to a file to use later
-np.savetxt('outputs/finalWeightsL0.001B3Rho0.01.out', theta_new, delimiter = ',')
+np.savetxt('outputs/finalWeightsL0.0001B3Rho0.01-2.out', theta_new, delimiter = ',')

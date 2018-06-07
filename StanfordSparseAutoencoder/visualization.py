@@ -1,7 +1,6 @@
 # Import the necessary packages
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import interactive
 import scipy.io
 import math
 
@@ -46,7 +45,7 @@ patches = np.reshape(patches, (64, 10000))
 m = len(patches[0])
 n = len(patches)
 
-# Tranpose patches to the dimension we want
+# Transpose patches to the dimension we want
 patches = patches.T                        # (10000, 64)
 
 # We need to values in patches to range from 0 to 1
@@ -68,7 +67,7 @@ for i in range(m):
 for i in range(m):
 	patches[i] = ((patches[i] - patches[i].min()) / (patches[i].max() - patches[i].min())) * (new_max - new_min) + new_min
 
-# Let's how accurate we were
+# Let's see how accurate we were
 error = np.zeros((m, n))
 for i in range(m):
 	error[i] = np.abs(patches[i] - a3_final[i])
