@@ -30,31 +30,52 @@ print y_vals.shape
 # Set up the arrays we need to store the data after we sort it
 train = []
 test = []
+labels_test = []
+labels_train = []
 
 # We need numbers 5-9 for our training set and 0-4 for out test set
 for i in range(size):
+	print "iteration: ", i
 	if (y_vals[i] == 5 or y_vals[i] == 6 or y_vals[i] == 7 or y_vals[i] == 8 or y_vals[i] == 9):
 		if (len(train) == 0):
 			train = np.reshape(x_vals[i], (1, len(x_vals[i])))
-			# y_train = np.reshape(y_vals[i], (1, len(y_vals[i])))
+			#labels_train = np.reshape(y_vals[i], (1, len(y_vals[i])))
 		else:
 			train = np.concatenate((train, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
-			# y_train = np.concatenate((y_train, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
+			#labels_train = np.concatenate((labels_train, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
+	'''
+	else:
 		if (len(test) == 0):
-			test = np.reshape(x_vals[i], (1, len(x_vals[i])))
-			# y_test = np.reshape(y_vals[i], (1, len(y_vals[i])))
+			#test = np.reshape(x_vals[i], (1, len(x_vals[i])))
+			#labels_test = np.reshape(y_vals[i], (1, len(y_vals[i])))
 		else:
-			test = np.concatenate((test, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
-			# y_test = np.concatenate((y_test, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
+			#test = np.concatenate((test, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
+			#labels_test = np.concatenate((labels_test, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
+	'''
 
 print train.shape
+'''
 print test.shape
-
+print labels_test.shape
+print labels_train.shape
+'''
 
 train = train.ravel()
+'''
 test = test.ravel()
+labels_test = labels_test.ravel()
+labels_train = labels_train.ravel()
+'''
 # Save the trains data to use later
 np.savetxt('data/trainDatafrom60000', train, delimiter = ',')
 
 # Save the tests data to use later
-np.savetxt('data/trainDatafrom60000', test, delimiter = ',')
+#np.savetxt('data/testDatafrom60000', test, delimiter = ',')
+
+# Save the trains data to use later
+#np.savetxt('data/trainLabelDatafrom60000', labels_train, delimiter = ',')
+
+# Save the tests data to use later
+#np.savetxt('data/testLabelDatafrom60000', labels_test, delimiter = ',')
+
+
