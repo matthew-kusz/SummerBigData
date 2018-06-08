@@ -14,68 +14,49 @@ def read_idx(filename, n=None):
 			arr = arr[:n]
 		return arr
 
-####### Code #######
-# Set up how large we want our data set (max of 60,000)
-size = 10000
+def get_data(size, string):
+	# Extract the MNIST training data sets
+	x_vals = read_idx('data/train-images-idx3-ubyte.gz', size)
+	x_vals = x_vals / 255.0
+	x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
+	y_vals = read_idx('data/train-labels-idx1-ubyte.gz', size)
+	y_vals = np.reshape(y_vals, (len(y_vals), 1))
+	print x_vals.shape
+	print y_vals.shape
+	
+	# Set up the arrays we need to store the data after we sort it
+	train = []
+	test = []
+	labels_test = []
+	labels_train = []
 
-# Extract the MNIST training data sets
-x_vals = read_idx('data/train-images-idx3-ubyte.gz', size)
-x_vals = x_vals / 255.0
-x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
-y_vals = read_idx('data/train-labels-idx1-ubyte.gz', size)
-y_vals = np.reshape(y_vals, (len(y_vals), 1))
-print x_vals.shape
-print y_vals.shape
-
-# Set up the arrays we need to store the data after we sort it
-train = []
-test = []
-labels_test = []
-labels_train = []
-
-# We need numbers 5-9 for our training set and 0-4 for out test set
-for i in range(size):
-	print "iteration: ", i
-	if (y_vals[i] == 5 or y_vals[i] == 6 or y_vals[i] == 7 or y_vals[i] == 8 or y_vals[i] == 9):
-		if (len(train) == 0):
-			train = np.reshape(x_vals[i], (1, len(x_vals[i])))
-			#labels_train = np.reshape(y_vals[i], (1, len(y_vals[i])))
-		else:
-			train = np.concatenate((train, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
-			#labels_train = np.concatenate((labels_train, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
-	'''
-	else:
-		if (len(test) == 0):
-			#test = np.reshape(x_vals[i], (1, len(x_vals[i])))
-			#labels_test = np.reshape(y_vals[i], (1, len(y_vals[i])))
-		else:
-			#test = np.concatenate((test, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
-			#labels_test = np.concatenate((labels_test, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
-	'''
-
-print train.shape
-'''
-print test.shape
-print labels_test.shape
-print labels_train.shape
-'''
-
-train = train.ravel()
-'''
-test = test.ravel()
-labels_test = labels_test.ravel()
-labels_train = labels_train.ravel()
-'''
-# Save the trains data to use later
-np.savetxt('data/trainDatafrom10000', train, delimiter = ',')
-
-# Save the tests data to use later
-#np.savetxt('data/testDatafrom60000', test, delimiter = ',')
-
-# Save the trains data to use later
-#np.savetxt('data/trainLabelDatafrom60000', labels_train, delimiter = ',')
-
-# Save the tests data to use later
-#np.savetxt('data/testLabelDatafrom60000', labels_test, delimiter = ',')
-
+	# We need numbers 5-9 for our training set and 0-4 for out test set
+	for i in range(size):
+		if (y_vals[i] == 5 or y_vals[i] == 6 or y_vals[i] == 7 or y_vals[i] == 8 or y_vals[i] == 9):
+			if (string == '59'):
+				if (len(train) == 0):
+					train = np.reshape(x_vals[i], (1, len(x_vals[i])))
+					labels_train = np.reshape(y_vals[i], (1, len(y_vals[i])))
+				else:
+					train = np.concatenate((train, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
+					labels_train = np.concatenate((labels_train, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
+			elif (string == '04'):
+				if (len(test) == 0):
+					test = np.reshape(x_vals[i], (1, len(x_vals[i])))
+					labels_test = np.reshape(y_vals[i], (1, len(y_vals[i])))
+				else:
+					test = np.concatenate((test, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
+					labels_test = np.concatenate((labels_test, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
+			
+	if (string == '59'):
+		print "no"
+		print train.shape
+		print labels_train.shape
+		return train, labels_train
+	
+	elif (string == '04'):
+		print "yes"
+		print test.shape
+		print labels_test.shape
+		return test, labels_test
 

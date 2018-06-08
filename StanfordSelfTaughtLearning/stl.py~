@@ -7,13 +7,14 @@ import scipy.optimize
 import scipy.io
 import random
 import math
+import grab_data
 
 ####### Global variables #######
 global_step = 0
 global_input_size  = 28 * 28
 global_num_labels  = 5
 global_hidden_size = 200
-global_rho = 0.1;    # desired average activation of the hidden units (sparsity parameter).
+global_rho = 0.1;           # desired average activation of the hidden units (sparsity parameter).
 global_lambda = 3e-3;       # weight decay parameter       
 global_beta = 3;            # weight of sparsity penalty term   
 
@@ -140,11 +141,10 @@ def reshape(theta):
 	return W1, W2, b1, b2
 
 # Import the file we want
-train = np.genfromtxt('data/trainDatafrom1000')
-train = np.reshape(train, (490, 784))
+train , labels_train = grab_data.get_data(40000, '59')
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size60000.out'
+filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size60000HL200.out'
 
 # Need to know how many inputs we have
 m = len(train)

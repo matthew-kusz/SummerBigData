@@ -5,10 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 import math
+import grab_data
+
 
 ####### Global variables #######
 global_visible_size  = 28 * 28
-global_hidden_size = 200
+global_hidden_size = 20
 
 ####### Definitions #######
 # Reading in MNIST data files	
@@ -79,11 +81,10 @@ def reshape(theta):
 	return W1, W2, b1, b2
 
 # Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B3Rho0.1.out')
+theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B3Rho0.1Size60000.out')
 
 # Import the file we want
-train = np.genfromtxt('data/trainDatafrom1000')
-train = np.reshape(train, (490, 784))
+train , labels_train = grab_data.get_data(100, '59')
 
 # Need to know how many inputs we have
 m = len(train)
@@ -147,12 +148,13 @@ for i in range(5):
 	x = W1_final[i + 15] / math.sqrt(np.sum(W1_final[i + 15] ** 2))
 	x = np.reshape(x, (28, 28))
 	images4[i] = x
-
+'''
 for i in range(5):
 	x = W1_final[i + 20] / math.sqrt(np.sum(W1_final[i + 20] ** 2))
 	x = np.reshape(x, (28, 28))
 	images5[i] = x
-
+'''
+images5 = images4
 # Stitch the images together horizontally
 set_up = np.concatenate((images, images2, images3, images4, images5), axis = 1)
 black_space = np.ones((28, 1)) * set_up.max()
