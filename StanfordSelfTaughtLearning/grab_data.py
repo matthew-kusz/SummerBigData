@@ -52,7 +52,7 @@ def get_data(size, string):
 	if (string == '59'):
 		print "59"
 		print train.shape
-		print labels_train.shape
+		# print labels_train.shape
 		return train, labels_train
 	
 	elif (string == '04'):

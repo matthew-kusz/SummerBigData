@@ -1,10 +1,6 @@
-(1000, 784)
-(1000, 1)
+(10000, 784)
+(10000, 1)
 59
-(490, 784)
-Traceback (most recent call last):
-  File "stl.py", line 144, in <module>
-    train , labels_train = grab_data.get_data(1000, '59')
-  File "/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordSelfTaughtLearning/grab_data.py", line 55, in get_data
-    print labels_train.shape
-AttributeError: 'list' object has no attribute 'shape'
+(4869, 784)
+Cost before minimization: 333.386
+Cost after minimization: 137.767

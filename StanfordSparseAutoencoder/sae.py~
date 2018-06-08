@@ -172,4 +172,4 @@ theta_new = minimum.x
 print 'Cost after minimization: %g' %(reg_cost(theta_new, patches, y))
 
 # Save to a file to use later
-# np.savetxt('outputs/finalWeightsL0.001B3Rho0.01.out', theta_new, delimiter = ',')
+np.savetxt('outputs/finalWeightsL0.001B3Rho0.01.out', theta_new, delimiter = ',')

@@ -8,6 +8,7 @@ import scipy.io
 import random
 import math
 import grab_data
+import time
 
 ####### Global variables #######
 global_step = 0
@@ -62,9 +63,7 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	return a3, a2
 
 # Backpropagation
-global_step = 0
 def backprop(theta, arr_x, arr_y):
-
 	# To keep track of our iterations
 	global global_step
 	global_step += 1
@@ -74,16 +73,16 @@ def backprop(theta, arr_x, arr_y):
 
 	# Change our weights and bias values back into their original shape
 	arr_W1, arr_W2, arr_b1, arr_b2 = reshape(theta)
-
+	
 	a3, a2 = feedforward(arr_W1, arr_W2, arr_b1, arr_b2, arr_x)
 
 	# Find the average activation of each hidden unit averaged over the training set
 	rho_hat = np.mean(a2, axis = 0)         # (200,) vector
 	rho_hat = np.tile(rho_hat, (m, 1))      # (m, 200) matrix (Could just leave it as a vector, code still runs the same)
 
-	delta3 = np.multiply(a3 - arr_y, a3 * (1 - a3))   # (m, 784)
+	delta3 = np.multiply(-(arr_y - a3), a3 * (1 - a3))   # (m, 784)
 	delta2 = np.multiply(np.dot(delta3, arr_W2) + global_beta * (-(global_rho / rho_hat) + ((1 - global_rho) / (1 - rho_hat))), a2 * (1 - a2))
-	# delta2 is a (10000, 25) matrix
+	# delta2 is a (m, 25) matrix
 	
 	# Compute the partial derivatives
 	pd_W1 = np.dot(delta2.T, arr_x)  # (200, 784)
@@ -100,7 +99,6 @@ def backprop(theta, arr_x, arr_y):
 	del_W1 = np.ravel(del_W1)
 	del_W2 = np.ravel(del_W2)
 	D_vals = np.concatenate((del_W1, del_W2, del_b1, del_b2))
-
 	return D_vals
 
 # Set up our weights and bias terms
@@ -140,11 +138,13 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
+time_start = time.time()
 # Import the file we want
-train , labels_train = grab_data.get_data(40000, '59')
+train , labels_train = grab_data.get_data(10000, '59')
+time_finish = time.time()
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size40000HL200.out'
+filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size10000HL200-2.out'
 
 # Need to know how many inputs we have
 m = len(train)
@@ -167,12 +167,19 @@ print scipy.optimize.check_grad(reg_cost, backprop, theta1, train, y)
 '''
 
 print 'Cost before minimization: %g' %(reg_cost(theta1, train, y))
+time_start2 = time.time()
 
 # Minimize the cost value
-minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'CG', tol = 1e-4, jac = backprop, args = (train, y))
+minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (train, y)) #options = {"disp":True}
+print minimum
 theta_new = minimum.x
 
 print 'Cost after minimization: %g' %(reg_cost(theta_new, train, y))
+time_finish2 = time.time()
 
 # Save to a file to use later
 np.savetxt(filename, theta_new, delimiter = ',')
+
+print 'Total time for obtaining data = %g' %(time_finish - time_start)
+print 'Total time for minimization = %g' %(time_finish2 - time_start2)
+

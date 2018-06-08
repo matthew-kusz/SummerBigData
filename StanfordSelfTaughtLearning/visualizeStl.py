@@ -81,10 +81,10 @@ def reshape(theta):
 	return W1, W2, b1, b2
 
 # Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B3Rho0.1Size60000HL200.out')
+theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B3Rho0.1Size10000HL200.out')
 
 # Import the file we want
-train , labels_train = grab_data.get_data(100, '59')
+train , labels_train = grab_data.get_data(10, '59')
 
 # Need to know how many inputs we have
 m = len(train)
@@ -148,13 +148,12 @@ for i in range(5):
 	x = W1_final[i + 15] / math.sqrt(np.sum(W1_final[i + 15] ** 2))
 	x = np.reshape(x, (28, 28))
 	images4[i] = x
-'''
+
 for i in range(5):
 	x = W1_final[i + 20] / math.sqrt(np.sum(W1_final[i + 20] ** 2))
 	x = np.reshape(x, (28, 28))
 	images5[i] = x
-'''
-images5 = images4
+
 # Stitch the images together horizontally
 set_up = np.concatenate((images, images2, images3, images4, images5), axis = 1)
 black_space = np.ones((28, 1)) * set_up.max()

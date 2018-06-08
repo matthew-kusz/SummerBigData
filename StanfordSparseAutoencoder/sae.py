@@ -166,10 +166,10 @@ print scipy.optimize.check_grad(reg_cost, backprop, theta1, patches, y)
 print 'Cost before minimization: %g' %(reg_cost(theta1, patches, y))
 
 # Minimize the cost value
-minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'CG', tol = 1e-4, jac = backprop, args = (patches, y))
+minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'CG', tol = 1e-4, jac = backprop, args = (patches, y), options = {"disp":True})
 theta_new = minimum.x
 
 print 'Cost after minimization: %g' %(reg_cost(theta_new, patches, y))
 
 # Save to a file to use later
-np.savetxt('outputs/finalWeightsL0.001B3Rho0.01.out', theta_new, delimiter = ',')
+# np.savetxt('outputs/finalWeightsL0.001B3Rho0.01.out', theta_new, delimiter = ',')
