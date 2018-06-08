@@ -11,6 +11,13 @@ images_data = scipy.io.loadmat('starter/IMAGES.mat')
 
 # The images that we need to extract are under the name 'IMAGES'
 images = images_data['IMAGES']
+print images.shape
+
+# Print out some of the pictures
+
+pictures = np.concatenate((images[:,:,0], images[:,:,5], images[:,:,9]), axis = 1)
+plt.imshow(pictures, cmap = 'binary', interpolation = 'none')
+plt.show()
 
 patch_size = 8       # We want to use 8x8 patches
 num_patches = 100    # Total number of patches we will have
@@ -36,4 +43,4 @@ plt.show()
 
 # Save our patches array to a file to be used later
 patches = np.ravel(patches)
-np.savetxt('outputs/100Random8x8.out', patches, delimiter = ',')
+#np.savetxt('outputs/100Random8x8.out', patches, delimiter = ',')

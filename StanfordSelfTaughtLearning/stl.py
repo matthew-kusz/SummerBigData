@@ -141,10 +141,10 @@ def reshape(theta):
 	return W1, W2, b1, b2
 
 # Import the file we want
-train , labels_train = grab_data.get_data(40000, '59')
+train , labels_train = grab_data.get_data(1000, '59')
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size40000HL200.out'
+filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size1000HL200.out'
 
 # Need to know how many inputs we have
 m = len(train)

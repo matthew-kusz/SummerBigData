@@ -1,5 +1,5 @@
-#PBS -N stlL3e-3Size40000HL200
-#PBS -l walltime=05:00:00
+#PBS -N saeL0.0001
+#PBS -l walltime=00:15:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u stl.py >& output.log
+python -u sae.py >& output.log

@@ -1,7 +1,10 @@
-(40000, 784)
-(40000, 1)
-no
-(19580, 784)
-(19580, 1)
-Cost before minimization: 333.329
-Cost after minimization: 139.379
+(1000, 784)
+(1000, 1)
+59
+(490, 784)
+Traceback (most recent call last):
+  File "stl.py", line 144, in <module>
+    train , labels_train = grab_data.get_data(1000, '59')
+  File "/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordSelfTaughtLearning/grab_data.py", line 55, in get_data
+    print labels_train.shape
+AttributeError: 'list' object has no attribute 'shape'
