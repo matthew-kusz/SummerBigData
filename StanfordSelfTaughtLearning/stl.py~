@@ -14,7 +14,7 @@ import time
 global_step = 0
 global_input_size  = 28 * 28
 global_num_labels  = 5
-global_hidden_size = 200
+global_hidden_size = 196
 global_rho = 0.1;           # desired average activation of the hidden units (sparsity parameter).
 global_lambda = 3e-3;       # weight decay parameter       
 global_beta = 3;            # weight of sparsity penalty term   
@@ -145,7 +145,7 @@ time_finish = time.time()
 print 'Total time for obtaining data = %g' %(time_finish - time_start)
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size60000HL200.out'
+filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size60000HL196.out'
 
 # Need to know how many inputs we have
 m = len(train)
