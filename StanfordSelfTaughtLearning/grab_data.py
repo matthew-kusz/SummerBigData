@@ -39,7 +39,7 @@ def get_data(size, string):
 			else:
 				train = np.concatenate((train, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
 				#labels_train = np.concatenate((labels_train, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
-		'''
+		
 		else:
 			if (len(test) == 0):
 				test = np.reshape(x_vals[i], (1, len(x_vals[i])))
@@ -47,7 +47,7 @@ def get_data(size, string):
 			else:
 				test = np.concatenate((test, np.reshape(x_vals[i], (1, len(x_vals[i])))), axis = 0)
 				labels_test = np.concatenate((labels_test, np.reshape(y_vals[i], (1, len(y_vals[i])))), axis = 0)
-		'''
+		
 
 	if (string == '59'):
 		print "59"
