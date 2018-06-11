@@ -1,0 +1,23 @@
+(60000, 784)
+(60000, 1)
+59
+(29404, 784)
+Total time for obtaining data = 1916.12
+Cost before minimization: 334.037
+Global step: 50
+Global step: 100
+Global step: 150
+Global step: 200
+Global step: 250
+  status: 0
+ success: True
+    nfev: 255
+     fun: 11.932221505690583
+       x: array([ -4.53626883e-04,  -8.49512029e-04,   8.35180484e-04, ...,
+        -4.63919529e+00,  -4.63335872e+00,  -4.63275568e+00])
+ message: 'CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH'
+     jac: array([ -1.36088065e-06,  -2.54853609e-06,   2.50554145e-06, ...,
+         7.99163886e-05,   8.08947885e-05,   8.10974999e-05])
+     nit: 244
+Cost after minimization: 11.9322
+Total time for minimization = 3191.12

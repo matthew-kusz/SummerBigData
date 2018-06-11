@@ -81,7 +81,7 @@ def reshape(theta):
 	return W1, W2, b1, b2
 
 # Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B3Rho0.1Size2000HL200.out')
+theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B3Rho0.1Size60000HL200.out')
 
 # Import the file we want
 train , labels_train = grab_data.get_data(10, '59')
@@ -168,7 +168,7 @@ all_img5 = np.concatenate((images5[0], black_space, images5[1], black_space, ima
 # Now stitch them vertically
 all_images = np.concatenate((all_img, black_space2, all_img2, black_space2, all_img3, black_space2, all_img4, black_space2, all_img5), axis = 0)
 d = plt.figure(3)
-plt.imshow(all_images, cmap = 'binary', interpolation = 'none')
+plt.imshow(all_images, interpolation = 'none')
 d.show()
 
 raw_input()
