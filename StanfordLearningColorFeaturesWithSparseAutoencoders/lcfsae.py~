@@ -8,7 +8,6 @@ import math
 
 ####### Global variables #######
 filename = 'outputs/finalWeightsL3e-3B5Rho0.035.out'
-global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
 global_visible_size = global_patch_dim * global_patch_dim * global_image_channels
