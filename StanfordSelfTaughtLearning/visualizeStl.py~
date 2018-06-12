@@ -161,8 +161,21 @@ for i in range(5):
 set_up = np.concatenate((images, images2, images3, images4, images5), axis = 1)
 black_space = np.ones((28, 1)) * set_up.max()
 black_space2 = np.ones((1, 144)) * set_up.max()
-black_space3 = np.ones((1, 405)) * set_up.max()
 
+all_img = np.concatenate((images[0], black_space, images[1], black_space, images[2], black_space, images[3], black_space, images[4]), axis = 1)
+all_img2 = np.concatenate((images2[0], black_space, images2[1], black_space, images2[2], black_space, images2[3], black_space, images2[4]), axis = 1)
+all_img3 = np.concatenate((images3[0], black_space, images3[1], black_space, images3[2], black_space, images3[3], black_space, images3[4]), axis = 1)
+all_img4 = np.concatenate((images4[0], black_space, images4[1], black_space, images4[2], black_space, images4[3], black_space, images4[4]), axis = 1)
+all_img5 = np.concatenate((images5[0], black_space, images5[1], black_space, images5[2], black_space, images5[3], black_space, images5[4]), axis = 1)
+
+# Now stitch them vertically
+all_images = np.concatenate((all_img, black_space2, all_img2, black_space2, all_img3, black_space2, all_img4, black_space2, all_img5), axis = 0)
+c = plt.figure(1)
+plt.imshow(all_images, cmap = 'binary', interpolation = 'none')
+c.show()
+
+# Now let's show all of the inputs
+black_space3 = np.ones((1, 405)) * set_up.max()
 images1 = []
 images6 = []
 
@@ -180,19 +193,6 @@ for i in range(14):
 		images6 = images1
 	else:
 		images6 = np.concatenate((images6, black_space3, images1), axis = 0)
-
-all_img = np.concatenate((images[0], black_space, images[1], black_space, images[2], black_space, images[3], black_space, images[4]), axis = 1)
-all_img2 = np.concatenate((images2[0], black_space, images2[1], black_space, images2[2], black_space, images2[3], black_space, images2[4]), axis = 1)
-all_img3 = np.concatenate((images3[0], black_space, images3[1], black_space, images3[2], black_space, images3[3], black_space, images3[4]), axis = 1)
-all_img4 = np.concatenate((images4[0], black_space, images4[1], black_space, images4[2], black_space, images4[3], black_space, images4[4]), axis = 1)
-all_img5 = np.concatenate((images5[0], black_space, images5[1], black_space, images5[2], black_space, images5[3], black_space, images5[4]), axis = 1)
-
-# Now stitch them vertically
-all_images = np.concatenate((all_img, black_space2, all_img2, black_space2, all_img3, black_space2, all_img4, black_space2, all_img5), axis = 0)
-c = plt.figure(1)
-plt.imshow(all_images, cmap = 'binary', interpolation = 'none')
-c.show()
-
 d = plt.figure(2)
 plt.imshow(images6, cmap = 'binary', interpolation = 'none')
 d.show()

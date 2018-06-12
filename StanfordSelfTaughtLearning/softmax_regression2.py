@@ -9,12 +9,20 @@ import random
 import math
 import grab_data
 import time
+import argparse
 
 ####### Global variables #######
+parser = argparse.ArgumentParser()
+parser.add_argument('Lambda', help = 'Lambda / 10000000 (ie 1 = 1e-7), Adjust to prevent overfitting.', type = float)
+
+args = parser.parse_args()
+
 global_step = 0
 global_input_size  = 28 * 28
 global_hidden_size = 200
-global_lambda = 1e-4;       # weight decay parameter         
+global_lambda = args.Lambda / 10000000.0;       # weight decay parameter
+
+print 'You chose', args     
 
 ####### Definitions #######
 # Sigmoid function
@@ -61,7 +69,6 @@ def backprop(thetaW2, arr_x, arr_y, thetaW1):
 	global global_step
 	global_step += 1
 	if (global_step % 50 == 0):
-		# np.savetxt(filename, theta, delimiter = ',')
 		print 'Global step: %g' %(global_step)
 
 	# Change our weights and bias values back into their original shape
@@ -137,7 +144,7 @@ test = data[data_points:]
 labels_test = labels_data[data_points:]
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsL1e-4B3Size60000HL200SOFT.out'
+# filename = 'outputs/finalWeightsL1e-4B3Size60000HL200SOFT.out'
 
 # Need to know how many training inputs we have
 m = len(train)
@@ -174,7 +181,6 @@ time_start2 = time.time()
 
 # Minimize the cost value
 minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta2, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (train, y_vals_train, theta1)) #options = {"disp":True}
-print minimum
 theta_new = minimum.x
 
 print 'Cost after minimization: %g' %(reg_cost(theta_new, train, y_vals_train, theta1))

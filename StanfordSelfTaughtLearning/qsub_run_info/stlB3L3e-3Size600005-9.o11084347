@@ -1,0 +1,16 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordSelfTaughtLearning
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=00:25:46
+walltime=00:25:52
+mem=1.243 GB
+vmem=1.820 GB
+-----------------------
+Resource units charged (estimate):
+0.172 RUs
+-----------------------

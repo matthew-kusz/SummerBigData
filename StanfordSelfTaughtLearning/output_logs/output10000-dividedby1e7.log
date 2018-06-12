@@ -1,0 +1,16 @@
+You chose Namespace(Lambda=10000.0)
+(60000, 784)
+(60000, 1)
+04
+(30596, 784)
+(30596, 1)
+Total time for obtaining data = 1.25492
+Cost before minimization: 1.61373
+Cost after minimization: 1.00725
+Total time for minimization = 36.052
+[[ 88.22178478]
+ [ 98.4522003 ]
+ [ 78.04960924]
+ [ 83.30052493]
+ [ 93.28609987]]
+[ 88.26204382]

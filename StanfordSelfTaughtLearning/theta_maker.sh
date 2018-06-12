@@ -1,5 +1,5 @@
-#PBS -N softmaxL1e-4Size60000
-#PBS -l walltime=01:00:00
+#PBS -N stlsize600005-9
+#PBS -l walltime=00:45:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u softmax_regression2.py >& output.log
+python -u stl.py $PBS_ARRAYID 10 300 >& output_logs/outputStlLambda$PBS_ARRAYID.log

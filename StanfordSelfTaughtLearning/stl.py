@@ -1,23 +1,32 @@
 # Import the necessary packages
-import struct as st
-import gzip
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize
-import scipy.io
 import random
 import math
 import grab_data
 import time
+import argparse
 
 ####### Global variables #######
+parser = argparse.ArgumentParser()
+parser.add_argument('Lambda', help = 'Lambda / 10000000 (ie 1 = 1e-7), adjust to prevent overfitting.', type = float)
+parser.add_argument('Rho', help = 'Rho / 100, desired average activation of the hidden units (sparsity parameter)', type = float)
+parser.add_argument('Beta', help = 'Beta / 100, weight of sparsity penalty term', type = float)
+
+args = parser.parse_args()
+
 global_step = 0
 global_input_size  = 28 * 28
-global_num_labels  = 5
 global_hidden_size = 200
-global_rho = 0.1;           # desired average activation of the hidden units (sparsity parameter).
-global_lambda = 3e-3;       # weight decay parameter       
-global_beta = 3;            # weight of sparsity penalty term   
+global_rho = args.Rho / 100;           # desired average activation of the hidden units (sparsity parameter). (0.1)
+global_lambda = args.Lambda / 10000000;     # weight decay parameter (3e-2)
+global_beta = args.Beta / 100;         # weight of sparsity penalty term (3)
+
+print 'You chose', args
+
+# Set up the filename we want to use
+filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size60000HL200.out'
 
 ####### Definitions #######
 # Sigmoid function
@@ -143,9 +152,6 @@ time_start = time.time()
 train , labels_train = grab_data.get_data(60000, '59')
 time_finish = time.time()
 print 'Total time for obtaining data = %g' %(time_finish - time_start)
-
-# Set up the filename we want to use
-filename = 'outputs/finalWeightsL3e-3B3Rho0.1Size60000HL200.out'
 
 # Need to know how many inputs we have
 m = len(train)
