@@ -61,7 +61,7 @@ def backprop(thetaW2, arr_x, arr_y, thetaW1):
 	global global_step
 	global_step += 1
 	if (global_step % 50 == 0):
-		np.savetxt(filename, theta, delimiter = ',')
+		# np.savetxt(filename, theta, delimiter = ',')
 		print 'Global step: %g' %(global_step)
 
 	# Change our weights and bias values back into their original shape
@@ -139,7 +139,7 @@ labels_test = labels_data[data_points:]
 # Set up the filename we want to use
 filename = 'outputs/finalWeightsL1e-4B3Size60000HL200SOFT.out'
 
-# Need to know how many inputs we have
+# Need to know how many training inputs we have
 m = len(train)
 
 # Create our weights and bias terms
@@ -171,7 +171,7 @@ print scipy.optimize.check_grad(reg_cost, backprop, theta2, train, y_vals_train,
 
 print 'Cost before minimization: %g' %(reg_cost(theta2, train, y_vals_train, theta1))
 time_start2 = time.time()
-'''
+
 # Minimize the cost value
 minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta2, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (train, y_vals_train, theta1)) #options = {"disp":True}
 print minimum
@@ -184,4 +184,45 @@ time_finish2 = time.time()
 # np.savetxt(filename, theta_new, delimiter = ',')
 
 print 'Total time for minimization = %g' %(time_finish2 - time_start2)
-'''
+
+# Find the probabilities for each digit
+# We need to reshape our theta values
+final_W1, final_W2, final_b1, final_b2 = reshape(theta1, theta_new)
+
+# Need to know how many testing inputs we have
+m = len(test)
+prob_all, nano = feedforward(final_W1, final_W2, final_b1, final_b2, test)
+
+# Find the largest value in each column
+best_prob = np.zeros((len(prob_all), 1))
+for i in range (len(prob_all)):
+	best_prob[i, 0] = np.argmax(prob_all[i, :])
+	 
+# Find how accurate our program was with identifying the correct number
+correct_guess = np.zeros((5, 1))
+for i in range(len(best_prob)):
+	if (best_prob[i] == int(labels_test[i])):
+		correct_guess[int(labels_test[i])] = correct_guess[int(labels_test[i])] + 1
+
+# Find how many of each number of our array labels_test has
+y_digits = np.zeros((5, 1))
+for i in range(5):
+	for j in range(len(labels_test)):
+		if (labels_test[j] == i):
+			y_digits[i] = y_digits[i] + 1
+
+# Calculate the percentage
+for i in range(len(correct_guess)):
+	correct_guess[i] = (correct_guess[i] / y_digits[i]) * 100
+
+# Check the results
+print correct_guess
+
+# Calculate the average accuracy
+avg_acc = 0
+for i in range(len(correct_guess)):
+	avg_acc = avg_acc + correct_guess[i]
+
+avg_acc = avg_acc / len(correct_guess)
+print avg_acc
+

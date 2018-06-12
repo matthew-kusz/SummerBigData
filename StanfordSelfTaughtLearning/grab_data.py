@@ -37,7 +37,7 @@ def get_data(size, string):
 	
 	# Find where we need to split our array
 	last_indices = np.argwhere(col(data_order, 0) == 4)[-1][0]
-	
+
 	# Seperate our data from 0-4 and 5-9
 	num04 = data_order[0:last_indices + 1]
 	num59 = data_order[last_indices + 1: ]

@@ -129,6 +129,8 @@ images2 = [[0], [0], [0], [0], [0]]
 images3 = [[0], [0], [0], [0], [0]]
 images4 = [[0], [0], [0], [0], [0]]
 images5 = [[0], [0], [0], [0], [0]]
+
+
 for i in range(5):
 	x = W1_final[i] / math.sqrt(np.sum(W1_final[i] ** 2))
 	x = np.reshape(x, (28, 28))
@@ -154,10 +156,30 @@ for i in range(5):
 	x = np.reshape(x, (28, 28))
 	images5[i] = x
 
+
 # Stitch the images together horizontally
 set_up = np.concatenate((images, images2, images3, images4, images5), axis = 1)
 black_space = np.ones((28, 1)) * set_up.max()
 black_space2 = np.ones((1, 144)) * set_up.max()
+black_space3 = np.ones((1, 405)) * set_up.max()
+
+images1 = []
+images6 = []
+
+for i in range(14):
+	for j in range(14):
+		if (j == 0):
+			images1 = W1_final[j + i * 14] / math.sqrt(np.sum(W1_final[j + i * 14] ** 2))
+			images1 = np.reshape(images1, (28, 28))
+		else:
+			temp = W1_final[j + i * 14] / math.sqrt(np.sum(W1_final[j + i * 14] ** 2))
+			temp = np.reshape(temp, (28, 28))
+			images1 = np.concatenate((images1, black_space, temp), axis = 1)
+			
+	if (i == 0):
+		images6 = images1
+	else:
+		images6 = np.concatenate((images6, black_space3, images1), axis = 0)
 
 all_img = np.concatenate((images[0], black_space, images[1], black_space, images[2], black_space, images[3], black_space, images[4]), axis = 1)
 all_img2 = np.concatenate((images2[0], black_space, images2[1], black_space, images2[2], black_space, images2[3], black_space, images2[4]), axis = 1)
@@ -167,8 +189,11 @@ all_img5 = np.concatenate((images5[0], black_space, images5[1], black_space, ima
 
 # Now stitch them vertically
 all_images = np.concatenate((all_img, black_space2, all_img2, black_space2, all_img3, black_space2, all_img4, black_space2, all_img5), axis = 0)
-d = plt.figure(3)
+c = plt.figure(1)
 plt.imshow(all_images, cmap = 'binary', interpolation = 'none')
-d.show()
+c.show()
 
+d = plt.figure(2)
+plt.imshow(images6, cmap = 'binary', interpolation = 'none')
+d.show()
 raw_input()
