@@ -18,6 +18,7 @@ parser.add_argument('Lambda', help = 'Lambda / 10000000 (ie 1 = 1e-7), Adjust to
 args = parser.parse_args()
 
 global_step = 0
+global_num_outputs = 10
 global_input_size  = 28 * 28
 global_hidden_size = 200
 global_lambda = args.Lambda / 10000000.0;       # weight decay parameter (1e-4)
@@ -112,18 +113,18 @@ def weights_bias():
 	'''	
 	r  = 0.12
 	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
-	random_weight2 = np.random.rand(5, global_hidden_size)     # (5, 200) matrix      
+	random_weight2 = np.random.rand(global_num_outputs, global_hidden_size)     # (5, 200) matrix      
 	random_weight2 = random_weight2 * 2 * r - r
 
 	# Set up our bias term
-	bias2 = np.random.rand(5, 1)    # (5, 1) matrix
+	bias2 = np.random.rand(global_num_outputs, 1)    # (5, 1) matrix
 	bias2 = bias2 * 2 * r - r
 
 	# Combine these into a 1-dimension vector
 	random_weight2_1D = np.ravel(random_weight2)
 	bias2_1D = np.ravel(bias2)
 
-	thetas = np.genfromtxt('outputs/finalWeightsL3e-3B3Rho0.1Size60000HL200.out')
+	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.03Beta3.0Size60000HL200MNIST.out')
 	random_weight1_1D = thetas[0:global_hidden_size * global_input_size]
 	bias1_1D = thetas[2 * global_hidden_size * global_input_size: 2 * global_hidden_size * global_input_size + global_hidden_size]
 	# Create two vectors theta1 = W1 + b1, theta2 = W2 + b2
@@ -136,12 +137,12 @@ def weights_bias():
 def reshape(theta1, theta2):
 	W1 = np.reshape(theta1[0:global_hidden_size * global_input_size], (global_hidden_size, global_input_size))
 	b1 =np.reshape(theta1[global_hidden_size * global_input_size: len(theta1)], (global_hidden_size, 1))
-	W2 = np.reshape(theta2[0:global_hidden_size * 5], (5, global_hidden_size))
-	b2 =np.reshape(theta2[global_hidden_size * 5: len(theta2)], (5, 1))
+	W2 = np.reshape(theta2[0:global_hidden_size * global_num_outputs], (global_num_outputs, global_hidden_size))
+	b2 =np.reshape(theta2[global_hidden_size * global_num_outputs: len(theta2)], (global_num_outputs, 1))
 	return W1, W2, b1, b2
 
 # Pick the size of the data we want (max 60000)
-size = 60000
+size = 10000
 
 # Extract the MNIST training data sets
 train = read_idx('data/train-images-idx3-ubyte.gz', size)
@@ -152,9 +153,6 @@ labels_train = np.reshape(labels_train, (len(labels_train), 1))
 print train.shape
 print labels_train.shape
 
-# Set up the filename we want to use
-# filename = 'outputs/finalWeightsL1e-4B3Size60000HL200SOFT.out'
-
 # Need to know how many training inputs we have
 m = len(train)
 
@@ -162,8 +160,8 @@ m = len(train)
 theta1, theta2 = weights_bias()
 
 # Set up an array that will be either 1 or 0 depending on which number we are looking at
-y_vals_train = np.zeros((len(labels_train), 5))
-for i in range(5):
+y_vals_train = np.zeros((len(labels_train), global_num_outputs))
+for i in range(global_num_outputs):
 	# Set up an array with the values that stand for each number
 	arr_num = [0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9]
 	
@@ -195,9 +193,6 @@ theta_new = minimum.x
 print 'Cost after minimization: %g' %(reg_cost(theta_new, train, y_vals_train, theta1))
 time_finish2 = time.time()
 
-# Save to a file to use later
-# np.savetxt(filename, theta_new, delimiter = ',')
-
 print 'Total time for minimization = %g' %(time_finish2 - time_start2)
 
 # Find the probabilities for each digit
@@ -205,6 +200,14 @@ print 'Total time for minimization = %g' %(time_finish2 - time_start2)
 final_W1, final_W2, final_b1, final_b2 = reshape(theta1, theta_new)
 
 # Need to know how many testing inputs we have
+# Extract the MNIST testing data sets
+test = read_idx('data/t10k-images-idx3-ubyte.gz', size)
+test = test / 255.0
+test = np.reshape(test, (test.shape[0], (test.shape[1] * test.shape[2])))
+labels_test = read_idx('data/t10k-labels-idx1-ubyte.gz', size)
+labels_test = np.reshape(labels_test, (len(labels_test), 1))
+print train.shape
+print labels_train.shape
 m = len(test)
 prob_all, nano = feedforward(final_W1, final_W2, final_b1, final_b2, test)
 
@@ -214,14 +217,14 @@ for i in range (len(prob_all)):
 	best_prob[i, 0] = np.argmax(prob_all[i, :])
 	 
 # Find how accurate our program was with identifying the correct number
-correct_guess = np.zeros((10, 1))
+correct_guess = np.zeros((global_num_outputs, 1))
 for i in range(len(best_prob)):
 	if (best_prob[i] == int(labels_test[i])):
 		correct_guess[int(labels_test[i])] = correct_guess[int(labels_test[i])] + 1
 
 # Find how many of each number of our array labels_test has
-y_digits = np.zeros((10, 1))
-for i in range(10):
+y_digits = np.zeros((global_num_outputs, 1))
+for i in range(global_num_outputs):
 	for j in range(len(labels_test)):
 		if (labels_test[j] == i):
 			y_digits[i] = y_digits[i] + 1

@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u stlMNIST.py 300000 10 300 >& output_logs/outputStlLambda3e-2Rho0.1Beta3MNIST.log
+python -u stlMNIST.py $PBS_ARRAYID 10 300 >& output_logs/outputStlRho0.1Beta3MNISTLambda$PBS_ARRAYID.log

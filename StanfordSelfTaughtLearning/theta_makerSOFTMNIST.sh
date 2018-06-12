@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u softmax_regression2MNIST.py 1000 >& output_logs/outputsoftmaxLambda1e-4MNIST.log
+python -u softmax_regression2MNIST.py 1000 >& output_logs/outputsoftmaxLambda1e-4MNISTwithMNISTsaeData.log
