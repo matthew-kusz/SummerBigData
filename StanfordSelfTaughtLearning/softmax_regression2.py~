@@ -171,7 +171,7 @@ print scipy.optimize.check_grad(reg_cost, backprop, theta2, train, y_vals_train,
 
 print 'Cost before minimization: %g' %(reg_cost(theta2, train, y_vals_train, theta1))
 time_start2 = time.time()
-
+'''
 # Minimize the cost value
 minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta2, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (train, y_vals_train, theta1)) #options = {"disp":True}
 print minimum
@@ -181,6 +181,7 @@ print 'Cost after minimization: %g' %(reg_cost(theta_new, train, y_vals_train, t
 time_finish2 = time.time()
 
 # Save to a file to use later
-np.savetxt(filename, theta_new, delimiter = ',')
+# np.savetxt(filename, theta_new, delimiter = ',')
 
 print 'Total time for minimization = %g' %(time_finish2 - time_start2)
+'''
