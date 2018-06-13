@@ -186,33 +186,28 @@ print scipy.optimize.check_grad(reg_cost, backprop, theta1, check_patches, y)
 # Recieved a value of 3.6e-5
 '''
 
-check_patches = patches[0:1000]
+check_patches = patches[0:20000]
 m = len(check_patches)
-y = check_patches
-print 'Cost before minimization: %g' %(reg_cost(theta1, check_patches, y))
-image = np.reshape(check_patches[0], (8,8,3))
-plt.imshow(image, interpolation = 'none')
-plt.show()
+# y = check_patches
 
 # Let's apply ZCA whitening
-mean_patches = np.mean(patches, axis = 0)
+mean_patches = np.mean(check_patches, axis = 0)
 mean_patches = np.reshape(mean_patches, (1, check_patches.shape[1]))
 check_patches = check_patches - np.tile(mean_patches, (check_patches.shape[0], 1))
 
 sigma = np.dot(check_patches.T, check_patches) / check_patches[0].shape
 u, s, v = np.linalg.svd(sigma)
 ZCAWhite = np.dot(u, np.dot(np.diag(1.0 / np.sqrt(s + global_epsilon)), u.T))
-check_patches = np.dot(check_patches, ZCAWhite)
+whitened_patches = np.dot(check_patches, ZCAWhite)
+y = whitened_patches
 
-image = np.reshape(check_patches[0], (8,8,3))
-plt.imshow(image, interpolation = 'none')
-plt.show()
+print 'Cost before minimization: %g' %(reg_cost(theta1, whitened_patches, y))
 
 # Minimize the cost value
-minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (check_patches, y)) #options = {"disp":True}
+minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (whitened_patches, y)) #options = {"disp":True}
 theta_new = minimum.x
 
-print 'Cost after minimization: %g' %(reg_cost(theta_new, check_patches, y))
+print 'Cost after minimization: %g' %(reg_cost(theta_new, whitened_patches, y))
 
 # Save to a file to use later
 np.savetxt(filename, theta_new, delimiter = ',')
