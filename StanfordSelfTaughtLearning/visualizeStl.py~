@@ -81,7 +81,7 @@ def reshape(theta):
 	return W1, W2, b1, b2
 
 # Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeights5-9L3e-3B3Rho0.1Size60000HL200.out')
+theta_final = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.03Beta3.0Size60000HL200MNIST.out')
 
 # Import the file we want
 train , labels_train = grab_data.get_data(10, '59')

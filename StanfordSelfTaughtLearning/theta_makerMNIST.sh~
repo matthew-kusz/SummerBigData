@@ -1,4 +1,4 @@
-#PBS -N stlMNISTsize60000Lamb3e-3Rho0.1Beta3
+#PBS -N stlMNISTsize60000Lamb0.003Rho0.1Beta3
 #PBS -l walltime=02:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u stlMNIST.py 300000 10 300 >& output_logs/outputStlLambda3e-2Rho0.1Beta3MNIST.log
+python -u stlMNIST.py 30000 10 300 >& outputStlRho0.1Beta3MNISTLambda0.003.log
