@@ -1,0 +1,17 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordSelfTaughtLearning
+=>> PBS: job killed: walltime 7239 exceeded limit 7200
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=02:00:33
+walltime=02:00:49
+mem=2.012 GB
+vmem=2.636 GB
+-----------------------
+Resource units charged (estimate):
+0.805 RUs
+-----------------------

@@ -1,5 +1,5 @@
 #PBS -N lcfsaeSize100000L3e-3B5Rho0.035
-#PBS -l walltime=00:45:00
+#PBS -l walltime=03:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe

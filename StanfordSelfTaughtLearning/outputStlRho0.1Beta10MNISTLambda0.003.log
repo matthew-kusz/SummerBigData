@@ -1,0 +1,20 @@
+You chose Namespace(Beta=1000.0, Lambda=30000.0, Rho=10.0)
+(60000, 784)
+(60000, 1)
+Cost before minimization: 903.496
+Global step: 50
+Global step: 100
+Global step: 150
+Global step: 200
+  status: 0
+ success: True
+    nfev: 245
+     fun: 13.310719811619613
+       x: array([ -9.57285864e-05,   4.84028436e-05,  -4.60722709e-05, ...,
+        -3.57428150e+00,  -3.56794325e+00,  -3.58474973e+00])
+ message: 'CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH'
+     jac: array([ -2.87185759e-07,   1.45208531e-07,  -1.38216813e-07, ...,
+         3.56416995e-04,   3.59975495e-04,   3.48093476e-04])
+     nit: 235
+Cost after minimization: 13.3107
+Total time for minimization = 5025.06

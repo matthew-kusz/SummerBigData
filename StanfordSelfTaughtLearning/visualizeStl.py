@@ -81,18 +81,46 @@ def reshape(theta):
 	return W1, W2, b1, b2
 
 # Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.003Beta3.0Size60000HL200MNIST.out')
+theta_final = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.003Beta0.5Size60000HL200MNIST.out')
+
+# Find the max activations
+W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
+y = W1_final / np.reshape(np.sqrt(np.sum(W1_final ** 2, axis = 1)), (len(W1_final), 1))
+
+# Now let's show all of the inputs
+images1 = []
+images6 = []
+
+dim_image = 28
+num_row = 14
+num_col = 14
+black_space = np.ones((dim_image, 1)) * y.max()
+black_space2 = np.ones((1, dim_image * num_col + num_col - 1)) * y.max()
+
+for i in range(num_row):
+	for j in range(num_col):
+		if (j == 0):
+			images1 = np.reshape(y[j + i * num_col], (dim_image, dim_image))
+		else:
+			temp = np.reshape(y[j + i * num_col], (dim_image, dim_image))
+			images1 = np.concatenate((images1, black_space, temp), axis = 1)
+			
+	if (i == 0):
+		images6 = images1
+	else:
+		images6 = np.concatenate((images6, black_space2, images1), axis = 0)
+d = plt.figure(2)
+plt.imshow(images6, cmap = 'binary', interpolation = 'none')
+d.show()
+
 
 # Import the file we want
 train , labels_train = grab_data.get_data(10, '59')
 
+
 # Need to know how many inputs we have
 m = len(train)
 
-# Create our weights and bias terms
-theta1 = weights_bias()
-
-W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 a3_final, a2_final = feedforward(W1_final, W2_final, b1_final, b2_final, train)
 '''
 for i in range(m):
@@ -123,77 +151,5 @@ a = plt.figure(1)
 plt.imshow(all_all, cmap = 'binary', interpolation = 'none')
 a.show()
 '''
-# This code is ugly, sorry
-images = [[0], [0], [0], [0], [0]]
-images2 = [[0], [0], [0], [0], [0]]
-images3 = [[0], [0], [0], [0], [0]]
-images4 = [[0], [0], [0], [0], [0]]
-images5 = [[0], [0], [0], [0], [0]]
 
-
-for i in range(5):
-	x = W1_final[i] / math.sqrt(np.sum(W1_final[i] ** 2))
-	x = np.reshape(x, (28, 28))
-	images[i] = x
-
-for i in range(5):
-	x = W1_final[i + 5] / math.sqrt(np.sum(W1_final[i + 5] ** 2))
-	x = np.reshape(x, (28, 28))
-	images2[i] = x
-
-for i in range(5):
-	x = W1_final[i + 10] / math.sqrt(np.sum(W1_final[i + 10] ** 2))
-	x = np.reshape(x, (28, 28))
-	images3[i] = x
-
-for i in range(5):
-	x = W1_final[i + 15] / math.sqrt(np.sum(W1_final[i + 15] ** 2))
-	x = np.reshape(x, (28, 28))
-	images4[i] = x
-
-for i in range(5):
-	x = W1_final[i + 20] / math.sqrt(np.sum(W1_final[i + 20] ** 2))
-	x = np.reshape(x, (28, 28))
-	images5[i] = x
-
-
-# Stitch the images together horizontally
-set_up = np.concatenate((images, images2, images3, images4, images5), axis = 1)
-black_space = np.ones((28, 1)) * set_up.max()
-black_space2 = np.ones((1, 144)) * set_up.max()
-
-all_img = np.concatenate((images[0], black_space, images[1], black_space, images[2], black_space, images[3], black_space, images[4]), axis = 1)
-all_img2 = np.concatenate((images2[0], black_space, images2[1], black_space, images2[2], black_space, images2[3], black_space, images2[4]), axis = 1)
-all_img3 = np.concatenate((images3[0], black_space, images3[1], black_space, images3[2], black_space, images3[3], black_space, images3[4]), axis = 1)
-all_img4 = np.concatenate((images4[0], black_space, images4[1], black_space, images4[2], black_space, images4[3], black_space, images4[4]), axis = 1)
-all_img5 = np.concatenate((images5[0], black_space, images5[1], black_space, images5[2], black_space, images5[3], black_space, images5[4]), axis = 1)
-
-# Now stitch them vertically
-all_images = np.concatenate((all_img, black_space2, all_img2, black_space2, all_img3, black_space2, all_img4, black_space2, all_img5), axis = 0)
-c = plt.figure(1)
-plt.imshow(all_images, cmap = 'binary', interpolation = 'none')
-c.show()
-
-# Now let's show all of the inputs
-black_space3 = np.ones((1, 405)) * set_up.max()
-images1 = []
-images6 = []
-
-for i in range(14):
-	for j in range(14):
-		if (j == 0):
-			images1 = W1_final[j + i * 14] / math.sqrt(np.sum(W1_final[j + i * 14] ** 2))
-			images1 = np.reshape(images1, (28, 28))
-		else:
-			temp = W1_final[j + i * 14] / math.sqrt(np.sum(W1_final[j + i * 14] ** 2))
-			temp = np.reshape(temp, (28, 28))
-			images1 = np.concatenate((images1, black_space, temp), axis = 1)
-			
-	if (i == 0):
-		images6 = images1
-	else:
-		images6 = np.concatenate((images6, black_space3, images1), axis = 0)
-d = plt.figure(2)
-plt.imshow(images6, cmap = 'binary', interpolation = 'none')
-d.show()
 raw_input()

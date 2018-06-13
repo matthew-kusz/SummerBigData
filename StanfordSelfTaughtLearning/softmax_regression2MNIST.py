@@ -70,7 +70,7 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	a2 = hypo(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 200) matrix
 
 	# Second run
-	a3 = hypo(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 5) matrix
+	a3 = hypo(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 10) matrix
 
 	return a3, a2
 
@@ -93,7 +93,7 @@ def backprop(thetaW2, arr_x, arr_y, thetaW1):
 	arr_W2b2 = np.hstack((arr_b2, arr_W2))
 
 	# Compute the partial derivatives
-	pd_W2 = np.dot((arr_y - a3).T, a2_1)   # (5, 201)
+	pd_W2 = np.dot((arr_y - a3).T, a2_1)   # (10, 201)
 
 	del_W2 = (-1.0 / m) * pd_W2 + global_lambda * arr_W2b2
 
@@ -113,18 +113,18 @@ def weights_bias():
 	'''	
 	r  = 0.12
 	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
-	random_weight2 = np.random.rand(global_num_outputs, global_hidden_size)     # (5, 200) matrix      
+	random_weight2 = np.random.rand(global_num_outputs, global_hidden_size)     # (10, 200) matrix      
 	random_weight2 = random_weight2 * 2 * r - r
 
 	# Set up our bias term
-	bias2 = np.random.rand(global_num_outputs, 1)    # (5, 1) matrix
+	bias2 = np.random.rand(global_num_outputs, 1)    # (10, 1) matrix
 	bias2 = bias2 * 2 * r - r
 
 	# Combine these into a 1-dimension vector
 	random_weight2_1D = np.ravel(random_weight2)
 	bias2_1D = np.ravel(bias2)
 
-	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.03Beta3.0Size60000HL200MNIST.out')
+	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.003Beta0.5Size60000HL200MNIST.out')
 	random_weight1_1D = thetas[0:global_hidden_size * global_input_size]
 	bias1_1D = thetas[2 * global_hidden_size * global_input_size: 2 * global_hidden_size * global_input_size + global_hidden_size]
 	# Create two vectors theta1 = W1 + b1, theta2 = W2 + b2

@@ -124,7 +124,7 @@ def weights_bias():
 	random_weight2_1D = np.ravel(random_weight2)
 	bias2_1D = np.ravel(bias2)
 
-	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.03Beta3.0Size60000HL200MNIST.out')
+	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.003Beta0.5Size60000HL200MNIST.out')
 	random_weight1_1D = thetas[0:global_hidden_size * global_input_size]
 	bias1_1D = thetas[2 * global_hidden_size * global_input_size: 2 * global_hidden_size * global_input_size + global_hidden_size]
 	# Create two vectors theta1 = W1 + b1, theta2 = W2 + b2
@@ -142,7 +142,7 @@ def reshape(theta1, theta2):
 	return W1, W2, b1, b2
 
 # Pick the size of the data we want (max 60000)
-size = 10000
+size = 60000
 
 # Extract the MNIST training data sets
 train = read_idx('data/train-images-idx3-ubyte.gz', size)

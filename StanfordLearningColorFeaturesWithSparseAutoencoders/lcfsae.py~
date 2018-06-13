@@ -7,7 +7,8 @@ import random
 import math
 
 ####### Global variables #######
-filename = 'outputs/finalWeightsL3e-3B5Rho0.035.out'
+filename = 'outputs/finalWeightsL3e-3B5Rho0.035TESTING.out'
+global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
 global_visible_size = global_patch_dim * global_patch_dim * global_image_channels
@@ -58,7 +59,7 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 400) matrix
 
 	# Second run
-	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))                # (m, 192) matrix
+	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))               # (m, 192) matrix
 
 	return a3, a2
 
@@ -161,6 +162,7 @@ y = patches
 theta1 = weights_bias()
 
 '''
+FOR CHECKING IF OUR BACKPROP AND COST FUNCTION WORKS
 # Check that our cost function is working
 cost_test = reg_cost(theta1, patches, y)
 print cost_test
@@ -171,17 +173,46 @@ check_patches = patches[0:100]
 print check_patches.shape
 y = check_patches
 m = len(check_patches)
+
+# Let's apply ZCA whitening
+check_patches = check_patches.T
+sigma = np.dot(check_patches, check_patches.T) / check_patches[0].shape
+u, s, v = np.linalg.svd(sigma)
+ZCAWhite = np.multiply(u, np.multiply(np.diag(1.0 / np.sqrt(np.diag(s) + global_epsilon)), u.T))
+check_patches = np.dot(ZCAWhite, check_patches)
+check_patches = check_patches.T
+
 print scipy.optimize.check_grad(reg_cost, backprop, theta1, check_patches, y)
 # Recieved a value of 3.6e-5
 '''
 
-print 'Cost before minimization: %g' %(reg_cost(theta1, patches, y))
+check_patches = patches[0:1000]
+m = len(check_patches)
+y = check_patches
+print 'Cost before minimization: %g' %(reg_cost(theta1, check_patches, y))
+image = np.reshape(check_patches[0], (8,8,3))
+plt.imshow(image, interpolation = 'none')
+plt.show()
+
+# Let's apply ZCA whitening
+mean_patches = np.mean(patches, axis = 0)
+mean_patches = np.reshape(mean_patches, (1, check_patches.shape[1]))
+check_patches = check_patches - np.tile(mean_patches, (check_patches.shape[0], 1))
+
+sigma = np.dot(check_patches.T, check_patches) / check_patches[0].shape
+u, s, v = np.linalg.svd(sigma)
+ZCAWhite = np.dot(u, np.dot(np.diag(1.0 / np.sqrt(s + global_epsilon)), u.T))
+check_patches = np.dot(check_patches, ZCAWhite)
+
+image = np.reshape(check_patches[0], (8,8,3))
+plt.imshow(image, interpolation = 'none')
+plt.show()
 
 # Minimize the cost value
-minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (patches, y)) #options = {"disp":True}
+minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (check_patches, y)) #options = {"disp":True}
 theta_new = minimum.x
 
-print 'Cost after minimization: %g' %(reg_cost(theta_new, patches, y))
+print 'Cost after minimization: %g' %(reg_cost(theta_new, check_patches, y))
 
 # Save to a file to use later
 np.savetxt(filename, theta_new, delimiter = ',')

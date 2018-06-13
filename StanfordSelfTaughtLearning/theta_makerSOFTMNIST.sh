@@ -1,5 +1,5 @@
-#PBS -N softmaxMNISTsize60000Lamb1e-4R
-#PBS -l walltime=00:45:00
+#PBS -N softmaxMNISTsize60000Rho0.1Beta0.5Lamb0.0000001
+#PBS -l walltime=01:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u softmax_regression2MNIST.py 1000 >& output_logs/outputsoftmaxLambda1e-4MNISTwithMNISTsaeData.log
+python -u softmax_regression2MNIST.py 1 >& softmaxMNISTsize60000Rho0.1Beta0.5Lamb0.0000001.log
