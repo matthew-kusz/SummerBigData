@@ -186,7 +186,7 @@ print scipy.optimize.check_grad(reg_cost, backprop, theta1, check_patches, y)
 # Recieved a value of 3.6e-5
 '''
 
-check_patches = patches[0:20000]
+check_patches = patches
 m = len(check_patches)
 # y = check_patches
 
@@ -197,10 +197,15 @@ check_patches = check_patches - np.tile(mean_patches, (check_patches.shape[0], 1
 
 sigma = np.dot(check_patches.T, check_patches) / check_patches[0].shape
 u, s, v = np.linalg.svd(sigma)
-ZCAWhite = np.dot(u, np.dot(np.diag(1.0 / np.sqrt(s + global_epsilon)), u.T))
+ZCAWhite = np.multiply(u, np.multiply(np.diag(1.0 / np.sqrt(s + global_epsilon)), u.T))
 whitened_patches = np.dot(check_patches, ZCAWhite)
 y = whitened_patches
 
+image = np.reshape(patches[0], (8, 8, 3))
+image2 = np.reshape(whitened_patches[0], (8, 8, 3))
+images = np.concatenate((image, image2))
+plt.imshow(images, interpolation = 'none')
+plt.show()
 print 'Cost before minimization: %g' %(reg_cost(theta1, whitened_patches, y))
 
 # Minimize the cost value

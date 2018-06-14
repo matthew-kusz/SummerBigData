@@ -13,7 +13,7 @@ import argparse
 
 ####### Global variables #######
 parser = argparse.ArgumentParser()
-parser.add_argument('Lambda', help = 'Lambda / 10000000 (ie 1 = 1e-7), Adjust to prevent overfitting.', type = float)
+parser.add_argument('Lambda', help = 'Lambda / 10000000 (ie 1 = 1e-9), Adjust to prevent overfitting.', type = float)
 
 args = parser.parse_args()
 

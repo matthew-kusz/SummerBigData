@@ -21,7 +21,7 @@ global_step = 0
 global_num_outputs = 10
 global_input_size  = 28 * 28
 global_hidden_size = 200
-global_lambda = args.Lambda / 10000000.0;       # weight decay parameter (1e-4)
+global_lambda = args.Lambda / 1000000000.0;       # weight decay parameter (1e-4)
 
 print 'You chose', args     
 
