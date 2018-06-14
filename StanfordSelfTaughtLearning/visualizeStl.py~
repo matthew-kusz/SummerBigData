@@ -81,7 +81,7 @@ def reshape(theta):
 	return W1, W2, b1, b2
 
 # Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.003Beta10.0Size60000HL200MNIST.out')
+theta_final = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.003Beta3 Size60000HL200.out')
 
 # Find the max activations
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
