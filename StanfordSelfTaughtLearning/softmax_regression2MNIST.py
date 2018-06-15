@@ -124,7 +124,7 @@ def weights_bias():
 	random_weight2_1D = np.ravel(random_weight2)
 	bias2_1D = np.ravel(bias2)
 
-	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.003Beta0.5Size60000HL200MNIST.out')
+	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.03Beta0.5Size60000HL200MNIST.out')
 	random_weight1_1D = thetas[0:global_hidden_size * global_input_size]
 	bias1_1D = thetas[2 * global_hidden_size * global_input_size: 2 * global_hidden_size * global_input_size + global_hidden_size]
 	# Create two vectors theta1 = W1 + b1, theta2 = W2 + b2

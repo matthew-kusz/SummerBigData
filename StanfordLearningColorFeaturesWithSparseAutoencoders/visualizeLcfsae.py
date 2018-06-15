@@ -101,11 +101,11 @@ a.show()
 '''
 
 # Import the weights we need
-theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B5Rho0.03Size100000.out')
+theta_final = np.genfromtxt('outputs/finalWeightsRho0.035Lambda0.003Beta5.0Size100000HL400.out')
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 
 # We need to reuse our whitening variable to apply to our weights
-ZCA_whitening = np.genfromtxt('outputs/ZCAwhitening.out')
+ZCA_whitening = np.genfromtxt('outputs/PatchesMeanZCAwhitening.out')
 ZCA_whitening = np.reshape(ZCA_whitening, (192, 192))
 
 # Find the max activations

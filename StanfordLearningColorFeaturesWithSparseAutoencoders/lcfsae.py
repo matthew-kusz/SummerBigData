@@ -15,21 +15,26 @@ parser.add_argument('Beta', help = 'Beta / 100, weight of sparsity penalty term'
 
 args = parser.parse_args()
 
-# filename2 = 'outputs/ZCAwhitening.out'
+# filename2 = 'outputs/PatchesMeanZCAwhiteningNORM.out'
 global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
 global_visible_size = global_patch_dim * global_patch_dim * global_image_channels
 global_hidden_size = 400
 global_output_size = global_visible_size
-global_lambda = args.Lambda / 10000000.0;     # weight decay parameter (3e-3)
-global_beta = args.Beta / 100.0;         # weight of sparsity penalty term (5)
-global_rho = args.Rho / 1000.0;           # desired average activation of the hidden units (0.035)
-global_epsilon = 0.1           # ZCA whitening
+global_lambda = args.Lambda / 10000000.0     # weight decay parameter (3e-3)
+global_beta = args.Beta / 100.0              # weight of sparsity penalty term (5)
+global_rho = args.Rho / 1000.0               # desired average activation of the hidden units (0.035)
+global_epsilon = 0.1                         # ZCA whitening
 global_num_patchs = 100000
 
+args.Lambda = global_lambda
+args.Rho = global_rho
+args.Beta = global_beta
+print 'You chose', args
+
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
+filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400TEST.out'
 
 ####### Definitions #######
 # Sigmoid function
@@ -182,17 +187,20 @@ image = np.reshape(patches[0], (8, 8, 3))
 plt.imshow(image, interpolation = 'none')
 plt.show()
 '''
+
 # Let's apply ZCA whitening
 whiten_patches, ZCA_matrix = ZCA_white(patches)
 # ZCA_matrix = np.ravel(ZCA_matrix)
 # np.savetxt(filename2, ZCA_matrix, delimiter = ',')
 
-# We need to normalized our whitened patches or else our picture doesn't look right
-whiten_patches = Norm(whiten_patches)
+# We need to normalize our whitened patches or else our picture doesn't look right
+for i in range(len(whiten_patches)):
+	whiten_patches[i] = Norm(whiten_patches[i])
 
 y = whiten_patches
 
 '''
+# Comparing images before and after whitening
 image = np.reshape(patches[0], (8, 8, 3))
 image2 = np.reshape(whiten_patches[0], (8, 8, 3))
 images = np.concatenate((image, image2), axis = 1)

@@ -1,0 +1,8 @@
+(100000, 192)
+Cost before minimization: 1152.24
+Global step: 20
+Global step: 40
+Global step: 60
+Global step: 80
+Global step: 100
+Cost after minimization: 0.390926
