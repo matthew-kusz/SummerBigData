@@ -119,33 +119,17 @@ a = plt.figure(1)
 plt.imshow(all_all, cmap = 'binary', interpolation = 'none')
 a.show()
 '''
-# We need to recalculate our whitening variable to apply to our weights
-data = scipy.io.loadmat('data/stlSampledPatches.mat')
-patches = data['patches']
 
-# Tranpose patches to the dimension we want
-patches = patches.T                        # (m, 192)
-m = len(patches)
+# Import the weights we need
+theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B5Rho0.03Size100000.out')
+W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 
-# Test set
-check_patches = patches[0:20000]
-m = len(check_patches)
-
-# Let's apply ZCA whitening
-mean_patches = np.mean(check_patches, axis = 0)
-mean_patches = np.reshape(mean_patches, (1, check_patches.shape[1]))
-check_patches = check_patches - np.tile(mean_patches, (check_patches.shape[0], 1))
-
-sigma = np.dot(check_patches.T, check_patches) / check_patches[0].shape
-u, s, v = np.linalg.svd(sigma)
-# ZCAWhite = np.dot(u, np.dot(np.diag(1.0 / np.sqrt(s + global_epsilon)), u.T))
-ZCAWhite = u.dot(np.diag(1.0 / np.sqrt(s + global_epsilon))).dot(u.T)
-# Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B5Rho0.035TESTING.out')
+# We need to reuse our whitening variable to apply to our weights
+ZCA_whitening = np.genfromtxt('outputs/ZCAwhitening.out')
+ZCA_whitening = np.reshape(ZCA_whitening, (192, 192))
+W1_whitened = np.dot(W1_final, ZCA_whitening)
 
 # Find the max activations
-W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
-W1_whitened = np.dot(W1_final, ZCAWhite)
 y = W1_whitened / np.reshape(np.sqrt(np.sum(W1_whitened ** 2, axis = 1)), (len(W1_whitened), 1))
 
 # Now let's show all of the inputs

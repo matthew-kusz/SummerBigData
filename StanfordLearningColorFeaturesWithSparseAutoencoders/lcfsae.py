@@ -7,7 +7,8 @@ import random
 import math
 
 ####### Global variables #######
-filename = 'outputs/finalWeightsL3e-3B5Rho0.035TESTING.out'
+filename = 'outputs/finalWeightsL3e-3B5Rho0.03Size100000.out'
+filename2 = 'outputs/ZCAwhitening.out'
 global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
@@ -140,80 +141,67 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
+# ZCA Whitening
+def ZCA_white(inputs):
+
+	sigma = np.dot(inputs.T, inputs) / m
+	u, s, v = np.linalg.svd(sigma)
+	ZCAWhite = np.dot(np.dot(u, np.diag(1.0 / np.sqrt(s + global_epsilon))), u.T)
+	whitened_patches = np.dot(inputs, ZCAWhite)
+	
+	return whitened_patches, ZCAWhite
+
 data = scipy.io.loadmat('data/stlSampledPatches.mat')
-patches = data['patches']
+patches = data['patches'].T                # (m, 192)
 print patches.shape
 
-'''
-# We need to values in patches to range from 0 to 1
-old_min = -1
-old_max = 1
-new_min = 0
-new_max = 1
-patches = ((patches - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
-'''
-
-# Tranpose patches to the dimension we want
-patches = patches.T                        # (m, 192)
 m = len(patches)
-# y = patches
 
 # Create our weights and bias terms
 theta1 = weights_bias()
 
 '''
-FOR CHECKING IF OUR BACKPROP AND COST FUNCTION WORKS
+image = np.reshape(patches[0], (8, 8, 3))
+plt.imshow(image, interpolation = 'none')
+plt.show()
+'''
+# Let's apply ZCA whitening
+whiten_patches, ZCA_matrix = ZCA_white(patches)
+ZCA_matrix = np.ravel(ZCA_matrix)
+np.savetxt(filename2, ZCA_matrix, delimiter = ',')
+
+# y = whiten_patches
+'''
+image = np.reshape(patches[0], (8, 8, 3))
+image2 = np.reshape(whiten_patches[0], (8, 8, 3))
+images = np.concatenate((image, image2))
+plt.imshow(images, interpolation = 'none')
+plt.show()
+'''
+check_patches = whiten_patches[0:100]
+m = len(check_patches)
+y = check_patches
+
+# FOR CHECKING IF OUR BACKPROP AND COST FUNCTION WORKS
 # Check that our cost function is working
-cost_test = reg_cost(theta1, patches, y)
+cost_test = reg_cost(theta1, check_patches, y)
 print cost_test
 # We had a cost value of 81.4
 
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
-check_patches = patches[0:100]
-print check_patches.shape
-y = check_patches
-m = len(check_patches)
-
-# Let's apply ZCA whitening
-check_patches = check_patches.T
-sigma = np.dot(check_patches, check_patches.T) / check_patches[0].shape
-u, s, v = np.linalg.svd(sigma)
-ZCAWhite = np.multiply(u, np.multiply(np.diag(1.0 / np.sqrt(np.diag(s) + global_epsilon)), u.T))
-check_patches = np.dot(ZCAWhite, check_patches)
-check_patches = check_patches.T
-
 print scipy.optimize.check_grad(reg_cost, backprop, theta1, check_patches, y)
 # Recieved a value of 3.6e-5
+
+
 '''
-
-check_patches = patches
-m = len(check_patches)
-# y = check_patches
-
-# Let's apply ZCA whitening
-mean_patches = np.mean(check_patches, axis = 0)
-mean_patches = np.reshape(mean_patches, (1, check_patches.shape[1]))
-check_patches = check_patches - np.tile(mean_patches, (check_patches.shape[0], 1))
-
-sigma = np.dot(check_patches.T, check_patches) / check_patches[0].shape
-u, s, v = np.linalg.svd(sigma)
-ZCAWhite = np.multiply(u, np.multiply(np.diag(1.0 / np.sqrt(s + global_epsilon)), u.T))
-whitened_patches = np.dot(check_patches, ZCAWhite)
-y = whitened_patches
-
-image = np.reshape(patches[0], (8, 8, 3))
-image2 = np.reshape(whitened_patches[0], (8, 8, 3))
-images = np.concatenate((image, image2))
-plt.imshow(images, interpolation = 'none')
-plt.show()
-print 'Cost before minimization: %g' %(reg_cost(theta1, whitened_patches, y))
+print 'Cost before minimization: %g' %(reg_cost(theta1, whiten_patches, y))
 
 # Minimize the cost value
-minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (whitened_patches, y)) #options = {"disp":True}
+minimum = scipy.optimize.minimize(fun = reg_cost, x0 = theta1, method = 'L-BFGS-B', tol = 1e-4, jac = backprop, args = (whiten_patches, y)) #options = {"disp":True}
 theta_new = minimum.x
 
-print 'Cost after minimization: %g' %(reg_cost(theta_new, whitened_patches, y))
+print 'Cost after minimization: %g' %(reg_cost(theta_new, whiten_patches, y))
 
 # Save to a file to use later
 np.savetxt(filename, theta_new, delimiter = ',')
-
+'''

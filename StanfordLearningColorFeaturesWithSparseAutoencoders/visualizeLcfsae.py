@@ -38,39 +38,12 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	This enables each row in our dot product to receive the same bias term. If it were a (25, 10000) array it is equivalent to adding 
 	our bias column to each dot product column with just + b1 (since b1 starts as a column).
 	'''
-	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 25) matrix
+	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 400) matrix
 
 	# Second run
-	a3 = sigmoid(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 64) matrix
+	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))       # (m, 192) matrix
 
 	return a3, a2
-
-# Set up our weights and bias terms
-def weights_bias():
-	# Initialize parameters randomly based on layer sizes.
-	# We'll choose weights uniformly from the interval [-r, r]
-	r  = 0.12
-	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (25, 64) matrix
-	random_weight1 = random_weight1 * 2 * r - r
-	random_weight2 = np.random.rand(global_visible_size, global_hidden_size)     # (64, 25) matrix      
-	random_weight2 = random_weight2 * 2 * r - r
-
-	# Set up our bias term
-	bias1 = np.random.rand(global_hidden_size, 1)     # (25, 1) matrix
-	bias1 = bias1 * 2 * r - r
-	bias2 = np.random.rand(global_visible_size, 1)    # (64, 1) matrix
-	bias2 = bias2 * 2 * r - r
-
-	# Combine these into a 1-dimension vector
-	random_weight1_1D = np.ravel(random_weight1)
-	bias1_1D = np.ravel(bias1)
-	random_weight2_1D = np.ravel(random_weight2)
-	bias2_1D = np.ravel(bias2)
-
-	# Create a vector theta = W1 + W2 + b1 + b2
-	theta_vals = np.concatenate((random_weight1_1D, random_weight2_1D, bias1_1D, bias2_1D))	
-	
-	return theta_vals
 
 # Change our weights and bias terms back into their proper shapes
 def reshape(theta):
@@ -119,33 +92,17 @@ a = plt.figure(1)
 plt.imshow(all_all, cmap = 'binary', interpolation = 'none')
 a.show()
 '''
-# We need to recalculate our whitening variable to apply to our weights
-data = scipy.io.loadmat('data/stlSampledPatches.mat')
-patches = data['patches']
 
-# Tranpose patches to the dimension we want
-patches = patches.T                        # (m, 192)
-m = len(patches)
+# Import the weights we need
+theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B5Rho0.03Size100000.out')
+W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 
-# Test set
-check_patches = patches[0:20000]
-m = len(check_patches)
-
-# Let's apply ZCA whitening
-mean_patches = np.mean(check_patches, axis = 0)
-mean_patches = np.reshape(mean_patches, (1, check_patches.shape[1]))
-check_patches = check_patches - np.tile(mean_patches, (check_patches.shape[0], 1))
-
-sigma = np.dot(check_patches.T, check_patches) / check_patches[0].shape
-u, s, v = np.linalg.svd(sigma)
-ZCAWhite = np.dot(u, np.dot(np.diag(1.0 / np.sqrt(s + global_epsilon)), u.T))
-
-# Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsL3e-3B5Rho0.035TESTING.out')
+# We need to reuse our whitening variable to apply to our weights
+ZCA_whitening = np.genfromtxt('outputs/ZCAwhitening.out')
+ZCA_whitening = np.reshape(ZCA_whitening, (192, 192))
+W1_whitened = np.dot(W1_final, ZCA_whitening)
 
 # Find the max activations
-W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
-W1_whitened = np.dot(W1_final, ZCAWhite)
 y = W1_whitened / np.reshape(np.sqrt(np.sum(W1_whitened ** 2, axis = 1)), (len(W1_whitened), 1))
 
 # Now let's show all of the inputs
