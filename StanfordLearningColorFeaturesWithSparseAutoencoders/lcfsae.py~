@@ -13,7 +13,7 @@ global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
 global_visible_size = global_patch_dim * global_patch_dim * global_image_channels
-global_hidden_size = 200
+global_hidden_size = 400
 global_output_size = global_visible_size
 global_lambda = 3e-3
 global_beta = 5
@@ -151,6 +151,13 @@ def ZCA_white(inputs):
 	
 	return whitened_patches, ZCAWhite
 
+def Norm(mat):
+	Min = np.amin(mat)
+	Max = np.amax(mat)
+	nMin = 0.00001
+	nMax = 0.99999
+	return ((mat - Min) / (Max - Min)) * (nMax - nMin) + nMin
+
 data = scipy.io.loadmat('data/stlSampledPatches.mat')
 patches = data['patches'].T                # (m, 192)
 print patches.shape
@@ -170,13 +177,17 @@ whiten_patches, ZCA_matrix = ZCA_white(patches)
 ZCA_matrix = np.ravel(ZCA_matrix)
 np.savetxt(filename2, ZCA_matrix, delimiter = ',')
 
-# y = whiten_patches
-'''
+# We need to normalized our whitened patches or else our picture doesn't look right
+whiten_patches = Norm(whiten_patches)
+
+y = whiten_patches
+
 image = np.reshape(patches[0], (8, 8, 3))
 image2 = np.reshape(whiten_patches[0], (8, 8, 3))
-images = np.concatenate((image, image2))
+images = np.concatenate((image, image2), axis = 1)
 plt.imshow(images, interpolation = 'none')
 plt.show()
+
 '''
 check_patches = whiten_patches[0:100]
 m = len(check_patches)
@@ -191,9 +202,8 @@ print cost_test
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
 print scipy.optimize.check_grad(reg_cost, backprop, theta1, check_patches, y)
 # Recieved a value of 3.6e-5
-
-
 '''
+
 print 'Cost before minimization: %g' %(reg_cost(theta1, whiten_patches, y))
 
 # Minimize the cost value
@@ -204,4 +214,4 @@ print 'Cost after minimization: %g' %(reg_cost(theta_new, whiten_patches, y))
 
 # Save to a file to use later
 np.savetxt(filename, theta_new, delimiter = ',')
-'''
+
