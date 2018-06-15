@@ -182,11 +182,13 @@ whiten_patches = Norm(whiten_patches)
 
 y = whiten_patches
 
+'''
 image = np.reshape(patches[0], (8, 8, 3))
 image2 = np.reshape(whiten_patches[0], (8, 8, 3))
 images = np.concatenate((image, image2), axis = 1)
 plt.imshow(images, interpolation = 'none')
 plt.show()
+'''
 
 '''
 check_patches = whiten_patches[0:100]

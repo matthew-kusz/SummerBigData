@@ -54,6 +54,13 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
+def Norm(mat):
+	Min = np.amin(mat)
+	Max = np.amax(mat)
+	nMin = 0.00001
+	nMax = 0.99999
+	return ((mat - Min) / (Max - Min)) * (nMax - nMin) + nMin
+
 '''
 # Import the file we want
 # train , labels_train = grab_data.get_data(10, '59')
@@ -100,10 +107,11 @@ W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 # We need to reuse our whitening variable to apply to our weights
 ZCA_whitening = np.genfromtxt('outputs/ZCAwhitening.out')
 ZCA_whitening = np.reshape(ZCA_whitening, (192, 192))
-W1_whitened = np.dot(W1_final, ZCA_whitening)
 
 # Find the max activations
-y = W1_whitened / np.reshape(np.sqrt(np.sum(W1_whitened ** 2, axis = 1)), (len(W1_whitened), 1))
+y = W1_final / np.reshape(np.sqrt(np.sum(W1_final ** 2, axis = 1)), (len(W1_final), 1))
+y = np.dot(y, ZCA_whitening)
+y = Norm(y)
 
 # Now let's show all of the inputs
 images1 = []
@@ -120,12 +128,12 @@ for i in range(num_row):
 			images1 = np.reshape(y[j + i * num_col], (global_patch_dim, global_patch_dim, global_image_channels))
 		else:
 			temp = np.reshape(y[j + i * num_col], (global_patch_dim, global_patch_dim, global_image_channels))
-			images1 = np.concatenate((images1, temp), axis = 1)
+			images1 = np.concatenate((images1, black_space, temp), axis = 1)
 			
 	if (i == 0):
 		images6 = images1
 	else:
-		images6 = np.concatenate((images6, images1), axis = 0)
+		images6 = np.concatenate((images6, black_space2, images1), axis = 0)
 
 d = plt.figure(2)
 plt.imshow(images6, interpolation = 'none')

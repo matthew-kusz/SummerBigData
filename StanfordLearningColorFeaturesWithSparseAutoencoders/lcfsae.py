@@ -5,21 +5,31 @@ import scipy.optimize
 import scipy.io
 import random
 import math
+import argparse
 
 ####### Global variables #######
-filename = 'outputs/finalWeightsL3e-3B5Rho0.03Size100000.out'
-filename2 = 'outputs/ZCAwhitening.out'
+parser = argparse.ArgumentParser()
+parser.add_argument('Lambda', help = 'Lambda / 10000000 (ie 1 = 1e-7), adjust to prevent overfitting.', type = float)
+parser.add_argument('Rho', help = 'Rho / 1000, desired average activation of the hidden units (sparsity parameter)', type = float)
+parser.add_argument('Beta', help = 'Beta / 100, weight of sparsity penalty term', type = float)
+
+args = parser.parse_args()
+
+# filename2 = 'outputs/ZCAwhitening.out'
 global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
 global_visible_size = global_patch_dim * global_patch_dim * global_image_channels
 global_hidden_size = 400
 global_output_size = global_visible_size
-global_lambda = 3e-3
-global_beta = 5
-global_rho = 0.035             # Sparsity parameter
+global_lambda = args.Lambda / 10000000.0;     # weight decay parameter (3e-3)
+global_beta = args.Beta / 100.0;         # weight of sparsity penalty term (5)
+global_rho = args.Rho / 1000.0;           # desired average activation of the hidden units (0.035)
 global_epsilon = 0.1           # ZCA whitening
 global_num_patchs = 100000
+
+# Set up the filename we want to use
+filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
 
 ####### Definitions #######
 # Sigmoid function
@@ -174,8 +184,8 @@ plt.show()
 '''
 # Let's apply ZCA whitening
 whiten_patches, ZCA_matrix = ZCA_white(patches)
-ZCA_matrix = np.ravel(ZCA_matrix)
-np.savetxt(filename2, ZCA_matrix, delimiter = ',')
+# ZCA_matrix = np.ravel(ZCA_matrix)
+# np.savetxt(filename2, ZCA_matrix, delimiter = ',')
 
 # We need to normalized our whitened patches or else our picture doesn't look right
 whiten_patches = Norm(whiten_patches)
