@@ -57,8 +57,8 @@ def reshape(theta):
 def Norm(mat):
 	Min = np.amin(mat)
 	Max = np.amax(mat)
-	nMin = 0.00001
-	nMax = 0.99999
+	nMin = 0.0
+	nMax = 1.0
 	return ((mat - Min) / (Max - Min)) * (nMax - nMin) + nMin
 
 '''
@@ -101,17 +101,19 @@ a.show()
 '''
 
 # Import the weights we need
-theta_final = np.genfromtxt('outputs/finalWeightsRho0.035Lambda0.003Beta5.0Size100000HL400.out')
+theta_final = np.genfromtxt('outputs/finalWeightsRho0.035Lambda0.003Beta5.0Size100000HL400MEANTEST.out')
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 
 # We need to reuse our whitening variable to apply to our weights
-ZCA_whitening = np.genfromtxt('outputs/PatchesMeanZCAwhitening.out')
+ZCA_whitening = np.genfromtxt('outputs/PatchesMeanZCAwhiteningMEANTEST.out')
 ZCA_whitening = np.reshape(ZCA_whitening, (192, 192))
 
 # Find the max activations
 y = W1_final / np.reshape(np.sqrt(np.sum(W1_final ** 2, axis = 1)), (len(W1_final), 1))
 y = np.dot(y, ZCA_whitening)
-y = Norm(y)
+print len(y)
+for i in range(len(y)):
+	y[i] = Norm(y[i])
 
 # Now let's show all of the inputs
 images1 = []
@@ -119,9 +121,8 @@ images6 = []
 
 num_row = 20
 num_col = 20
-black_space = np.ones((global_patch_dim, 1, 3)) * y.max()
-black_space2 = np.ones((1, global_patch_dim * num_col + num_col - 1, 3)) * y.max()
-
+black_space = np.ones((global_patch_dim, 1, 3)) * np.amin(y)
+black_space2 = np.ones((1, global_patch_dim * num_col + num_col - 1, 3)) * np.amin(y)
 for i in range(num_row):
 	for j in range(num_col):
 		if (j == 0):
@@ -134,8 +135,8 @@ for i in range(num_row):
 		images6 = images1
 	else:
 		images6 = np.concatenate((images6, black_space2, images1), axis = 0)
-
+# images6 = (images6 + 1.0) / 2
 d = plt.figure(2)
-plt.imshow(images6, interpolation = 'none')
+plt.imshow(images6, interpolation = 'nearest')
 d.show()
 raw_input()

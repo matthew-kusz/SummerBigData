@@ -15,7 +15,7 @@ parser.add_argument('Beta', help = 'Beta / 100, weight of sparsity penalty term'
 
 args = parser.parse_args()
 
-# filename2 = 'outputs/PatchesMeanZCAwhiteningNORM.out'
+filename2 = 'outputs/PatchesMeanZCAwhiteningMEANTESTSize1000.out'
 global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
@@ -34,7 +34,7 @@ args.Beta = global_beta
 print 'You chose', args
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400TEST.out'
+filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size1000HL400MEANTEST.out'
 
 ####### Definitions #######
 # Sigmoid function
@@ -158,6 +158,8 @@ def reshape(theta):
 
 # ZCA Whitening
 def ZCA_white(inputs):
+	mu = np.mean(inputs, axis = 0).reshape(1, inputs.shape[1])  # (1, 192)
+	inputs -= np.tile(mu, (inputs.shape[0], 1)) 	            # (m, 192)
 
 	sigma = np.dot(inputs.T, inputs) / m
 	u, s, v = np.linalg.svd(sigma)
@@ -169,12 +171,13 @@ def ZCA_white(inputs):
 def Norm(mat):
 	Min = np.amin(mat)
 	Max = np.amax(mat)
-	nMin = 0.00001
-	nMax = 0.99999
+	nMin = 0.0
+	nMax = 1.0
 	return ((mat - Min) / (Max - Min)) * (nMax - nMin) + nMin
 
 data = scipy.io.loadmat('data/stlSampledPatches.mat')
 patches = data['patches'].T                # (m, 192)
+patches = patches[0:1000]
 print patches.shape
 
 m = len(patches)
@@ -190,13 +193,17 @@ plt.show()
 
 # Let's apply ZCA whitening
 whiten_patches, ZCA_matrix = ZCA_white(patches)
-# ZCA_matrix = np.ravel(ZCA_matrix)
-# np.savetxt(filename2, ZCA_matrix, delimiter = ',')
+ZCA_matrix = np.ravel(ZCA_matrix)
+np.savetxt(filename2, ZCA_matrix, delimiter = ',')
 
+'''
 # We need to normalize our whitened patches or else our picture doesn't look right
 for i in range(len(whiten_patches)):
 	whiten_patches[i] = Norm(whiten_patches[i])
+'''
 
+# We need to normalize whiten_patches so that it goes from 0-1
+# whiten_patches = Norm(whiten_patches)
 y = whiten_patches
 
 '''
@@ -221,7 +228,7 @@ print cost_test
 
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
 print scipy.optimize.check_grad(reg_cost, backprop, theta1, check_patches, y)
-# Recieved a value of 3.6e-5
+# Recieved a value of 3.6e-5 (hidden layer of 20)
 '''
 
 print 'Cost before minimization: %g' %(reg_cost(theta1, whiten_patches, y))
