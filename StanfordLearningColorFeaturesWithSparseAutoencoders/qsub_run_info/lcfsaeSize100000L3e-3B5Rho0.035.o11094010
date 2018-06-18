@@ -1,0 +1,16 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordLearningColorFeaturesWithSparseAutoencoders
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=00:53:14
+walltime=00:53:17
+mem=2.140 GB
+vmem=2.728 GB
+-----------------------
+Resource units charged (estimate):
+0.355 RUs
+-----------------------
