@@ -35,6 +35,7 @@ print 'You chose', args
 # Set up the filename we want to use
 filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
 filename2 = 'outputs/ZCAwhitening' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
+filename3 = 'outputs/meanPatchesRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
 
 ####### Definitions #######
 # Sigmoid function
@@ -167,7 +168,7 @@ def ZCA_white(inputs):
 	ZCAWhite = np.dot(np.dot(u, np.diag(1.0 / np.sqrt(s + global_epsilon))), u.T)
 	whitened_patches = np.dot(inputs, ZCAWhite)
 	
-	return whitened_patches, ZCAWhite
+	return whitened_patches, ZCAWhite, mu
 
 # Normalizing a matrix to have the range 0-1
 def Norm(mat):
@@ -177,6 +178,7 @@ def Norm(mat):
 	nMax = 1.0
 	return ((mat - Min) / (Max - Min)) * (nMax - nMin) + nMin
 
+# Upload the provided data
 data = scipy.io.loadmat('data/stlSampledPatches.mat')
 patches = data['patches'].T                # (m, 192)
 print patches.shape
@@ -187,12 +189,16 @@ m = len(patches)
 theta1 = weights_bias()
 
 # Let's apply ZCA whitening
-whiten_patches, ZCA_matrix = ZCA_white(patches)
+whiten_patches, ZCA_matrix, mu = ZCA_white(patches)
+
+# Save our ZCA_matrix and mu for later when we are visualizing our activiations
 ZCA_matrix = np.ravel(ZCA_matrix)
-np.savetxt(filename2, ZCA_matrix, delimiter = ',')
+# np.savetxt(filename2, ZCA_matrix, delimiter = ',')
+mu = np.ravel(mu)
+np.savetxt(filename3, mu, delimiter = ',')
 
 y = whiten_patches
-
+stop
 '''
 # Comparing images before and after whitening
 # We need to normalize whiten_patches so that it goes from 0-1 or else our picture doesn't look right
