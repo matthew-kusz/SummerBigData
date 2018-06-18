@@ -61,21 +61,28 @@ def Norm(mat):
 	nMax = 1.0
 	return ((mat - Min) / (Max - Min)) * (nMax - nMin) + nMin
 
-'''
+####### Comparing our inputs with our outputs #######
 # Import the file we want
-# train , labels_train = grab_data.get_data(10, '59')
+data = scipy.io.loadmat('data/stlSampledPatches.mat')
+patches = data['patches'].T                # (m, 192)
 
 # Need to know how many inputs we have
-m = len(train)
+m = len(patches)
+n = len(patches[0])
 
+# Import the weights we need
+theta_final = np.genfromtxt('outputs/finalWeightsRho0.035Lambda0.003Beta5.0Size100000HL400.out')
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
-a3_final, a2_final = feedforward(W1_final, W2_final, b1_final, b2_final, train)
+
+# Forward propagate
+a3_final, a2_final = feedforward(W1_final, W2_final, b1_final, b2_final, patches)
+
+# Normalize our inputs and outputs so each row ranges from 0-1
+for i in range(m):
+	a3_final[i] = Norm(a3_final[i])
 
 for i in range(m):
-	a3_final[i] = ((a3_final[i] - a3_final[i].min()) / (a3_final[i].max() - a3_final[i].min())) * (new_max - new_min) + new_min
-
-for i in range(m):
-	patches[i] = ((patches[i] - patches[i].min()) / (patches[i].max() - patches[i].min())) * (new_max - new_min) + new_min
+	patches[i] = Norm(patches[i])
 
 # Let's see how accurate we were
 error = np.zeros((m, n))
@@ -85,60 +92,67 @@ for i in range(m):
 print "The average difference between the output pixel and the input pixel is %g." %(np.mean(error))
 
 # Plot an image of a1 and a3 side by side to see how accurate the output is to the original
-blackspace = np.ones((8,1))
-blackspace2 = np.ones((1,17))
-all1 = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
-for i in range (10):
-	temp = np.reshape(patches[i*1000], (8, 8))
-	temp2 = np.reshape(a3_final[i*1000], (8, 8))
-	all1[i] = np.concatenate((temp, blackspace, temp2), axis = 1)
+comparison1 = []
+comparison2 = []
 
-all_all = np.concatenate((all1[0], blackspace2, all1[1], blackspace2, all1[2], blackspace2, all1[3], blackspace2, all1[4], blackspace2, all1[5], blackspace2, all1[6], blackspace2, all1[7], blackspace2, all1[8], blackspace2, all1[9]), axis = 0)
+# Set up the number of columns and rows that we want in our grid
+num_row = 10
+num_col = 2
 
+# Dividers
+blackbar_length = 2
+black_space = np.zeros((global_patch_dim,blackbar_length,global_image_channels))
+black_space2 = np.zeros((blackbar_length, global_patch_dim * num_col + num_col * blackbar_length - blackbar_length, global_image_channels))
+
+# Setting up our grid
+for i in range(num_row):
+	for j in range(num_col):
+		if (j == 0):
+			comparison1 = np.reshape(patches[i*2000], (global_patch_dim, global_patch_dim, global_image_channels))
+		else:
+			temp = np.reshape(a3_final[i*2000], (global_patch_dim, global_patch_dim, global_image_channels))
+			comparison1 = np.concatenate((comparison1, black_space, temp), axis = 1)
+
+	if (i == 0):
+		comparison2 = comparison1
+	else:
+		comparison2 = np.concatenate((comparison2, black_space2, comparison1), axis = 0)
+
+# Displaying the grid			
 a = plt.figure(1)
-plt.imshow(all_all, cmap = 'binary', interpolation = 'none')
+plt.imshow(comparison2, interpolation = 'nearest')
 a.show()
-'''
 
-# Import the weights we need
-theta_final = np.genfromtxt('outputs/finalWeightsRho0.035Lambda0.003Beta5.0Size100000HL400MEANTEST.out')
-W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
-
+####### Visualizing our max activations #######
 # We need to reuse our whitening variable to apply to our weights
-ZCA_whitening = np.genfromtxt('outputs/PatchesMeanZCAwhiteningMEANTEST.out')
+ZCA_whitening = np.genfromtxt('outputs/ZCAwhitening0.035Lambda0.003Beta5.0Size100000HL400.out')
 ZCA_whitening = np.reshape(ZCA_whitening, (192, 192))
 
 # Find the max activations
 y = W1_final / np.reshape(np.sqrt(np.sum(W1_final ** 2, axis = 1)), (len(W1_final), 1))
 y = np.dot(y, ZCA_whitening)
 
-# TEMP
-W = y
-'''
-# Normalize each row so that they range from 0-1
-for i in range(len(y)):
-	y[i] = Norm(y[i])
-'''
-# y = (y + 1.0) / 2.0
-print np.amax(y)
-print np.amin(y)
+# Normalize our matrix
+y = (y + 1.0) / 2.0
 
-y = Norm(y)
 # Now let's show all of the inputs
 images1 = []
-images6 = []
+images2 = []
 
+# Set up the number of columns and rows that we want in our grid
 num_row = 20
 num_col = 20
+
 # Dividers
-blackbar_length = 1
-black_space = np.ones((global_patch_dim, blackbar_length, 3)) * np.amax(y)
-black_space2 = np.ones((blackbar_length, global_patch_dim * num_col + num_col * blackbar_length - blackbar_length, 3)) * np.amax(y)
+blackbar_length = 2
+black_space = np.ones((global_patch_dim, blackbar_length, global_image_channels)) * np.max(y)
+black_space2 = np.ones((blackbar_length, global_patch_dim * num_col + num_col * blackbar_length - blackbar_length, global_image_channels)) * np.amax(y)
 
 # Setting up our grid
 for i in range(num_row):
 	for j in range(num_col):
 		if (j == 0):
+			# First set up our image in red, then blue, then green
 			s = global_patch_dim**2
     			img = np.zeros((global_patch_dim, global_patch_dim, 3))
     			img[:,:,0] = y[j + i * num_col][:s].reshape(global_patch_dim, global_patch_dim)
@@ -155,49 +169,14 @@ for i in range(num_row):
 			images1 = np.concatenate((images1, black_space, img), axis = 1)
 			
 	if (i == 0):
-		images6 = images1
+		images2 = images1
 	else:
-		images6 = np.concatenate((images6, black_space2, images1), axis = 0)
+		images2 = np.concatenate((images2, black_space2, images1), axis = 0)
 
-# Displaying the results
+# Displaying the grid
 d = plt.figure(2)
-plt.imshow(images6, interpolation = 'nearest')
+plt.imshow(images2, interpolation = 'nearest')
 d.show()
 
-# Trying a different method
-samp_size = 400
-W = (W + 1.0) / 2.0
-dim = int(np.sqrt(W.shape[1]/3.0))
-print W.shape, dim
-
-grid_dim = int(np.sqrt(samp_size))
-padding = 2
-w, h = grid_dim*dim + padding*(grid_dim+1), grid_dim*dim + padding*(grid_dim+1)
-row, col = -1, -1
-grid = np.zeros((h, w, 3))
-#grid -= 1
-
-for x in W:
-    col += 1
-    if col % grid_dim == 0:
-        col = 0
-        row += 1
-
-    x_left = dim*col + (col+1)*padding
-    x_right = dim*(col+1) + (col+1)*padding
-    y_top = dim*row + (row+1)*padding
-    y_bottom = dim*(row+1) + (row+1)*padding
-
-    s = dim**2
-    img = np.zeros((dim, dim, 3))
-    img[:,:,0] = x[:s].reshape(dim, dim)
-    img[:,:,1] = x[s:2*s].reshape(dim, dim)
-    img[:,:,2] = x[2*s:].reshape(dim, dim)
-
-    grid[y_top:y_bottom, x_left:x_right] = img
-
-c = plt.figure(3)
-plt.imshow(grid, interpolation='nearest')
-c.show()
-
+# Allows us to view all images at once
 raw_input()

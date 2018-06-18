@@ -15,7 +15,6 @@ parser.add_argument('Beta', help = 'Beta / 100, weight of sparsity penalty term'
 
 args = parser.parse_args()
 
-filename2 = 'outputs/PatchesMeanZCAwhiteningMEANTESTSize1000.out'
 global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
@@ -34,7 +33,8 @@ args.Beta = global_beta
 print 'You chose', args
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size1000HL400MEANTEST.out'
+filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
+filename2 = 'outputs/ZCAwhitening' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
 
 ####### Definitions #######
 # Sigmoid function
@@ -75,7 +75,7 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 400) matrix
 
 	# Second run
-	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))               # (m, 192) matrix
+	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))                # (m, 192) matrix
 
 	return a3, a2
 
@@ -124,7 +124,6 @@ def weights_bias():
 	# Initialize parameters randomly based on layer sizes.
 	# We'll choose weights uniformly from the interval [-r, r]
 	r  = 0.12
-	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
 	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (400, 192) matrix
 	random_weight1 = random_weight1 * 2 * r - r
 	random_weight2 = np.random.rand(global_visible_size, global_hidden_size)     # (192, 400) matrix      
@@ -158,9 +157,11 @@ def reshape(theta):
 
 # ZCA Whitening
 def ZCA_white(inputs):
+	# Subtract the mean from our matrix
 	mu = np.mean(inputs, axis = 0).reshape(1, inputs.shape[1])  # (1, 192)
 	inputs -= np.tile(mu, (inputs.shape[0], 1)) 	            # (m, 192)
 
+	# Whiten our matrix
 	sigma = np.dot(inputs.T, inputs) / m
 	u, s, v = np.linalg.svd(sigma)
 	ZCAWhite = np.dot(np.dot(u, np.diag(1.0 / np.sqrt(s + global_epsilon))), u.T)
@@ -168,6 +169,7 @@ def ZCA_white(inputs):
 	
 	return whitened_patches, ZCAWhite
 
+# Normalizing a matrix to have the range 0-1
 def Norm(mat):
 	Min = np.amin(mat)
 	Max = np.amax(mat)
@@ -177,7 +179,6 @@ def Norm(mat):
 
 data = scipy.io.loadmat('data/stlSampledPatches.mat')
 patches = data['patches'].T                # (m, 192)
-patches = patches[0:1000]
 print patches.shape
 
 m = len(patches)
@@ -185,29 +186,17 @@ m = len(patches)
 # Create our weights and bias terms
 theta1 = weights_bias()
 
-'''
-image = np.reshape(patches[0], (8, 8, 3))
-plt.imshow(image, interpolation = 'none')
-plt.show()
-'''
-
 # Let's apply ZCA whitening
 whiten_patches, ZCA_matrix = ZCA_white(patches)
 ZCA_matrix = np.ravel(ZCA_matrix)
 np.savetxt(filename2, ZCA_matrix, delimiter = ',')
 
-'''
-# We need to normalize our whitened patches or else our picture doesn't look right
-for i in range(len(whiten_patches)):
-	whiten_patches[i] = Norm(whiten_patches[i])
-'''
-
-# We need to normalize whiten_patches so that it goes from 0-1
-# whiten_patches = Norm(whiten_patches)
 y = whiten_patches
 
 '''
 # Comparing images before and after whitening
+# We need to normalize whiten_patches so that it goes from 0-1 or else our picture doesn't look right
+whiten_patches = Norm(whiten_patches)
 image = np.reshape(patches[0], (8, 8, 3))
 image2 = np.reshape(whiten_patches[0], (8, 8, 3))
 images = np.concatenate((image, image2), axis = 1)
@@ -216,11 +205,11 @@ plt.show()
 '''
 
 '''
+# FOR CHECKING IF OUR BACKPROP AND COST FUNCTION WORKS
 check_patches = whiten_patches[0:100]
 m = len(check_patches)
 y = check_patches
 
-# FOR CHECKING IF OUR BACKPROP AND COST FUNCTION WORKS
 # Check that our cost function is working
 cost_test = reg_cost(theta1, check_patches, y)
 print cost_test
