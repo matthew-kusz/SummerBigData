@@ -1,22 +1,4 @@
 You chose Namespace(Lambda=1.0)
 (60000, 784)
 (60000, 1)
-Cost before minimization: 2.30664
-Global step: 50
-Global step: 100
-Global step: 150
-Cost after minimization: 0.18639
-Total time for minimization = 1098.81
-(60000, 784)
-(60000, 1)
-[[ 97.95918367]
- [ 98.76651982]
- [ 94.47674419]
- [ 92.07920792]
- [ 94.90835031]
- [ 95.29147982]
- [ 96.13778706]
- [ 92.50972763]
- [ 92.19712526]
- [ 92.07135778]]
-[ 94.63974834]
+Cost before minimization: 2.30784
