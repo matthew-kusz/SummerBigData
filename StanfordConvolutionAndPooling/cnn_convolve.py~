@@ -1,0 +1,11 @@
+# Import the necessary packages
+
+####### Definitions #######
+def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
+	# Number of images
+	m = images.shape[3]
+	# Dimension of image
+	img_dim = images.shape[0]
+	# Number of channels
+	channel_num = images.shape[2]
+	print m, img_dim, channel_num
