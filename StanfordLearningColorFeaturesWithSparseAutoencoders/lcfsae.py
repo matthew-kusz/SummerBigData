@@ -15,7 +15,6 @@ parser.add_argument('Beta', help = 'Beta / 100, weight of sparsity penalty term'
 
 args = parser.parse_args()
 
-filename2 = 'outputs/PatchesMeanZCAwhiteningMEANTESTSize1000.out'
 global_step = 0
 global_image_channels = 3
 global_patch_dim = 8
@@ -34,7 +33,8 @@ args.Beta = global_beta
 print 'You chose', args
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size1000HL400MEANTEST.out'
+filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
+filename2 = 'outputs/ZCAwhitening' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size100000HL400.out'
 
 ####### Definitions #######
 # Sigmoid function

@@ -101,42 +101,103 @@ a.show()
 '''
 
 # Import the weights we need
-theta_final = np.genfromtxt('outputs/finalWeightsRho0.035Lambda0.003Beta5.0Size1000HL400MEANTEST.out')
+theta_final = np.genfromtxt('outputs/finalWeightsRho0.035Lambda0.003Beta5.0Size100000HL400MEANNORMTEST.out')
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 
 # We need to reuse our whitening variable to apply to our weights
-ZCA_whitening = np.genfromtxt('outputs/PatchesMeanZCAwhiteningMEANTESTSize1000.out')
+ZCA_whitening = np.genfromtxt('outputs/PatchesMeanZCAwhiteningNORMTEST.out')
 ZCA_whitening = np.reshape(ZCA_whitening, (192, 192))
 
 # Find the max activations
 y = W1_final / np.reshape(np.sqrt(np.sum(W1_final ** 2, axis = 1)), (len(W1_final), 1))
 y = np.dot(y, ZCA_whitening)
-print len(y)
+
+# TEMP
+W = y
+'''
+# Normalize each row so that they range from 0-1
 for i in range(len(y)):
 	y[i] = Norm(y[i])
+'''
+# y = (y + 1.0) / 2.0
+print np.amax(y)
+print np.amin(y)
 
+y = Norm(y)
 # Now let's show all of the inputs
 images1 = []
 images6 = []
 
 num_row = 20
 num_col = 20
-black_space = np.ones((global_patch_dim, 1, 3)) * np.amin(y)
-black_space2 = np.ones((1, global_patch_dim * num_col + num_col - 1, 3)) * np.amin(y)
+# Dividers
+blackbar_length = 1
+black_space = np.ones((global_patch_dim, blackbar_length, 3)) * np.amax(y)
+black_space2 = np.ones((blackbar_length, global_patch_dim * num_col + num_col * blackbar_length - blackbar_length, 3)) * np.amax(y)
+
+# Setting up our grid
 for i in range(num_row):
 	for j in range(num_col):
 		if (j == 0):
-			images1 = np.reshape(y[j + i * num_col], (global_patch_dim, global_patch_dim, global_image_channels))
+			s = global_patch_dim**2
+    			img = np.zeros((global_patch_dim, global_patch_dim, 3))
+    			img[:,:,0] = y[j + i * num_col][:s].reshape(global_patch_dim, global_patch_dim)
+   			img[:,:,1] = y[j + i * num_col][s:2*s].reshape(global_patch_dim, global_patch_dim)
+    			img[:,:,2] = y[j + i * num_col][2*s:].reshape(global_patch_dim, global_patch_dim)
+			images1 = img
+
 		else:
-			temp = np.reshape(y[j + i * num_col], (global_patch_dim, global_patch_dim, global_image_channels))
-			images1 = np.concatenate((images1, black_space, temp), axis = 1)
+			s = global_patch_dim**2
+    			img = np.zeros((global_patch_dim, global_patch_dim, 3))
+    			img[:,:,0] = y[j + i * num_col][:s].reshape(global_patch_dim, global_patch_dim)
+   			img[:,:,1] = y[j + i * num_col][s:2*s].reshape(global_patch_dim, global_patch_dim)
+    			img[:,:,2] = y[j + i * num_col][2*s:].reshape(global_patch_dim, global_patch_dim)
+			images1 = np.concatenate((images1, black_space, img), axis = 1)
 			
 	if (i == 0):
 		images6 = images1
 	else:
 		images6 = np.concatenate((images6, black_space2, images1), axis = 0)
-# images6 = (images6 + 1.0) / 2
+
+# Displaying the results
 d = plt.figure(2)
 plt.imshow(images6, interpolation = 'nearest')
 d.show()
+
+# Trying a different method
+samp_size = 400
+W = (W + 1.0) / 2.0
+dim = int(np.sqrt(W.shape[1]/3.0))
+print W.shape, dim
+
+grid_dim = int(np.sqrt(samp_size))
+padding = 2
+w, h = grid_dim*dim + padding*(grid_dim+1), grid_dim*dim + padding*(grid_dim+1)
+row, col = -1, -1
+grid = np.zeros((h, w, 3))
+#grid -= 1
+
+for x in W:
+    col += 1
+    if col % grid_dim == 0:
+        col = 0
+        row += 1
+
+    x_left = dim*col + (col+1)*padding
+    x_right = dim*(col+1) + (col+1)*padding
+    y_top = dim*row + (row+1)*padding
+    y_bottom = dim*(row+1) + (row+1)*padding
+
+    s = dim**2
+    img = np.zeros((dim, dim, 3))
+    img[:,:,0] = x[:s].reshape(dim, dim)
+    img[:,:,1] = x[s:2*s].reshape(dim, dim)
+    img[:,:,2] = x[2*s:].reshape(dim, dim)
+
+    grid[y_top:y_bottom, x_left:x_right] = img
+
+c = plt.figure(3)
+plt.imshow(grid, interpolation='nearest')
+c.show()
+
 raw_input()

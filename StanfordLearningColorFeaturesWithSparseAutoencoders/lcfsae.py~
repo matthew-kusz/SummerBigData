@@ -181,7 +181,7 @@ patches = patches[0:1000]
 print patches.shape
 
 m = len(patches)
-stop
+
 # Create our weights and bias terms
 theta1 = weights_bias()
 

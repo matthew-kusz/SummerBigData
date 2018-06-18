@@ -1,4 +1,4 @@
-#PBS -N lcfsaeSize100000L3e-3B5Rho0.035MEANTESTING
+#PBS -N lcfsaeSize1000L3e-3B5Rho0.035MEANTESTING
 #PBS -l walltime=01:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u lcfsae.py 30000 35 500 >& output_logs/outputLcfsaeSize100000L3e-3B5Rho0.035MEANTESTING.log
+python -u lcfsae.py 30000 35 500 >& output_logs/outputLcfsaeSize1000L3e-3B5Rho0.035MEANTESTING.log
