@@ -1,4 +1,5 @@
 # Import the necessary packages
+import numpy as np
 
 ####### Definitions #######
 def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
@@ -8,10 +9,14 @@ def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
 	img_dim = images.shape[0]
 	# Number of channels
 	num_channel = images.shape[2]
-	print m, img_dim, channel_num
+	print m, img_dim, num_channel
 	
-	convolved_features = np.zeros(num_features, m, img_dim - patch_dim + 1, img_dim - patch_Dim + 1)
+	convolved_features = np.zeros((num_features, m, img_dim - patch_dim + 1, img_dim - patch_dim + 1))
 
+	print images.shape
+	'''
+	# Precompute the matrices that will be used during the convolution
+	images -= 
 	for i in m:
 		for j in num_features:
 		
@@ -23,3 +28,4 @@ def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
 
 			# Flip the feature matrix because of the definition of convolution, as explained later
 			feature = np.flipud(?)
+	'''

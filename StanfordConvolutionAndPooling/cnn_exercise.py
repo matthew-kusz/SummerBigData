@@ -28,12 +28,16 @@ def reshape(theta):
 
 ####### Code #######
 # First we need to grab the theta values, ZCA_matrix and mean patches we obtained from our linear decoder
-final_theta = np.genfromtxt('/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordLearningColorFeaturesWithSparseAutoencoders/outputs/finalWeightsRho0.035Lambda0.003Beta5.0Size100000HL400.out')
-ZCA_matrix = np.genfromtxt('/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordLearningColorFeaturesWithSparseAutoencoders/outputs/ZCAwhitening0.035Lambda0.003Beta5.0Size100000HL400.out')
-mean_patches = np.genfromtxt('/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordLearningColorFeaturesWithSparseAutoencoders/outputs/meanPatchesRho0.035Lambda0.003Beta5.0Size100000HL400.out')
+final_theta = np.genfromtxt('provided_data/finalWeightsRho0.035Lambda0.003Beta5.0Size100000HL400.out')
+ZCA_matrix = np.genfromtxt('provided_data/ZCAwhitening0.035Lambda0.003Beta5.0Size100000HL400.out')
+mean_patches = np.genfromtxt('provided_data/meanPatchesRho0.035Lambda0.003Beta5.0Size100000HL400.out')
 
 # We need to reshape our final_theta values and only use W1 and b1
 W1_final, W2_final, b1_final, b2_final = reshape(final_theta)
+
+# We need to also reshape our ZCA_matrix and mean_patches
+ZCA_matrix = np.reshape(ZCA_matrix, (192, 192))
+mean_patches = np.reshape(mean_patches, (1, 192))
 
 # Now we need to load in the STL10 images
 data = scipy.io.loadmat('provided_data/stlTrainSubset.mat')
