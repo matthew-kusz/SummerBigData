@@ -46,10 +46,10 @@ def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
 				feature = WT_reform[j, :, :, k]
 	
 				# Flip the feature matrix because of the definition of convolution, as explained later
-				feature = np.flipud(np.fliplr(feature))
+				feature = np.flipud(np.fliplr(np.squeeze(feature)))
 	
 				# Obtain the image
-				im = images[i, :, :, k]                                                # (64, 64)
+				im = np.squeeze(images[i, :, :, k])                                                # (64, 64)
 	
 				# Convolve feature with im, add the result to convolved_image
 				convolved_image += ss.convolve2d(im, feature, mode = 'valid', boundary = 'fill', fillvalue = 0)	# (57, 57)

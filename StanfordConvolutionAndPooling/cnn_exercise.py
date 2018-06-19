@@ -7,7 +7,6 @@ import random
 import sys
 
 ####### Global variables #######
-global_step = 0
 global_image_dim = 64
 global_image_channels = 3
 global_patch_dim = 8
@@ -73,6 +72,27 @@ def check_conv(im, conv_feat, mu, ZCA, W1, b1):
 
 	return	
 
+# Checking the pooling code
+def check_pool():
+	test_matrix = np.arange(1, 65).reshape(8, 8)
+	expected_matrix = np.array((np.mean(np.mean(test_matrix[0:4, 0:4])), np.mean(np.mean(test_matrix[0:4, 4:8])), np.mean(np.mean(test_matrix[4:8, 0:4])), np.mean(np.mean(test_matrix[4:8, 4:8])))).reshape(2, 2)
+
+	test_matrix = np.reshape(test_matrix, (1, 1, 8, 8))
+
+	pool_feat = np.squeeze(cnn_pooling.pooling(4, test_matrix))
+
+	if np.any(np.not_equal(pool_feat, expected_matrix) == True):
+		print 'Pooling incorrect'
+		print 'Expected'
+		print expected_matrix
+		print 'Got'
+		print pool_feat
+		sys.exit()
+	else:
+		print 'Congratz! Your pooling code passed the test.'
+
+	return
+
 # Generate training data
 def gen_train_data():
 	data = scipy.io.loadmat('provided_data/stlTrainSubset.mat')
@@ -81,17 +101,37 @@ def gen_train_data():
 	num_images = int(data['numTrainImages'])
 
 	# reformat our images array
-	ord_img = np.zeros((2000, 64, 64, 3))
-	for i in range(2000):
+	ord_img = np.zeros((num_images, 64, 64, 3))
+	for i in range(num_images):
 		ord_img[i] = images[:, :, :, i]
+
+	print 'Dimensions of our training data: ', ord_img.shape
+
+	return labels, ord_img, num_images
+
+# Generate testing data
+def gen_test_data():
+	data = scipy.io.loadmat('provided_data/stlTestSubset.mat')
+	labels = data['testLabels']
+	images = data['testImages']
+	num_images = int(data['numTestImages'])
+
+	# reformat our images array
+	ord_img = np.zeros((num_images, 64, 64, 3))
+	for i in range(num_images):
+		ord_img[i] = images[:, :, :, i]
+
+	print 'Dimensions of our testing data: ', ord_img.shape
 
 	return labels, ord_img, num_images
 
 # Change our weights and bias terms back into their proper shapes
 def reshape(theta):
 	W1 = np.reshape(theta[0:global_hidden_size * global_visible_size], (global_hidden_size, global_visible_size))
-	W2 = np.reshape(theta[global_hidden_size * global_visible_size: 2 * global_hidden_size * global_visible_size], (global_visible_size, global_hidden_size))
-	b1 =np.reshape(theta[2 * global_hidden_size * global_visible_size: 2 * global_hidden_size * global_visible_size + global_hidden_size], (global_hidden_size, 1))
+	W2 = np.reshape(theta[global_hidden_size * global_visible_size: 2 * global_hidden_size * global_visible_size],
+		(global_visible_size, global_hidden_size))
+	b1 =np.reshape(theta[2 * global_hidden_size * global_visible_size: 2 * global_hidden_size * global_visible_size + global_hidden_size],
+		(global_hidden_size, 1))
 	b2 =np.reshape(theta[2 * global_hidden_size * global_visible_size + global_hidden_size: len(theta)], (global_visible_size, 1))
 	
 	return W1, W2, b1, b2
@@ -112,14 +152,62 @@ mean_patches = np.reshape(mean_patches, (1, 192))
 # Generate our training data
 train_labels, train_images, num_train_images = gen_train_data()
 
+'''
+#FOR TESTING OUR CONVOLUTION AND POOLING CODE
 # Grab a small amount of images to test our convolve code on
 train_test_images = train_images[0:8, :, :, :]
 
 # Implement convolution
-convolved_features = cnn_convolve.convolve(global_patch_dim, global_hidden_size, train_test_images, W1_final, b1_final, ZCA_matrix, mean_patches)
+convolved_features = cnn_convolve.convolve(global_patch_dim, global_hidden_size,
+	train_test_images, W1_final, b1_final, ZCA_matrix, mean_patches)
 
 # We will now check our convolution
 check_conv(train_test_images, convolved_features, mean_patches, ZCA_matrix, W1_final, b1_final)
 
 # Implement pooling
 pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
+
+# Now we need to test if our pooling is correct
+check_pool()
+'''
+
+# Now to start running the full data set
+# We need need to run our convolution and pooling 50 features at a time so we don't run out of memory
+step_size = 50
+assert global_hidden_size % step_size == 0, 'Step size should divide hidden size'
+
+# Generate out testing data
+test_labels, test_images, num_test_images = gen_test_data()
+
+pooled_features_train = np.zeros((global_hidden_size, num_train_images,
+	np.floor((global_image_dim - global_patch_dim + 1) / global_pool_dim),
+	np.floor((global_image_dim - global_patch_dim + 1) / global_pool_dim)))
+
+pooled_features_test = np.zeros((global_hidden_size, num_test_images,
+	np.floor((global_image_dim - global_patch_dim + 1) / global_pool_dim),
+	np.floor((global_image_dim - global_patch_dim + 1) / global_pool_dim)))
+print pooled_features_train.shape
+'''
+for i in range(global_hidden_size / step_size):
+	feature_start = i * step_size 
+	feature_end = (i + 1) * step_size
+
+	print 'Step %g: features %g to %g' %(i + 1, feature_start + 1, feature_end)
+	Wt = W1_final[feature_start: feature_end, :]
+	bt = b1_final[feature_start: feature_end, :]
+
+	print 'Convolving and pooling train images.'
+	convolved_features = cnn_convolve.convolve(global_patch_dim, step_size,
+		train_images, Wt, bt, ZCA_matrix, mean_patches)
+	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
+	pooled_features_train[feature_start: feature_end, :, :, :] = pooled_features
+
+	print 'Convolving and pooling test images.'
+	convolved_features = cnn_convolve.convolve(global_patch_dim, step_size,
+		test_images, Wt, bt, ZCA_matrix, mean_patches)
+	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features2)
+	pooled_features_test[feature_start: feature_end, :, :, :] = pooled_features
+'''
+# Save the files
+np.savetxt('outputs/convPoolTrainFeaturesSize2000', np.ravel(pooled_features_train))
+np.savetxt('outputs/convPoolTestFeaturesSize3200', np.ravel(pooled_features_test))

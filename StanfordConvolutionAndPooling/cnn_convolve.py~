@@ -14,7 +14,6 @@ def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
 	img_dim = images.shape[1]
 	# Number of channels
 	num_channel = images.shape[3]
-	print m, img_dim, num_channel
 	
 	convolved_features = np.zeros((num_features, m, img_dim - patch_dim + 1, img_dim - patch_dim + 1)) # (400, m , 57, 57)
 
