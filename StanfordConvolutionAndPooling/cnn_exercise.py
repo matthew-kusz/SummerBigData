@@ -172,19 +172,18 @@ check_pool()
 '''
 
 # Now to start running the full data set
-
 # We need need to run our convolution and pooling 50 features at a time so we don't run out of memory
 step_size = 50
 assert global_hidden_size % step_size == 0, 'Step size should divide hidden size'
 
 # Generate our testing data
 test_labels, test_images, num_test_images = gen_test_data()
-test_images = test_images[0:150, :, :, :]
+
 pooled_features_train = np.zeros((global_hidden_size, num_train_images,
 	np.floor((global_image_dim - global_patch_dim + 1) / global_pool_dim),
 	np.floor((global_image_dim - global_patch_dim + 1) / global_pool_dim)))
 
-pooled_features_test = np.zeros((global_hidden_size, 150,
+pooled_features_test = np.zeros((global_hidden_size, num_test_images,
 	np.floor((global_image_dim - global_patch_dim + 1) / global_pool_dim),
 	np.floor((global_image_dim - global_patch_dim + 1) / global_pool_dim)))
 
@@ -195,22 +194,19 @@ for i in range(global_hidden_size / step_size):
 	print 'Step %g: features %g to %g' %(i + 1, feature_start + 1, feature_end)
 	Wt = W1_final[feature_start: feature_end, :]
 	bt = b1_final[feature_start: feature_end, :]
-	'''
+
 	print 'Convolving and pooling train images.'
 	convolved_features = cnn_convolve.convolve(global_patch_dim, step_size,
 		train_images, Wt, bt, ZCA_matrix, mean_patches)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_train[feature_start: feature_end, :, :, :] = pooled_features
-	# np.savetxt('outputs/convPoolTrainFeaturesSize2000StepSize50Step' + str(i + 1), np.ravel(pooled_features))
-	'''
+
 	print 'Convolving and pooling test images.'
 	convolved_features = cnn_convolve.convolve(global_patch_dim, step_size,
 		test_images, Wt, bt, ZCA_matrix, mean_patches)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_test[feature_start: feature_end, :, :, :] = pooled_features
-
-	# np.savetxt('outputs/convPoolTestFeaturesSize3200StepSize50Step' + str(i + 1), np.ravel(pooled_features))
 	
-#np.savetxt('outputs/convPoolTrainFeaturesSize2000StepSize50', np.ravel(pooled_features_train))
-np.savetxt('outputs/convPoolTestFeaturesSize150', np.ravel(pooled_features_test))
-# We will now set up softmax regression
+np.savetxt('outputs/convPoolTrainFeaturesSize2000StepSize50', np.ravel(pooled_features_train))
+np.savetxt('outputs/convPoolTestFeaturesSize3200StepSize50', np.ravel(pooled_features_test))
+

@@ -6,11 +6,11 @@ nodes=1:ppn=1
 mem=16gb
 -----------------------
 Resources used:
-cput=00:04:17
-walltime=00:04:25
-mem=2.999 GB
-vmem=3.582 GB
+cput=01:29:15
+walltime=01:29:28
+mem=7.113 GB
+vmem=7.617 GB
 -----------------------
 Resource units charged (estimate):
-0.029 RUs
+0.596 RUs
 -----------------------
