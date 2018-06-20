@@ -1,0 +1,10 @@
+Dimensions of our training data:  (2000, 64, 64, 3)
+Dimensions of our testing data:  (3200, 64, 64, 3)
+(400, 2000, 3, 3)
+Step 1: features 1 to 20
+Convolving and pooling train images.
+Convolving and pooling test images.
+Traceback (most recent call last):
+  File "cnn_exercise.py", line 209, in <module>
+    pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features2)
+NameError: name 'convolved_features2' is not defined
