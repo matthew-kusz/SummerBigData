@@ -1,0 +1,26 @@
+Dimensions of our training data:  (2000, 64, 64, 3)
+Dimensions of our testing data:  (3200, 64, 64, 3)
+Step 1: features 1 to 50
+Convolving and pooling train images.
+Convolving and pooling test images.
+Step 2: features 51 to 100
+Convolving and pooling train images.
+Convolving and pooling test images.
+Step 3: features 101 to 150
+Convolving and pooling train images.
+Convolving and pooling test images.
+Step 4: features 151 to 200
+Convolving and pooling train images.
+Convolving and pooling test images.
+Step 5: features 201 to 250
+Convolving and pooling train images.
+Convolving and pooling test images.
+Step 6: features 251 to 300
+Convolving and pooling train images.
+Convolving and pooling test images.
+Step 7: features 301 to 350
+Convolving and pooling train images.
+Convolving and pooling test images.
+Step 8: features 351 to 400
+Convolving and pooling train images.
+Convolving and pooling test images.

@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u cnn_exercise >& output_logs/fullDataSetStepSize20.log
+python -u cnn_exercise.py >& output_logs/fullDataSetStepSize20.log

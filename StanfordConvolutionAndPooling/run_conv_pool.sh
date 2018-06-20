@@ -1,4 +1,4 @@
-#PBS -N fullDataSetStepSize20
+#PBS -N fullDataSetStepSize50
 #PBS -l walltime=05:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u cnn_exercise.py >& output_logs/fullDataSetStepSize20.log
+python -u cnn_exercise.py >& output_logs/fullDataSetStepSize50.log
