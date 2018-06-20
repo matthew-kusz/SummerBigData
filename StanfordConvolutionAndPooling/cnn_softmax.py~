@@ -14,14 +14,14 @@ parser.add_argument('Lambda', help = 'Lambda / 10000000 (ie 1 = 1e-7), Adjust to
 
 args = parser.parse_args()
 '''
+global_step = 0
 global_image_dim = 64
 global_image_channels = 3
 global_patch_dim = 8
 global_num_patches = 50000
-global_visible_size = global_patch_dim * global_patch_dim * global_image_channels
-global_output_size = global_visible_size
-global_hidden_size = 400
-global_lamda = 1e-4
+global_visible_size = 0
+global_hidden_size = 36
+global_lambda = 1e-4
 global_num_classes = 4
 
 # print 'You chose', args     
@@ -29,23 +29,26 @@ global_num_classes = 4
 ####### Definitions #######
 # Sigmoid function
 def sigmoid(value):
+	return 1.0 / (1.0 + np.exp(-value))
+
+def hypo(value):
 	# To prevent overflow subract the max number from each element in the array
 	constant = value.max()
 	return (np.exp(value - constant)/ np.reshape(np.sum(np.exp(value - constant), axis = 1), (m, 1)))
 
 # Regularized cost function
-def reg_cost(thetaW2, arr_x, arr_y, thetaW1):
-
+def reg_cost(theta2, arr_x, arr_y):
 	# Change our weights and bias values back into their original shape
-	arr_W1, arr_W2, arr_b1, arr_b2 = reshape(thetaW1, thetaW2)
+	arr_W1, arr_W2, arr_b1, arr_b2 = reshape(theta2)
 
 	# Find our hypothesis
 	h, a2 = feedforward(arr_W1, arr_W2, arr_b1, arr_b2, arr_x)
 
 	# Calculate the cost	
 	cost1 = np.sum((-1.0 / m) * np.multiply(arr_y, np.log(h)))
+	cost2 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W1, arr_W1)))
 	cost3 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W2, arr_W2)))
-	cost = cost1 + cost3
+	cost = cost1 + + cost2 + cost3
 
 	return cost
 
@@ -58,15 +61,15 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	This enables each row in our dot product to receive the same bias term. If it were a (25, 10000) array it is equivalent to adding 
 	our bias column to each dot product column with just + b1 (since b1 starts as a column).
 	'''
-	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 200) matrix
+	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 36) matrix
 
 	# Second run
-	a3 = sigmoid(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 5) matrix
+	a3 = hypo(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 4) matrix
 
 	return a3, a2
 
 # Backpropagation
-def backprop(thetaW2, arr_x, arr_y, thetaW1):
+def backprop(theta2, arr_x, arr_y):
 	# To keep track of our iterations
 	global global_step
 	global_step += 1
@@ -74,25 +77,35 @@ def backprop(thetaW2, arr_x, arr_y, thetaW1):
 		print 'Global step: %g' %(global_step)
 
 	# Change our weights and bias values back into their original shape
-	arr_W1, arr_W2, arr_b1, arr_b2 = reshape(thetaW1, thetaW2)
+	arr_W1, arr_W2, arr_b1, arr_b2 = reshape(theta2)
 	
 	a3, a2 = feedforward(arr_W1, arr_W2, arr_b1, arr_b2, arr_x)
 
-	# Following the exact method given to us in the instructions
+	# Following previous method for computing the deltas
 	arr_ones = np.ones((len(a2), 1))
 	a2_1 = np.hstack((arr_ones, a2))
 	arr_W2b2 = np.hstack((arr_b2, arr_W2))
 
-	# Compute the partial derivatives
-	pd_W2 = np.dot((arr_y - a3).T, a2_1)   # (5, 201)
+	arr_ones = np.ones((len(arr_x), 1))
+	arr_x1 = np.hstack((arr_ones, arr_x))
+	arr_W1b1 = np.hstack((arr_b1, arr_W1))
 
+	# Compute the partial derivatives
+	delta2 = np.multiply(np.dot(arr_W2.T, (arr_y - a3).T).T, (a2 * (1 - a2)))
+
+	pd_W1 = np.dot(delta2.T, arr_x1)         # (36, ? + 1)
+	pd_W2 = np.dot((arr_y - a3).T, a2_1)     # (4, 37)
+
+	del_W1 = (-1.0 / m) * pd_W1 + global_lambda * arr_W1b1
 	del_W2 = (-1.0 / m) * pd_W2 + global_lambda * arr_W2b2
 
 	# Changed the gradients into a one dimensional vector
+	del_b1 = np.ravel(del_W1[:, : 1])
+	del_W1 = np.ravel(del_W1[:, 1: ])
 	del_b2 = np.ravel(del_W2[:, : 1])
-	del_W21 = np.ravel(del_W2[:, 1: ])
+	del_W2 = np.ravel(del_W2[:, 1: ])
 
-	D_vals = np.concatenate((del_W21, del_b2))
+	D_vals = np.concatenate((del_W1, del_W2, del_b1, del_b2))
 	return D_vals
 
 # Set up our weights and bias terms
@@ -103,13 +116,13 @@ def weights_bias():
 	We'll choose weights uniformly from the interval [-r, r]
 	'''	
 	r  = 0.12 
-	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (400, 192) matrix
+	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (36, ?) matrix
 	random_weight1 = random_weight1 * 2 * r - r
-	random_weight2 = np.random.rand(global_num_classes, global_hidden_size)      # (4, 400) matrix      
+	random_weight2 = np.random.rand(global_num_classes, global_hidden_size)      # (4, 36) matrix      
 	random_weight2 = random_weight2 * 2 * r - r
 
 	# Set up our bias term
-	bias1 = np.random.rand(global_hidden_size, 1)    # (400, 1) matrix
+	bias1 = np.random.rand(global_hidden_size, 1)    # (36, 1) matrix
 	bias1 = bias1 * 2 * r - r
 	bias2 = np.random.rand(global_num_classes, 1)    # (4, 1) matrix
 	bias2 = bias2 * 2 * r - r
@@ -126,13 +139,15 @@ def weights_bias():
 	return theta_vals
 
 # Change our weights and bias terms back into their proper shapes
-def reshape(theta1, theta2):
+def reshape(theta):
 	W1 = np.reshape(theta[0:global_hidden_size * global_visible_size], (global_hidden_size, global_visible_size))
-	W2 = np.reshape(theta[global_hidden_size * global_visible_size: 2 * global_hidden_size * global_visible_size],
-		(global_visible_size, global_hidden_size))
-	b1 =np.reshape(theta[2 * global_hidden_size * global_visible_size: 2 * global_hidden_size * global_visible_size + global_hidden_size],
+	W2 = np.reshape(theta[global_hidden_size * global_visible_size: 
+		global_visible_size * global_hidden_size + global_hidden_size * global_num_classes], (global_num_classes, global_hidden_size))
+	b1 = np.reshape(theta[global_visible_size * global_hidden_size + global_hidden_size * global_num_classes: 
+		global_visible_size * global_hidden_size + global_hidden_size * global_num_classes + global_hidden_size ],
 		(global_hidden_size, 1))
-	b2 =np.reshape(theta[2 * global_hidden_size * global_visible_size + global_hidden_size: len(theta)], (global_visible_size, 1))
+	b2 = np.reshape(theta[global_visible_size * global_hidden_size + global_hidden_size * global_num_classes + global_hidden_size:
+		 len(theta)], (global_num_classes, 1))
 	
 	return W1, W2, b1, b2
 
@@ -171,9 +186,15 @@ def gen_test_data():
 # Import the files we want
 train = np.genfromtxt('outputs/convPoolTrainFeaturesSize100')
 train = np.reshape(train, (400, 100, 3, 3))
+train = np.swapaxes(train, 0, 1)
+train = np.reshape(train, (train.shape[0], len(train.ravel()) / train.shape[0]))
+print train.shape
+
+global_visible_size = train.shape[1]
 
 # Generate our training data
 train_labels, __, __ = gen_train_data()
+train_labels = train_labels[0: train.shape[0]]
 
 # Generate our testing data
 test_labels, __, __ = gen_test_data()
@@ -182,14 +203,13 @@ test_labels, __, __ = gen_test_data()
 # filename = 'outputs/finalWeightsL1e-4B3Size60000HL200SOFT.out'
 
 # Need to know how many training inputs we have
-m = train.shape[1]
-print m
+m = train.shape[0]
 
 # Create our weights and bias terms
 theta = weights_bias()
 
 # Set up an array that will be either 1 or 0 depending on what we are looking at
-y_vals_train = np.zeros((len(train_labels), 5))
+y_vals_train = np.zeros((len(train_labels), global_num_classes))
 for i in range(global_num_classes):
 	# Set up an array with the values that stand for each number
 	arr_num = [1, 2, 3, 4]
@@ -201,17 +221,17 @@ for i in range(global_num_classes):
 		else:
 			y_vals_train[j, i:] = 0
 
-'''
+
 # Check that our cost function is working
-cost_test = reg_cost(theta2, train, y_vals_train, theta1)
+cost_test = reg_cost(theta, train, y_vals_train)
 print cost_test
 # We had a cost value of 5.6
 
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
-print scipy.optimize.check_grad(reg_cost, backprop, theta2, train, y_vals_train, theta1)
+print scipy.optimize.check_grad(reg_cost, backprop, theta, train, y_vals_train)
 # Recieved a value of 1.45e-5
-'''
 
+'''
 print 'Cost before minimization: %g' %(reg_cost(theta2, train, y_vals_train, theta1))
 time_start2 = time.time()
 
@@ -226,6 +246,7 @@ time_finish2 = time.time()
 # np.savetxt(filename, theta_new, delimiter = ',')
 
 print 'Total time for minimization = %g' %(time_finish2 - time_start2)
+'''
 '''
 # Find the probabilities for each digit
 # We need to reshape our theta values
