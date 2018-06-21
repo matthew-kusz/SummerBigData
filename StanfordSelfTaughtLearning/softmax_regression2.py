@@ -22,7 +22,7 @@ global_lambda = args.Lambda / 10000000.0       # weight decay parameter
 print 'You chose', args     
 
 ####### Definitions #######
-# Sigmoid function
+# Hypothesis function
 def hypo(value):
 	# To prevent overflow subract the max number from each element in the array
 	constant = value.max()

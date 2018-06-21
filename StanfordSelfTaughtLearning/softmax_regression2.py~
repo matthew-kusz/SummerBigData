@@ -22,8 +22,8 @@ global_lambda = args.Lambda / 10000000.0       # weight decay parameter
 print 'You chose', args     
 
 ####### Definitions #######
-# Sigmoid function
-def sigmoid(value):
+# Softmax
+def hypo(value):
 	# To prevent overflow subract the max number from each element in the array
 	constant = value.max()
 	return (np.exp(value - constant)/ np.reshape(np.sum(np.exp(value - constant), axis = 1), (m, 1)))
@@ -53,10 +53,10 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	This enables each row in our dot product to receive the same bias term. If it were a (25, 10000) array it is equivalent to adding 
 	our bias column to each dot product column with just + b1 (since b1 starts as a column).
 	'''
-	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 200) matrix
+	a2 = hypo(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 200) matrix
 
 	# Second run
-	a3 = sigmoid(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 5) matrix
+	a3 = hypo(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 5) matrix
 
 	return a3, a2
 
