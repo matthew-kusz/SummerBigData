@@ -1,0 +1,42 @@
+# Import the necessary packages
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.io
+
+####### Global variables #######
+global_image_dim = 64
+global_image_channels = 3
+
+# Generate visualization data
+def gen_test_data():
+	data = scipy.io.loadmat('provided_data/stlTestSubset.mat')
+	labels = data['testLabels']
+	images = data['testImages']
+	num_images = int(data['numTestImages'])
+
+	# reformat our images array
+	ord_img = np.zeros((num_images, global_image_dim, global_image_dim, global_image_channels))
+	for i in range(num_images):
+		ord_img[i] = images[:, :, :, i]
+
+	print 'Dimensions of our testing data: ', ord_img.shape
+
+	return labels, ord_img, num_images
+
+# Generate our visualization data
+test_labels, test_images, __ = gen_test_data()
+
+print test_labels[0:25]
+
+images1 = np.concatenate((test_images[1, :, :, :], test_images[4, :, :, :], test_images[15, :, :, :], test_images[20, :, :, :]), axis = 1)
+images2 = np.concatenate((test_images[5, :, :, :], test_images[6, :, :, :], test_images[12, :, :, :], test_images[14, :, :, :]), axis = 1)
+images3 = np.concatenate((test_images[0, :, :, :], test_images[2, :, :, :], test_images[8, :, :, :], test_images[17, :, :, :]), axis = 1)
+images4 = np.concatenate((test_images[3, :, :, :], test_images[7, :, :, :], test_images[9, :, :, :], test_images[16, :, :, :]), axis = 1)
+
+images_all = np.concatenate((images1, images2, images3, images4), axis =0)
+
+plt.imshow(images_all, interpolation = 'none')
+plt.show()
+
+
+
