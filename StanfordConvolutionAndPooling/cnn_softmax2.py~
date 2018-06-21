@@ -319,7 +319,7 @@ avg2 /= y_digits[1]
 avg3 /= y_digits[2]
 avg4 /= y_digits[3]
 
-confuse_mat = np.concatenate(([avg1], [ang2], [avg3], [avg4]), axis = 0)
+confuse_mat = np.concatenate(([avg1], [avg2], [avg3], [avg4]), axis = 0)
 bar_plot = np.zeros(4)
 
 for i in range(4):
@@ -328,6 +328,10 @@ print bar_plot
 
 img = plt.imshow(confuse_mat, cmap = 'coolwarm', interpolation = 'none')
 plt.colorbar()
+plt.ylabel('Class')
+plt.xlabel('Guessed Class')
+plt.xticks([0, 1, 2, 3], [1, 2, 3, 4])
+plt.yticks([0, 1, 2, 3], [1, 2, 3, 4])
 #plt.savefig('images/confusionMatrix.png', transparent = True, format = 'png')
 plt.show()
 

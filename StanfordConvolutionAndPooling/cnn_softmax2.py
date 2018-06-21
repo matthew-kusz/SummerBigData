@@ -328,6 +328,11 @@ print bar_plot
 
 img = plt.imshow(confuse_mat, cmap = 'coolwarm', interpolation = 'none')
 plt.colorbar()
+plt.ylabel('Class')
+plt.xlabel('Guessed Class')
+plt.xticks([0, 1, 2, 3], [1, 2, 3, 4])
+plt.yticks([0, 1, 2, 3], [1, 2, 3, 4])
+plt.gca().invert_yaxis()
 #plt.savefig('images/confusionMatrix.png', transparent = True, format = 'png')
 plt.show()
 
