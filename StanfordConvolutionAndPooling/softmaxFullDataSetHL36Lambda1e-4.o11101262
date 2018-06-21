@@ -1,0 +1,16 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordConvolutionAndPooling
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=00:02:26
+walltime=00:02:34
+mem=1.641 GB
+vmem=2.180 GB
+-----------------------
+Resource units charged (estimate):
+0.017 RUs
+-----------------------

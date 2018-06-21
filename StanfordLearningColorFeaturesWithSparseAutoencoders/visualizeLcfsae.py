@@ -1,11 +1,7 @@
 # Import the necessary packages
-import struct as st
-import gzip
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
-import math
-
 
 ####### Global variables #######
 global_image_channels = 3
@@ -15,16 +11,6 @@ global_hidden_size = 400
 global_epsilon = 0.1           # ZCA whitening
 
 ####### Definitions #######
-# Reading in MNIST data files	
-def read_idx(filename, n=None):
-	with gzip.open(filename) as f:
-		zero, dtype, dims = st.unpack('>HBB', f.read(4))
-		shape = tuple(st.unpack('>I', f.read(4))[0] for d in range(dims))
-		arr = np.fromstring(f.read(), dtype=np.uint8).reshape(shape)
-		if not n is None:
-			arr = arr[:n]
-		return arr
-
 # Sigmoid function
 def sigmoid(value):
 	return 1.0 / (1.0 + np.exp(-value))
@@ -33,15 +19,13 @@ def sigmoid(value):
 def feedforward(W1, W2, b1, b2, arr_x):
 
 	'''
-	We will be running our sigmoid function twice.
 	Tile function allows us to duplicate our rows to the proper dimensions without requiring a for loop.
 	This enables each row in our dot product to receive the same bias term. If it were a (25, 10000) array it is equivalent to adding 
 	our bias column to each dot product column with just + b1 (since b1 starts as a column).
 	'''
 	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 400) matrix
 
-	# Second run
-	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))       # (m, 192) matrix
+	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))                # (m, 192) matrix
 
 	return a3, a2
 
@@ -54,6 +38,7 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
+# Normalize our matrix so its values range from 0-1
 def Norm(mat):
 	Min = np.amin(mat)
 	Max = np.amax(mat)
@@ -61,6 +46,7 @@ def Norm(mat):
 	nMax = 1.0
 	return ((mat - Min) / (Max - Min)) * (nMax - nMin) + nMin
 
+####### Code #######
 ####### Comparing our inputs with our outputs #######
 # Import the file we want
 data = scipy.io.loadmat('data/stlSampledPatches.mat')
@@ -152,7 +138,8 @@ black_space2 = np.ones((blackbar_length, global_patch_dim * num_col + num_col * 
 for i in range(num_row):
 	for j in range(num_col):
 		if (j == 0):
-			# First set up our image in red, then blue, then green
+			### IMPORTANT ###
+			# Make sure the colors are reshaped correctly ([0:64] for first color, [64:128] for second, [128:192] for third)
 			s = global_patch_dim**2
     			img = np.zeros((global_patch_dim, global_patch_dim, 3))
     			img[:,:,0] = y[j + i * num_col][:s].reshape(global_patch_dim, global_patch_dim)

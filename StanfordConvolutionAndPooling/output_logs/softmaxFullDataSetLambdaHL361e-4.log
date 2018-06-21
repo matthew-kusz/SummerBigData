@@ -1,0 +1,17 @@
+Dimensions of train (2000, 3600)
+Dimensions of test (3200, 3600)
+Dimensions of our training data:  (2000, 64, 64, 3)
+Dimensions of our testing data:  (3200, 64, 64, 3)
+Cost before minimization: 1.4197
+Global step: 50
+Global step: 100
+Global step: 150
+Global step: 200
+Global step: 250
+Cost after minimization: 0.0918898
+Total time for minimization = 64.9979 seconds
+[[ 88.625]
+ [ 86.125]
+ [ 71.375]
+ [ 70.75 ]]
+[ 79.21875]

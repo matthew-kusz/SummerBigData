@@ -29,7 +29,7 @@ def feedforward(W1, W2, b1, b2, arr_x):
 
 	return a3, a2
 
-
+####### Code #######
 # Change our weights and bias terms back into their proper shapes
 def reshape(theta):
 	W1 = np.reshape(theta[0:global_hidden_size * global_visible_size], (global_hidden_size, global_visible_size))
@@ -48,7 +48,7 @@ n = len(patches)
 # Transpose patches to the dimension we want
 patches = patches.T                        # (10000, 64)
 
-# We need to values in patches to range from 0 to 1
+# We need our values in patches and a3_finalto range from 0 to 1
 old_min = -1
 old_max = 1
 new_min = 0

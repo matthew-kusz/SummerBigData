@@ -35,7 +35,7 @@ def reg_cost(theta2, arr_x, arr_y):
 	cost1 = np.sum((-1.0 / m) * np.multiply(arr_y, np.log(h)))
 	cost2 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W1, arr_W1)))
 
-	cost = cost1 + + cost2
+	cost = cost1 + cost2
 
 	return cost
 
@@ -217,8 +217,7 @@ time_finish2 = time.time()
 
 print 'Total time for minimization = %g seconds' %(time_finish2 - time_start2)
 
-
-# Find the probabilities for each digit
+# Find the probabilities for each image
 # We need to reshape our theta values
 final_W1, final_b1 = reshape(theta_new)
 

@@ -36,14 +36,7 @@ def reg_cost(theta, arr_x, arr_y):
 	cost1 = (1.0 / (2 * m)) * np.sum(np.multiply((h - arr_y), (h - arr_y)))
 	cost2 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W1, arr_W1)))
 	cost3 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W2, arr_W2)))
-	cost = cost1 + cost2 + cost3 + KL_divergence
-	'''
-	# To keep track of our iterations
-	global_step += 1
-	if (global_step % 20 == 0):
-		print 'cost = %g' %(cost)
-		print 'Global step: %g' %(global_step)
-	'''	
+	cost = cost1 + cost2 + cost3 + KL_divergence	
 	
 	return cost
 
@@ -102,7 +95,6 @@ def weights_bias():
 	# Initialize parameters randomly based on layer sizes.
 	# We'll choose weights uniformly from the interval [-r, r]
 	r  = 0.12
-	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
 	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (25, 64) matrix
 	random_weight1 = random_weight1 * 2 * r - r
 	random_weight2 = np.random.rand(global_visible_size, global_hidden_size)     # (64, 25) matrix      
@@ -134,6 +126,8 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
+####### Code #######
+# Grab the patches that we need
 patches = np.genfromtxt('outputs/10KRandom8x8.out')
 patches = np.reshape(patches, (64, 10000))
 m = len(patches[0])

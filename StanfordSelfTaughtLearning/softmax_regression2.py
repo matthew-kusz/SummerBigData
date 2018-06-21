@@ -1,12 +1,9 @@
 # Import the necessary packages
-import struct as st
-import gzip
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize
 import scipy.io
 import random
-import math
 import grab_data
 import time
 import argparse
@@ -20,13 +17,13 @@ args = parser.parse_args()
 global_step = 0
 global_input_size  = 28 * 28
 global_hidden_size = 200
-global_lambda = args.Lambda / 10000000.0;       # weight decay parameter
+global_lambda = args.Lambda / 10000000.0       # weight decay parameter
 
 print 'You chose', args     
 
 ####### Definitions #######
 # Sigmoid function
-def sigmoid(value):
+def hypo(value):
 	# To prevent overflow subract the max number from each element in the array
 	constant = value.max()
 	return (np.exp(value - constant)/ np.reshape(np.sum(np.exp(value - constant), axis = 1), (m, 1)))
@@ -56,10 +53,10 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	This enables each row in our dot product to receive the same bias term. If it were a (25, 10000) array it is equivalent to adding 
 	our bias column to each dot product column with just + b1 (since b1 starts as a column).
 	'''
-	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 200) matrix
+	a2 = hypo(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 200) matrix
 
 	# Second run
-	a3 = sigmoid(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 5) matrix
+	a3 = hypo(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 5) matrix
 
 	return a3, a2
 
@@ -97,11 +94,10 @@ def backprop(thetaW2, arr_x, arr_y, thetaW1):
 def weights_bias():
 	'''
 	Initialize parameters randomly based on layer sizes.
-	W1 and b1 will be taking from our autoencoder portion of this exercise
+	W1 and b1 will be taken from our autoencoder portion of this exercise
 	We'll choose weights uniformly from the interval [-r, r]
 	'''	
 	r  = 0.12
-	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
 	random_weight2 = np.random.rand(5, global_hidden_size)     # (5, 200) matrix      
 	random_weight2 = random_weight2 * 2 * r - r
 
@@ -130,6 +126,7 @@ def reshape(theta1, theta2):
 	b2 =np.reshape(theta2[global_hidden_size * 5: len(theta2)], (5, 1))
 	return W1, W2, b1, b2
 
+####### Code #######
 time_start = time.time()
 # Import the file we want
 data , labels_data = grab_data.get_data(60000, '04')

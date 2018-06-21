@@ -159,7 +159,7 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
-# Pick the size of the data we want
+# Pick the size of the data we want (max 60000)
 size = 60000
 
 # Extract the MNIST training data sets

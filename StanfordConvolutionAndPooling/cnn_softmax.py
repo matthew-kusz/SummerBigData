@@ -13,7 +13,7 @@ global_image_dim = 64
 global_image_channels = 3
 global_visible_size = 0    # Will be determined later
 global_hidden_size = 36
-global_lambda = 1e-5
+global_lambda = 1e-4
 global_num_classes = 4    
 
 ####### Definitions #######
@@ -39,7 +39,7 @@ def reg_cost(theta2, arr_x, arr_y):
 	cost1 = np.sum((-1.0 / m) * np.multiply(arr_y, np.log(h)))
 	cost2 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W1, arr_W1)))
 	cost3 = (global_lambda / (2.0)) * (np.sum(np.multiply(arr_W2, arr_W2)))
-	cost = cost1 + + cost2 + cost3
+	cost = cost1 + cost2 + cost3
 
 	return cost
 
@@ -243,7 +243,7 @@ time_finish2 = time.time()
 
 print 'Total time for minimization = %g seconds' %(time_finish2 - time_start2)
 
-# Find the probabilities for each digit
+# Find the probabilities for each image
 # We need to reshape our theta values
 final_W1, final_W2, final_b1, final_b2 = reshape(theta_new)
 

@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import scipy.optimize
 import scipy.io
 import random
-import math
 import grab_data
 import time
 import argparse
@@ -21,7 +20,7 @@ global_step = 0
 global_num_outputs = 10
 global_input_size  = 28 * 28
 global_hidden_size = 200
-global_lambda = args.Lambda / 1000000000.0;       # weight decay parameter (1e-4)
+global_lambda = args.Lambda / 1000000000.0       # weight decay parameter (1e-4)
 
 print 'You chose', args     
 
@@ -112,7 +111,6 @@ def weights_bias():
 	We'll choose weights uniformly from the interval [-r, r]
 	'''	
 	r  = 0.12
-	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
 	random_weight2 = np.random.rand(global_num_outputs, global_hidden_size)     # (10, 200) matrix      
 	random_weight2 = random_weight2 * 2 * r - r
 
@@ -141,6 +139,7 @@ def reshape(theta1, theta2):
 	b2 =np.reshape(theta2[global_hidden_size * global_num_outputs: len(theta2)], (global_num_outputs, 1))
 	return W1, W2, b1, b2
 
+####### Code #######
 # Pick the size of the data we want (max 60000)
 size = 60000
 

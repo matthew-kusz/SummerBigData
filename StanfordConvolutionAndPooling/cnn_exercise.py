@@ -10,7 +10,6 @@ import sys
 global_image_dim = 64
 global_image_channels = 3
 global_patch_dim = 8
-global_num_patches = 50000
 global_visible_size = global_patch_dim * global_patch_dim * global_image_channels
 global_output_size = global_visible_size
 global_hidden_size = 400

@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import scipy.optimize
 import scipy.io
 import random
-import math
 import argparse
 
 ####### Global variables #######
@@ -54,7 +53,8 @@ def reg_cost(theta, arr_x, arr_y):
 	rho_hat = (1.0 / m) * np.sum(a2, axis = 0)         # (400,) vector
 
 	# Calculate the cost
-	KL_divergence = global_beta * np.sum((global_rho * np.log(global_rho / rho_hat) + (1 - global_rho) * np.log((1 - global_rho) / (1 - rho_hat))))
+	KL_divergence = global_beta * np.sum((global_rho * np.log(global_rho / rho_hat)
+		+ (1 - global_rho) * np.log((1 - global_rho) / (1 - rho_hat))))
 
 	# Calculate the cost
 	cost1 = (1.0 / (2 * m)) * np.sum(np.multiply((h - arr_y), (h - arr_y)))
@@ -68,14 +68,12 @@ def reg_cost(theta, arr_x, arr_y):
 def feedforward(W1, W2, b1, b2, arr_x):
 
 	'''
-	We will be running our sigmoid function twice.
 	Tile function allows us to duplicate our rows to the proper dimensions without requiring a for loop.
 	This enables each row in our dot product to receive the same bias term. If it were a (25, 10000) array it is equivalent to adding 
 	our bias column to each dot product column with just + b1 (since b1 starts as a column).
 	'''
 	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 400) matrix
 
-	# Second run
 	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))                # (m, 192) matrix
 
 	return a3, a2
@@ -98,13 +96,13 @@ def backprop(theta, arr_x, arr_y):
 	rho_hat = np.mean(a2, axis = 0)         # (400,) vector
 	rho_hat = np.tile(rho_hat, (m, 1))      # (m, 400) matrix (Could just leave it as a vector, code still runs the same)
 
-	delta3 = a3 - arr_y  # (m, 192)
-	delta2 = np.multiply(np.dot(delta3, arr_W2) + global_beta * (-(global_rho / rho_hat) + ((1 - global_rho) / (1 - rho_hat))), a2 * (1 - a2))
-	# delta2 is a (m, 400) matrix
+	delta3 = a3 - arr_y                     # (m, 192)
+	delta2 = np.multiply(np.dot(delta3, arr_W2) + global_beta * (-(global_rho / rho_hat) + ((1 - global_rho) / (1 - rho_hat))),
+		a2 * (1 - a2))                  # delta2 is a (m, 400) matrix
 	
 	# Compute the partial derivatives
-	pd_W1 = np.dot(delta2.T, arr_x)  # (400, 192)
-	pd_W2 = np.dot(delta3.T, a2)     # (192, 400)
+	pd_W1 = np.dot(delta2.T, arr_x)   # (400, 192)
+	pd_W2 = np.dot(delta3.T, a2)      # (192, 400)
 	pd_b1 = np.mean(delta2, axis = 0) # (400,) vector
 	pd_b2 = np.mean(delta3, axis = 0) # (192,) vector
 
@@ -193,12 +191,12 @@ whiten_patches, ZCA_matrix, mu = ZCA_white(patches)
 
 # Save our ZCA_matrix and mu for later when we are visualizing our activiations
 ZCA_matrix = np.ravel(ZCA_matrix)
-# np.savetxt(filename2, ZCA_matrix, delimiter = ',')
+#np.savetxt(filename2, ZCA_matrix, delimiter = ',')
 mu = np.ravel(mu)
-np.savetxt(filename3, mu, delimiter = ',')
+#np.savetxt(filename3, mu, delimiter = ',')
 
 y = whiten_patches
-stop
+
 '''
 # Comparing images before and after whitening
 # We need to normalize whiten_patches so that it goes from 0-1 or else our picture doesn't look right
@@ -235,5 +233,5 @@ theta_new = minimum.x
 print 'Cost after minimization: %g' %(reg_cost(theta_new, whiten_patches, y))
 
 # Save to a file to use later
-np.savetxt(filename, theta_new, delimiter = ',')
+#np.savetxt(filename, theta_new, delimiter = ',')
 

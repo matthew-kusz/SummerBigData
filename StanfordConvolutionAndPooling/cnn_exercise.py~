@@ -154,7 +154,7 @@ mean_patches = np.reshape(mean_patches, (1, 192))
 train_labels, train_images, num_train_images = gen_train_data()
 
 '''
-#FOR TESTING OUR CONVOLUTION AND POOLING CODE
+# FOR TESTING OUR CONVOLUTION AND POOLING CODE
 # Grab a small amount of images to test our convolve code on
 train_test_images = train_images[0:8, :, :, :]
 
@@ -173,7 +173,7 @@ check_pool()
 '''
 
 # Now to start running the full data set
-# We need need to run our convolution and pooling 50 features at a time so we don't run out of memory
+# We need to run our convolution and pooling 50 features at a time so we don't run out of memory
 step_size = 50
 assert global_hidden_size % step_size == 0, 'Step size should divide hidden size'
 
@@ -207,7 +207,8 @@ for i in range(global_hidden_size / step_size):
 		test_images, Wt, bt, ZCA_matrix, mean_patches)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_test[feature_start: feature_end, :, :, :] = pooled_features
-	
+
+# Save our data for later	
 np.savetxt('outputs/convPoolTrainFeaturesSize2000StepSize50', np.ravel(pooled_features_train))
 np.savetxt('outputs/convPoolTestFeaturesSize3200StepSize50', np.ravel(pooled_features_test))
 

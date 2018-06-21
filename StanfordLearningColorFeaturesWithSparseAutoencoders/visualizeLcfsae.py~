@@ -145,8 +145,8 @@ num_col = 20
 
 # Dividers
 blackbar_length = 2
-black_space = np.ones((global_patch_dim, blackbar_length, global_image_channels)) * np.amin(y)
-black_space2 = np.ones((blackbar_length, global_patch_dim * num_col + num_col * blackbar_length - blackbar_length, global_image_channels)) * np.amin(y)
+black_space = np.ones((global_patch_dim, blackbar_length, global_image_channels)) * np.max(y)
+black_space2 = np.ones((blackbar_length, global_patch_dim * num_col + num_col * blackbar_length - blackbar_length, global_image_channels)) * np.amax(y)
 
 # Setting up our grid
 for i in range(num_row):

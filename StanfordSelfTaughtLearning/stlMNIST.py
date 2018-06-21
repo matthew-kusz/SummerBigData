@@ -127,7 +127,6 @@ def weights_bias():
 	# Initialize parameters randomly based on layer sizes.
 	# We'll choose weights uniformly from the interval [-r, r]
 	r  = 0.12
-	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
 	random_weight1 = np.random.rand(global_hidden_size, global_input_size)     # (200, 784) matrix
 	random_weight1 = random_weight1 * 2 * r - r
 	random_weight2 = np.random.rand(global_input_size, global_hidden_size)     # (784, 200) matrix      
@@ -159,6 +158,7 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
+####### Code #######
 # Pick the size of the data we want (max 60000)
 size = 60000
 

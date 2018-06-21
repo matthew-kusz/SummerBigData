@@ -13,7 +13,7 @@ global_step = 0
 global_image_dim = 64
 global_image_channels = 3
 global_visible_size = 0    # Will be determined later
-global_lambda = 1e-4
+global_lambda = 1e-5
 global_num_classes = 4   
 
 ####### Definitions #######
@@ -217,8 +217,7 @@ time_finish2 = time.time()
 
 print 'Total time for minimization = %g seconds' %(time_finish2 - time_start2)
 
-
-# Find the probabilities for each digit
+# Find the probabilities for each image
 # We need to reshape our theta values
 final_W1, final_b1 = reshape(theta_new)
 

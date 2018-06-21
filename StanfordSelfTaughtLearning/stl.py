@@ -19,9 +19,9 @@ args = parser.parse_args()
 global_step = 0
 global_input_size  = 28 * 28
 global_hidden_size = 200
-global_rho = args.Rho / 100;           # desired average activation of the hidden units (sparsity parameter). (0.1)
+global_rho = args.Rho / 100;                # desired average activation of the hidden units (sparsity parameter). (0.1)
 global_lambda = args.Lambda / 10000000;     # weight decay parameter (3e-2)
-global_beta = args.Beta / 100;         # weight of sparsity penalty term (3)
+global_beta = args.Beta / 100;              # weight of sparsity penalty term (3)
 
 print 'You chose', args
 
@@ -94,8 +94,8 @@ def backprop(theta, arr_x, arr_y):
 	# delta2 is a (m, 25) matrix
 	
 	# Compute the partial derivatives
-	pd_W1 = np.dot(delta2.T, arr_x)  # (200, 784)
-	pd_W2 = np.dot(delta3.T, a2)     # (784, 200)
+	pd_W1 = np.dot(delta2.T, arr_x)   # (200, 784)
+	pd_W2 = np.dot(delta3.T, a2)      # (784, 200)
 	pd_b1 = np.mean(delta2, axis = 0) # (200,) vector
 	pd_b2 = np.mean(delta3, axis = 0) # (784,) vector
 
@@ -115,7 +115,6 @@ def weights_bias():
 	# Initialize parameters randomly based on layer sizes.
 	# We'll choose weights uniformly from the interval [-r, r]
 	r  = 0.12
-	# math.sqrt(6) / math.sqrt(global_hidden_size + global_visible_size + 1);
 	random_weight1 = np.random.rand(global_hidden_size, global_input_size)     # (200, 784) matrix
 	random_weight1 = random_weight1 * 2 * r - r
 	random_weight2 = np.random.rand(global_input_size, global_hidden_size)     # (784, 200) matrix      
@@ -147,6 +146,7 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
+####### Code #######
 time_start = time.time()
 # Import the file we want
 train , labels_train = grab_data.get_data(60000, '59')

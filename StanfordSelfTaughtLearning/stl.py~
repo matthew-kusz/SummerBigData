@@ -26,7 +26,7 @@ global_beta = args.Beta / 100;         # weight of sparsity penalty term (3)
 print 'You chose', args
 
 # Set up the filename we want to use
-filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) +' Size60000HL200.out'
+filename = 'outputs/finalWeightsRho' + str(global_rho) + 'Lambda' + str(global_lambda) + 'Beta' + str(global_beta) + 'Size60000HL200.out'
 
 ####### Definitions #######
 # Sigmoid function

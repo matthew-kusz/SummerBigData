@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import scipy.optimize
 import scipy.io
 import random
-import math
 import grab_data
 import time
 import argparse
@@ -21,7 +20,7 @@ global_step = 0
 global_num_outputs = 10
 global_input_size  = 28 * 28
 global_hidden_size = 200
-global_lambda = args.Lambda / 1000000000.0;       # weight decay parameter (1e-4)
+global_lambda = args.Lambda / 1000000000.0       # weight decay parameter (1e-4)
 
 print 'You chose', args     
 
@@ -124,7 +123,7 @@ def weights_bias():
 	random_weight2_1D = np.ravel(random_weight2)
 	bias2_1D = np.ravel(bias2)
 
-	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.003Beta0.5Size60000HL200MNIST.out')
+	thetas = np.genfromtxt('outputs/finalWeightsRho0.1Lambda0.03Beta0.5Size60000HL200MNIST.out')
 	random_weight1_1D = thetas[0:global_hidden_size * global_input_size]
 	bias1_1D = thetas[2 * global_hidden_size * global_input_size: 2 * global_hidden_size * global_input_size + global_hidden_size]
 	# Create two vectors theta1 = W1 + b1, theta2 = W2 + b2
@@ -141,6 +140,7 @@ def reshape(theta1, theta2):
 	b2 =np.reshape(theta2[global_hidden_size * global_num_outputs: len(theta2)], (global_num_outputs, 1))
 	return W1, W2, b1, b2
 
+####### Code #######
 # Pick the size of the data we want (max 60000)
 size = 60000
 
