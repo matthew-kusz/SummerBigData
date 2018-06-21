@@ -26,14 +26,12 @@ def sigmoid(value):
 def feedforward(W1, W2, b1, b2, arr_x, m):
 
 	'''
-	We will be running our sigmoid function twice.
 	Tile function allows us to duplicate our rows to the proper dimensions without requiring a for loop.
 	This enables each row in our dot product to receive the same bias term. If it were a (25, 10000) array it is equivalent to adding 
 	our bias column to each dot product column with just + b1 (since b1 starts as a column).
 	'''
 	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 400) matrix
 
-	# Second run
 	a3 = np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1))                # (m, 192) matrix
 
 	return a3, a2
@@ -74,7 +72,10 @@ def check_conv(im, conv_feat, mu, ZCA, W1, b1):
 
 # Checking the pooling code
 def check_pool():
+	# Set up a test matrix to test on
 	test_matrix = np.arange(1, 65).reshape(8, 8)
+
+	# Manually compute our results to check against
 	expected_matrix = np.array((np.mean(np.mean(test_matrix[0:4, 0:4])), np.mean(np.mean(test_matrix[0:4, 4:8])), np.mean(np.mean(test_matrix[4:8, 0:4])), np.mean(np.mean(test_matrix[4:8, 4:8])))).reshape(2, 2)
 
 	test_matrix = np.reshape(test_matrix, (1, 1, 8, 8))
@@ -101,7 +102,7 @@ def gen_train_data():
 	num_images = int(data['numTrainImages'])
 
 	# reformat our images array
-	ord_img = np.zeros((num_images, 64, 64, 3))
+	ord_img = np.zeros((num_images, global_image_dim, global_image_dim, global_image_channels))
 	for i in range(num_images):
 		ord_img[i] = images[:, :, :, i]
 
@@ -117,7 +118,7 @@ def gen_test_data():
 	num_images = int(data['numTestImages'])
 
 	# reformat our images array
-	ord_img = np.zeros((num_images, 64, 64, 3))
+	ord_img = np.zeros((num_images, global_image_dim, global_image_dim, global_image_channels))
 	for i in range(num_images):
 		ord_img[i] = images[:, :, :, i]
 
@@ -153,7 +154,7 @@ mean_patches = np.reshape(mean_patches, (1, 192))
 train_labels, train_images, num_train_images = gen_train_data()
 
 '''
-#FOR TESTING OUR CONVOLUTION AND POOLING CODE
+# FOR TESTING OUR CONVOLUTION AND POOLING CODE
 # Grab a small amount of images to test our convolve code on
 train_test_images = train_images[0:8, :, :, :]
 
@@ -172,7 +173,7 @@ check_pool()
 '''
 
 # Now to start running the full data set
-# We need need to run our convolution and pooling 50 features at a time so we don't run out of memory
+# We need to run our convolution and pooling 50 features at a time so we don't run out of memory
 step_size = 50
 assert global_hidden_size % step_size == 0, 'Step size should divide hidden size'
 
@@ -206,7 +207,8 @@ for i in range(global_hidden_size / step_size):
 		test_images, Wt, bt, ZCA_matrix, mean_patches)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_test[feature_start: feature_end, :, :, :] = pooled_features
-	
+
+# Save our data for later	
 np.savetxt('outputs/convPoolTrainFeaturesSize2000StepSize50', np.ravel(pooled_features_train))
 np.savetxt('outputs/convPoolTestFeaturesSize3200StepSize50', np.ravel(pooled_features_test))
 

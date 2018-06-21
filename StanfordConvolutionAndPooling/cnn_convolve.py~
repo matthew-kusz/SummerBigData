@@ -8,6 +8,19 @@ def sigmoid(value):
 	return 1.0 / (1.0 + np.exp(-value))
 
 def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
+	'''
+	Parameters:
+	patch_dim - dimension of patch region (8)
+	num_features - amount of features we are using (400)
+	images - matrix of our images (m, 64, 64, 3)
+	W - our matrix of our weights (400, 192)
+	b - our bias term (400, 1)
+	ZCA_white - The whitening matrix we computed earlier (192, 192)
+	mean_patch - the mean of our patches that we computed earlier (1, 192)
+
+	Returns:
+	convolved_features - matrix of convolved features (400, m, 57, 57)
+	'''
 	# Number of images
 	m = images.shape[0]
 	# Dimension of image
@@ -46,10 +59,10 @@ def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
 				feature = WT_reform[j, :, :, k]
 	
 				# Flip the feature matrix because of the definition of convolution, as explained later
-				feature = np.flipud(np.fliplr(feature))
+				feature = np.flipud(np.fliplr(np.squeeze(feature)))
 	
 				# Obtain the image
-				im = images[i, :, :, k]                                                # (64, 64)
+				im = np.squeeze(images[i, :, :, k])                                                # (64, 64)
 	
 				# Convolve feature with im, add the result to convolved_image
 				convolved_image += ss.convolve2d(im, feature, mode = 'valid', boundary = 'fill', fillvalue = 0)	# (57, 57)
