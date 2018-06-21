@@ -171,7 +171,7 @@ train_labels, __, __ = gen_train_data()
 train_labels = train_labels[0: train.shape[0]]
 
 # Generate our testing data
-test_labels, __, __ = gen_test_data()
+test_labels, test_image, __ = gen_test_data()
 # Used to set up grad_check (works for full data set)
 test_labels = test_labels[0: test.shape[0]]
 
@@ -257,4 +257,78 @@ for i in range(len(correct_guess)):
 
 avg_acc = avg_acc / len(correct_guess)
 print avg_acc
+
+Wrong1_2 = 0
+Wrong1_3 = 0
+Wrong1_4 = 0
+Wrong2_1 = 0
+Wrong2_3 = 0
+Wrong2_4 = 0
+Wrong3_1 = 0
+Wrong3_2 = 0
+Wrong3_4 = 0
+Wrong4_1 = 0
+Wrong4_2 = 0
+Wrong4_3 = 0
+
+# Let's see what was mixed up the most
+for i in range(len(best_prob)):
+	if (best_prob[i] + 1 == 1 and int(test_labels[i]) == 2):
+		Wrong1_2 += 1
+	elif (best_prob[i] + 1 == 1 and int(test_labels[i]) == 3):
+		Wrong1_3 += 1
+	elif (best_prob[i] + 1 == 1 and int(test_labels[i]) == 4):
+		Wrong1_4 += 1
+	elif (best_prob[i] + 1 == 2 and int(test_labels[i]) == 1):
+		Wrong2_1 += 1
+	elif (best_prob[i] + 1 == 2 and int(test_labels[i]) == 3):
+		Wrong2_3 += 1
+	elif (best_prob[i] + 1 == 2 and int(test_labels[i]) == 4):
+		Wrong2_4 += 1
+	elif (best_prob[i] + 1 == 3 and int(test_labels[i]) == 1):
+		Wrong3_1 += 1
+	elif (best_prob[i] + 1 == 3 and int(test_labels[i]) == 2):
+		Wrong3_2 += 1
+	elif (best_prob[i] + 1 == 3 and int(test_labels[i]) == 4):
+		Wrong3_4 += 1
+	elif (best_prob[i] + 1 == 4 and int(test_labels[i]) == 1):
+		Wrong4_1 += 1
+	elif (best_prob[i] + 1 == 4 and int(test_labels[i]) == 2):
+		Wrong4_2 += 1
+	elif (best_prob[i] + 1 == 4 and int(test_labels[i]) == 3):
+		Wrong4_3 += 1
+	
+print Wrong1_2, Wrong1_3, Wrong1_4, Wrong2_1, Wrong2_3, Wrong2_4, Wrong3_1, Wrong3_2, Wrong3_4, Wrong4_1, Wrong4_2, Wrong4_3
+
+# Attempting to set up confusion matrix
+avg1 = [0 ,0 ,0 ,0]
+avg2 = [0 ,0 ,0 ,0]
+avg3 = [0 ,0 ,0 ,0]
+avg4 = [0 ,0 ,0 ,0]
+for i in range(len(prob_all)):
+	if (int(test_labels[i]) == 1):
+		avg1 += prob_all[i]
+	elif (int(test_labels[i]) == 2):
+		avg2 += prob_all[i]
+	elif (int(test_labels[i]) == 3):
+		avg3 += prob_all[i]
+	elif (int(test_labels[i]) == 4):
+		avg4 += prob_all[i]
+avg1 /= y_digits[0]
+avg2 /= y_digits[1]
+avg3 /= y_digits[2]
+avg4 /= y_digits[3]
+
+confuse_mat = np.concatenate(([avg1], [avg2], [avg3], [avg4]), axis = 0)
+bar_plot = np.zeros(4)
+
+for i in range(4):
+	bar_plot[i] = np.amax(confuse_mat[i])	
+print bar_plot
+
+img = plt.imshow(confuse_mat, cmap = 'coolwarm', interpolation = 'none')
+plt.colorbar()
+#plt.savefig('images/confusionMatrix.png', transparent = True, format = 'png')
+plt.show()
+
 
