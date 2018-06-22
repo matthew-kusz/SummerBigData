@@ -38,7 +38,8 @@ def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
 	s = patch_dim ** 2
 	WT_reform = np.zeros((len(WT), patch_dim, patch_dim, num_channel))
 	for i in range(len(WT)):
-		# Make sure the colors are reformatted correctly
+		### IMPORTANT ###
+		# Make sure the colors are reshaped correctly ([0:64] for first color, [64:128] for second, [128:192] for third)
     		WT_reform[i,:,:,0] = WT[i, :s].reshape(patch_dim, patch_dim)
    		WT_reform[i,:,:,1] = WT[i, s:2*s].reshape(patch_dim, patch_dim)
     		WT_reform[i,:,:,2] = WT[i, 2*s:].reshape(patch_dim, patch_dim)

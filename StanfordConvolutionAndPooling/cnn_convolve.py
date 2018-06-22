@@ -60,7 +60,7 @@ def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
 				feature = np.zeros((patch_dim, patch_dim))                               # (8, 8)
 				feature = WT_reform[j, :, :, k]
 	
-				# Flip the feature matrix because of the definition of convolution, as explained later
+				# Flip the feature matrix because of the definition of convolution
 				feature = np.flipud(np.fliplr(np.squeeze(feature)))
 	
 				# Obtain the image
