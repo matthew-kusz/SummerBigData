@@ -7,7 +7,7 @@ import scipy.signal as ss
 def sigmoid(value):
 	return 1.0 / (1.0 + np.exp(-value))
 
-def convolve(patch_dim, num_features, images, W, b):
+def convolve(patch_dim, num_features, images, W, b, ZCA_white, mean_patch):
 	'''
 	Parameters:
 	patch_dim - dimension of patch region (8)

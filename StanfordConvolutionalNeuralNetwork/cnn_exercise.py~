@@ -92,15 +92,15 @@ def weights_bias():
 	# Initialize parameters randomly based on layer sizes.
 	# We'll choose weights uniformly from the interval [-r, r]
 	r  = 0.12
-	random_weight1 = np.random.rand(global_hidden_size, global_input_size)     # (100, 225) matrix
+	random_weight1 = np.random.rand(global_hidden_size, global_input_size)     # (200, 784) matrix
 	random_weight1 = random_weight1 * 2 * r - r
-	random_weight2 = np.random.rand(global_input_size, global_hidden_size)     # (225, 100) matrix      
+	random_weight2 = np.random.rand(global_input_size, global_hidden_size)     # (784, 200) matrix      
 	random_weight2 = random_weight2 * 2 * r - r
 
 	# Set up our bias term
-	bias1 = np.random.rand(global_hidden_size, 1)   # (100, 1) matrix
+	bias1 = np.random.rand(global_hidden_size, 1)     # (200, 1) matrix
 	bias1 = bias1 * 2 * r - r
-	bias2 = np.random.rand(global_input_size, 1)    # (225, 1) matrix
+	bias2 = np.random.rand(global_input_size, 1)    # (784, 1) matrix
 	bias2 = bias2 * 2 * r - r
 
 	# Combine these into a 1-dimension vector
@@ -162,11 +162,11 @@ num_train_images = len(train_images)
 '''
 # FOR TESTING OUR CONVOLUTION AND POOLING CODE
 # Grab a small amount of images to test our convolve code on
-train_test_images = train_images[0:8, :]
+train_test_images = train_images[0:8, :, :, :]
 
 # Implement convolution
 convolved_features = cnn_convolve.convolve(global_patch_dim, global_hidden_size,
-	train_test_images, W1_final, b1_final)
+	train_test_images, W1_final, b1_final, ZCA_matrix, mean_patches)
 
 # We will now check our convolution
 check_conv(train_test_images, convolved_features, mean_patches, ZCA_matrix, W1_final, b1_final)

@@ -2,4 +2,7 @@ StanfordConvolutionAndPooling/outputs/convPoolTrainFeaturesSize2000StepSize50
 
 StanfordConvolutionAndPooling/outputs/convPoolTestFeaturesSize3200StepSize50
 
+StanfordConvolutionalNeuralNetwork/outputs/MNIST10000patches10x10.out
+
+StanfordConvolutionalNeuralNetwork/outputs/MNIST10000patches15x15.out
 

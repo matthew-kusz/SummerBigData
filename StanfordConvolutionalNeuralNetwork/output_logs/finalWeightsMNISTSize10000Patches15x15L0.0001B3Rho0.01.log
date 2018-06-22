@@ -1,0 +1,8 @@
+(10000, 225)
+Cost before minimization: 51.8308
+Optimization terminated successfully.
+         Current function value: 2.979846
+         Iterations: 2460
+         Function evaluations: 4235
+         Gradient evaluations: 4235
+Cost after minimization: 2.97985
