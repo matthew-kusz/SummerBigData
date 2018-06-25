@@ -1,4 +1,4 @@
-HIDDEL LAYER 25
+HIDDEL LAYER 25/n
 Different lambdas:
 finalWeightsMNISTSize10000Patches15x15L1e-05B1.0Rho0.01HL25
 The average difference between the output pixel and the input pixel is 0.213608.
