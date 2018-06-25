@@ -15,7 +15,7 @@ def pooling(pool_dim, convolve_feat):
 	m = convolve_feat.shape[1]
 	# Dimension of convolve_feat
 	convolved_dim = convolve_feat.shape[2]
-	# Number of channels
+	# Number of features
 	num_features = convolve_feat.shape[0]
 
 	pooled_features = np.zeros((num_features, m, np.floor(convolved_dim / pool_dim), np.floor(convolved_dim / pool_dim))) # (400, m, 3, 3)

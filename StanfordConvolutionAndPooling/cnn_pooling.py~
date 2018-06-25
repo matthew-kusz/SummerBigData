@@ -27,7 +27,6 @@ def pooling(pool_dim, convolve_feat):
 		for k in range(convolved_dim / pool_dim):
 			temp = np.zeros((num_features, m, pool_dim, pool_dim))
 			temp = convolve_feat[:, :, j * pool_dim: pool_dim + j * pool_dim, k * pool_dim: pool_dim + k * pool_dim]
-			temp = np.sum(temp) / (pool_dim ** 2)
-			pooled_features[:, : ,j, k] = 0
+			pooled_features[:, : ,j, k] = np.mean(temp, axis = (2, 3))
 
 	return pooled_features
