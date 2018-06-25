@@ -163,7 +163,7 @@ def ConfuMat(a3, y):
 	
 	a3avg /= numFeatures
 	a3avg *= 800
-	a3avg.astype(int)
+	a3avg = np.rint(a3avg)
 	print a3avg
 	
 	yAxLabels = ["Plane", "Car", "Cat", "Dog"]

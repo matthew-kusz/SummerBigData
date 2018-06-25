@@ -4,7 +4,7 @@ import numpy as np
 def pooling(pool_dim, convolve_feat):
 	'''
 	Parameters:
-	pool_dim - dimension of pooling region (7)
+	pool_dim - dimension of pooling region (2)
 	convolve_feat - convolved features to pool (100, m, 14, 14)
 
 	Returns:
@@ -20,7 +20,7 @@ def pooling(pool_dim, convolve_feat):
 
 	pooled_features = np.zeros((num_features, m, np.floor(convolved_dim / pool_dim), np.floor(convolved_dim / pool_dim))) # (100, m, 7, 7)
 
-	# We need to divide our convolved features into 9 different sections and find the mean feature activation over these regions
+	# We need to divide our convolved features into 4 different sections and find the mean feature activation over these regions
 	# For each row
 	for j in range(convolved_dim / pool_dim):
 		# For each column

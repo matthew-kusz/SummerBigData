@@ -1,0 +1,12 @@
+(30000, 784) (30000, 1)
+(10000, 784) (10000, 1)
+Step 1: features 1 to 20
+Convolving and pooling train images.
+Step 2: features 21 to 40
+Convolving and pooling train images.
+Step 3: features 41 to 60
+Convolving and pooling train images.
+Step 4: features 61 to 80
+Convolving and pooling train images.
+Step 5: features 81 to 100
+Convolving and pooling train images.

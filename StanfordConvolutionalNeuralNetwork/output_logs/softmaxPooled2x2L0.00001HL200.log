@@ -1,0 +1,20 @@
+Dimensions of train (60000, 400)
+Dimensions of test (10000, 400)
+(60000, 784) (60000, 1)
+(10000, 784) (10000, 1)
+Cost before minimization: 2.4814
+Global step: 50
+Global step: 100
+Cost after minimization: 0.52723
+Total time for minimization = 309.647 seconds
+[[ 98.46938776]
+ [ 99.030837  ]
+ [ 94.86434109]
+ [ 95.94059406]
+ [ 94.90835031]
+ [ 95.40358744]
+ [ 95.82463466]
+ [ 91.82879377]
+ [ 92.81314168]
+ [ 93.75619425]]
+[ 95.2839862]

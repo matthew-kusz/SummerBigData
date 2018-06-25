@@ -15,7 +15,7 @@ global_patch_dim = 15
 global_visible_size = global_patch_dim ** 2
 globel_output_size = global_visible_size
 global_hidden_size = 100
-global_pool_dim = 5
+global_pool_dim = 2
 
 ####### Definitions #######
 # Sigmoid function
@@ -105,37 +105,36 @@ def get_train(size):
 	x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
 	y_vals = read_idx('provided_data/train-labels-idx1-ubyte.gz', size)
 	y_vals = np.reshape(y_vals, (len(y_vals), 1))
-	print x_vals.shape
-	print y_vals.shape
+	print x_vals.shape, y_vals.shape
 	
 	return x_vals, y_vals
 
 # Extract the MNIST testing data sets
-def get_train(size):
+def get_test(size):
 	x_vals = read_idx('provided_data/t10k-images-idx3-ubyte.gz', size)
 	x_vals = x_vals / 255.0
-	test_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
+	x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
 	y_vals = read_idx('provided_data/t10k-labels-idx1-ubyte.gz', size)
-	test_labels = np.reshape(y_vals, (len(y_vals), 1))
-	print test_vals.shape
-	print test_labels.shape
+	y_vals = np.reshape(y_vals, (len(y_vals), 1))
+	print x_vals.shape, y_vals.shape
 	
-	return test_vals, test_labels
+	return x_vals, y_vals
 
 ####### Code #######
 # Import the weights we need
-final_theta = np.genfromtxt('outputs/finalWeightsMNISTSize10000Patches15x15L0.0001B1.0Rho0.01HL25.out')
+final_theta = np.genfromtxt('outputs/HL100/finalWeightsMNISTSize10000Patches15x15L0.001B0.5Rho0.05HL100.out')
 
 # We need to reshape our final_theta values and only use W1 and b1
 W1_final, W2_final, b1_final, b2_final = reshape(final_theta)
 
 # Extract the MNIST training data sets
-train_images, train_labels = get_train(global_num_images)
+train_images, __ = get_train(global_num_images)
 num_train_images = len(train_images)
 
-# Reshape our images so that they are (m , 28, 28)
+# Reshape our images so that they are (num_train_images , 28, 28)
 train_images = np.reshape(train_images, (len(train_images), len(train_images[0]) / global_image_dim, len(train_images[0]) / global_image_dim))
 
+'''
 # FOR TESTING OUR CONVOLUTION AND POOLING CODE
 # Grab a small amount of images to test our convolve code on
 train_test_images = train_images[0:8, :]
@@ -152,11 +151,17 @@ pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 
 # Now we need to test if our pooling is correct
 check_pool()
-
 '''
+# Extract the MNIST testing data sets
+test_images, __ = get_test(global_num_images)
+num_test_images = len(test_images)
+
+# Reshape our images so that they are (num_test_images , 28, 28)
+test_images = np.reshape(test_images, (len(test_images), len(test_images[0]) / global_image_dim, len(test_images[0]) / global_image_dim))
+
 # Now to start running the full data set
-# We need to run our convolution and pooling 50 features at a time so we don't run out of memory
-step_size = 50
+# We need to run our convolution and pooling 20 features at a time so we don't run out of memory
+step_size = 20
 assert global_hidden_size % step_size == 0, 'Step size should divide hidden size'
 
 pooled_features_train = np.zeros((global_hidden_size, num_train_images,
@@ -174,20 +179,21 @@ for i in range(global_hidden_size / step_size):
 	print 'Step %g: features %g to %g' %(i + 1, feature_start + 1, feature_end)
 	Wt = W1_final[feature_start: feature_end, :]
 	bt = b1_final[feature_start: feature_end, :]
-
+	'''
 	print 'Convolving and pooling train images.'
 	convolved_features = cnn_convolve.convolve(global_patch_dim, step_size,
-		train_images, Wt, bt, ZCA_matrix, mean_patches)
+		train_images, Wt, bt)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_train[feature_start: feature_end, :, :, :] = pooled_features
-
+	'''
 	print 'Convolving and pooling test images.'
 	convolved_features = cnn_convolve.convolve(global_patch_dim, step_size,
-		test_images, Wt, bt, ZCA_matrix, mean_patches)
+		test_images, Wt, bt)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_test[feature_start: feature_end, :, :, :] = pooled_features
 
+
 # Save our data for later	
-np.savetxt('outputs/convPoolTrainFeaturesSize2000StepSize50', np.ravel(pooled_features_train))
-np.savetxt('outputs/convPoolTestFeaturesSize3200StepSize50', np.ravel(pooled_features_test))
-'''
+#np.savetxt('outputs/convPoolTrainFeaturesSize60000StepSize50-2.out', np.ravel(pooled_features_train))
+np.savetxt('outputs/convPoolTestFeaturesSize10000StepSize50-2.out', np.ravel(pooled_features_test))
+

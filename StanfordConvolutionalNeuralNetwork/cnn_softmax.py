@@ -1,5 +1,7 @@
 # THIS CODE HAS A HIDDEN LAYER THAT IS COMPUTED USING LOGISTIC REGRESSION (It's backprop is computed using logistic regression)
 # Import the necessary packages
+import struct as st
+import gzip
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize
@@ -8,19 +10,30 @@ import random
 import time
 
 ####### Global variables #######
+global_num_images = 60000
 global_step = 0
-global_image_dim = 64
-global_image_channels = 3
+global_image_dim = 28
+global_image_channels = 0
+global_pooled_dim = 2
 global_visible_size = 0    # Will be determined later
-global_hidden_size = 36
-global_lambda = 1e-4
-global_num_classes = 4    
+global_hidden_size = 100
+global_lambda = 1e-3
+global_num_classes = 10    
 
 ####### Definitions #######
 # Sigmoid function
 def sigmoid(value):
 	return 1.0 / (1.0 + np.exp(-value))
 
+# Reading in MNIST data files
+def read_idx(filename, n=None):
+	with gzip.open(filename) as f:
+		zero, dtype, dims = st.unpack('>HBB', f.read(4))
+		shape = tuple(st.unpack('>I', f.read(4))[0] for d in range(dims))
+		arr = np.fromstring(f.read(), dtype=np.uint8).reshape(shape)
+		if not n is None:
+			arr = arr[:n]
+		return arr
 # Softmax
 def hypo(value):
 	# To prevent overflow subract the max number from each element in the array
@@ -53,7 +66,7 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	'''
 	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (m, 36) matrix
 
-	a3 = hypo(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 4) matrix
+	a3 = hypo(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (m, 10) matrix
 
 	return a3, a2
 
@@ -84,7 +97,7 @@ def backprop(theta2, arr_x, arr_y):
 	delta2 = np.multiply(np.dot(arr_W2.T, (arr_y - a3).T).T, (a2 * (1 - a2)))
 
 	pd_W1 = np.dot(delta2.T, arr_x1)         # (36, ? + 1)
-	pd_W2 = np.dot((arr_y - a3).T, a2_1)     # (4, 37)
+	pd_W2 = np.dot((arr_y - a3).T, a2_1)     # (10, 37)
 
 	del_W1 = (-1.0 / m) * pd_W1 + global_lambda * arr_W1b1
 	del_W2 = (-1.0 / m) * pd_W2 + global_lambda * arr_W2b2
@@ -111,13 +124,13 @@ def weights_bias():
 
 	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (36, ?) matrix
 	random_weight1 = random_weight1 * 2 * r - r
-	random_weight2 = np.random.rand(global_num_classes, global_hidden_size)      # (4, 36) matrix      
+	random_weight2 = np.random.rand(global_num_classes, global_hidden_size)      # (10, 36) matrix      
 	random_weight2 = random_weight2 * 2 * r - r
 
 	# Set up our bias term
 	bias1 = np.random.rand(global_hidden_size, 1)    # (36, 1) matrix
 	bias1 = bias1 * 2 * r - r
-	bias2 = np.random.rand(global_num_classes, 1)    # (4, 1) matrix
+	bias2 = np.random.rand(global_num_classes, 1)    # (10, 1) matrix
 	bias2 = bias2 * 2 * r - r
 
 	# Combine these into a 1-dimension vector
@@ -144,60 +157,60 @@ def reshape(theta):
 	
 	return W1, W2, b1, b2
 
-# Generate training data
-def gen_train_data():
-	data = scipy.io.loadmat('provided_data/stlTrainSubset.mat')
-	labels = data['trainLabels']
-	images = data['trainImages']
-	num_images = int(data['numTrainImages'])
+# Extract the MNIST training data sets
+def get_train(size):
+	x_vals = read_idx('provided_data/train-images-idx3-ubyte.gz', size)
+	x_vals = x_vals / 255.0
+	x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
+	y_vals = read_idx('provided_data/train-labels-idx1-ubyte.gz', size)
+	y_vals = np.reshape(y_vals, (len(y_vals), 1))
+	print x_vals.shape, y_vals.shape
+	
+	return x_vals, y_vals
 
-	# reformat our images array
-	ord_img = np.zeros((num_images, global_image_dim, global_image_dim, global_image_channels))
-	for i in range(num_images):
-		ord_img[i] = images[:, :, :, i]
-
-	print 'Dimensions of our training data: ', ord_img.shape
-
-	return labels, ord_img, num_images
-
-# Generate testing data
-def gen_test_data():
-	data = scipy.io.loadmat('provided_data/stlTestSubset.mat')
-	labels = data['testLabels']
-	images = data['testImages']
-	num_images = int(data['numTestImages'])
-
-	# reformat our images array
-	ord_img = np.zeros((num_images, global_image_dim, global_image_dim, global_image_channels))
-	for i in range(num_images):
-		ord_img[i] = images[:, :, :, i]
-
-	print 'Dimensions of our testing data: ', ord_img.shape
-
-	return labels, ord_img, num_images
+# Extract the MNIST testing data sets
+def get_test(size):
+	x_vals = read_idx('provided_data/t10k-images-idx3-ubyte.gz', size)
+	x_vals = x_vals / 255.0
+	x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
+	y_vals = read_idx('provided_data/t10k-labels-idx1-ubyte.gz', size)
+	y_vals = np.reshape(y_vals, (len(y_vals), 1))
+	print x_vals.shape, y_vals.shape
+	
+	return x_vals, y_vals
 
 # Import the files we want and reshape them into the correct dimension
-train = np.genfromtxt('outputs/convPoolTrainFeaturesSize2000StepSize50')
-train = np.reshape(train, (400, 2000, global_image_channels, global_image_channels))
+train = np.genfromtxt('outputs/convPoolTrainFeaturesSize60000StepSize50.out')
+train = np.reshape(train, (100, 60000, global_pooled_dim, global_pooled_dim))
 train = np.swapaxes(train, 0, 1)
-train = np.reshape(train, (train.shape[0], len(train.ravel()) / train.shape[0]))   # (m, 3600)
+train = np.reshape(train, (train.shape[0], len(train.ravel()) / train.shape[0]))   # (60k, 4900)
 print 'Dimensions of train', train.shape
 
-test = np.genfromtxt('outputs/convPoolTestFeaturesSize3200StepSize50')
-test = np.reshape(test, (400, 3200, global_image_channels, global_image_channels))
+test = np.genfromtxt('outputs/convPoolTestFeaturesSize10000StepSize50.out')
+test = np.reshape(test, (100, 10000, global_pooled_dim, global_pooled_dim))
 test = np.swapaxes(test, 0, 1)
-test = np.reshape(test, (test.shape[0], len(test.ravel()) / test.shape[0]))   # (m, 3600)
+test = np.reshape(test, (test.shape[0], len(test.ravel()) / test.shape[0]))   # (10k, 4900)
 print 'Dimensions of test', test.shape
 
 global_visible_size = train.shape[1]
 
-# Generate our training data
-train_labels, __, __ = gen_train_data()
+# Extract the MNIST training data sets to get our labels
+train_images, train_labels = get_train(global_num_images)
+num_train_images = len(train_images)
+
+# Reshape our images so that they are (num_train_images , 28, 28)
+train_images = np.reshape(train_images, (len(train_images), len(train_images[0]) / global_image_dim, len(train_images[0]) / global_image_dim))
+
 # Used to set up grad_check (works for full data set)
 train_labels = train_labels[0: train.shape[0]]
 
-# Generate our testing data
-test_labels, __, __ = gen_test_data()
+# Extract the MNIST testing data sets to get our labels
+test_images, test_labels = get_test(global_num_images)
+num_test_images = len(test_images)
+
+# Reshape our images so that they are (num_test_images , 28, 28)
+test_images = np.reshape(test_images, (len(test_images), len(test_images[0]) / global_image_dim, len(test_images[0]) / global_image_dim))
+
 # Used to set up grad_check (works for full data set)
 test_labels = test_labels[0: test.shape[0]]
 
@@ -211,7 +224,7 @@ theta = weights_bias()
 y_vals_train = np.zeros((len(train_labels), global_num_classes))
 for i in range(global_num_classes):
 	# Set up an array with the values that stand for each label
-	arr_num = [1, 2, 3, 4]
+	arr_num = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 	
 	for j in range(len(train_labels)):
 		if (train_labels[j] == arr_num[i]):
@@ -259,14 +272,14 @@ for i in range (len(prob_all)):
 # Find how accurate our program was
 correct_guess = np.zeros((global_num_classes, 1))
 for i in range(len(best_prob)):
-	if (best_prob[i] + 1 == int(test_labels[i])):
-		correct_guess[int(test_labels[i]) - 1] = correct_guess[int(test_labels[i]) - 1] + 1
+	if (best_prob[i] == int(test_labels[i])):
+		correct_guess[int(test_labels[i])] = correct_guess[int(test_labels[i]) ] + 1
 
 # Find how many of each image our array test_labels has
 y_digits = np.zeros((global_num_classes, 1))
 for i in range(global_num_classes):
 	for j in range(len(test_labels)):
-		if (test_labels[j] == i + 1):
+		if (test_labels[j] == i):
 			y_digits[i] = y_digits[i] + 1
 
 # Calculate the percentage
