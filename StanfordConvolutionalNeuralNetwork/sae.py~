@@ -5,6 +5,7 @@ import scipy.optimize
 import scipy.io
 import random
 import math
+import argparse
 
 ####### Global variables #######
 parser = argparse.ArgumentParser()
@@ -16,14 +17,14 @@ args = parser.parse_args()
 
 global_patch_dim = 15
 global_visible_size = global_patch_dim ** 2
-global_hidden_size = 25
+global_hidden_size = 100
 global_rho = args.Rho;                # desired average activation of the hidden units (sparsity parameter). (0.01)
 global_lambda = args.Lambda;          # weight decay parameter (1e-3)
 global_beta = args.Beta;              # weight of sparsity penalty term (1)
 
 print 'You chose', args
 
-filename = 'outputs/finalWeightsMNISTSize10000Patches15x15L' + str(global_lambda) + 'B' + str(global_beta) + 'Rho' + str(global_rho) + '.out'
+filename = 'outputs/finalWeightsMNISTSize10000Patches15x15L' + str(global_lambda) + 'B' + str(global_beta) + 'Rho' + str(global_rho) + 'HL' + str(global_hidden_size) + '.out'
 
 ####### Definitions #######
 # Sigmoid function
@@ -85,8 +86,8 @@ def backprop(theta, arr_x, arr_y):
 	# delta2 is a (10000, 25) matrix
 	
 	# Compute the partial derivatives
-	pd_W1 = np.dot(delta2.T, arr_x)  # (25, 225)
-	pd_W2 = np.dot(delta3.T, a2)     # (225, 25)
+	pd_W1 = np.dot(delta2.T, arr_x)   # (25, 225)
+	pd_W2 = np.dot(delta3.T, a2)      # (225, 25)
 	pd_b1 = np.mean(delta2, axis = 0) # (25,) vector
 	pd_b2 = np.mean(delta3, axis = 0) # (225,) vector
 
@@ -107,6 +108,10 @@ def weights_bias():
 	# Initialize parameters randomly based on layer sizes.
 	# We'll choose weights uniformly from the interval [-r, r]
 	r  = 0.12
+
+	# Generate a seed so our andom values remain the same through each run
+	np.random.seed(7)
+
 	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (25, 225) matrix
 	random_weight1 = random_weight1 * 2 * r - r
 	random_weight2 = np.random.rand(global_visible_size, global_hidden_size)     # (225, 25) matrix      

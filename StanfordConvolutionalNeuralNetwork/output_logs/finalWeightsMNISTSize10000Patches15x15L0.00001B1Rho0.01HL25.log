@@ -1,0 +1,9 @@
+You chose Namespace(Beta=1.0, Lambda=1e-05, Rho=0.01)
+(10000, 225)
+Cost before minimization: 21.8793
+Optimization terminated successfully.
+         Current function value: 1.891067
+         Iterations: 6051
+         Function evaluations: 10002
+         Gradient evaluations: 10002
+Cost after minimization: 1.89107

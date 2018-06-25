@@ -17,14 +17,14 @@ args = parser.parse_args()
 
 global_patch_dim = 15
 global_visible_size = global_patch_dim ** 2
-global_hidden_size = 25
+global_hidden_size = 100
 global_rho = args.Rho;                # desired average activation of the hidden units (sparsity parameter). (0.01)
 global_lambda = args.Lambda;          # weight decay parameter (1e-3)
 global_beta = args.Beta;              # weight of sparsity penalty term (1)
 
 print 'You chose', args
 
-filename = 'outputs/finalWeightsMNISTSize10000Patches15x15L' + str(global_lambda) + 'B' + str(global_beta) + 'Rho' + str(global_rho) + '.out'
+filename = 'outputs/finalWeightsMNISTSize10000Patches15x15L' + str(global_lambda) + 'B' + str(global_beta) + 'Rho' + str(global_rho) + 'HL' + str(global_hidden_size) + '.out'
 
 ####### Definitions #######
 # Sigmoid function
@@ -40,7 +40,7 @@ def reg_cost(theta, arr_x, arr_y):
 	h, a2 = feedforward(arr_W1, arr_W2, arr_b1, arr_b2, arr_x)
 
 	# Find the average activation of each hidden unit averaged over the training set
-	rho_hat = (1.0 / m) * np.sum(a2, axis = 0)         # (25,) vector
+	rho_hat = (1.0 / m) * np.sum(a2, axis = 0)         # (100,) vector
 
 	# Calculate the cost
 	KL_divergence = global_beta * np.sum((global_rho * np.log(global_rho / rho_hat) + (1 - global_rho) * np.log((1 - global_rho) / (1 - rho_hat))))
@@ -62,7 +62,7 @@ def feedforward(W1, W2, b1, b2, arr_x):
 	This enables each row in our dot product to receive the same bias term. If it were a (25, 10000) array it is equivalent to adding 
 	our bias column to each dot product column with just + b1 (since b1 starts as a column).
 	'''
-	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (10000, 25) matrix
+	a2 = sigmoid(np.dot(arr_x, W1.T) + np.tile(np.ravel(b1), (m, 1)))    # (10000, 100) matrix
 
 	# Second run
 	a3 = sigmoid(np.dot(a2, W2.T) + np.tile(np.ravel(b2), (m, 1)))       # (10000, 225) matrix
@@ -78,16 +78,16 @@ def backprop(theta, arr_x, arr_y):
 	a3, a2 = feedforward(arr_W1, arr_W2, arr_b1, arr_b2, arr_x)
 
 	# Find the average activation of each hidden unit averaged over the training set
-	rho_hat = np.mean(a2, axis = 0)         # (25,) vector
-	rho_hat = np.tile(rho_hat, (m, 1))      # (10000, 25) matrix (Could just leave it as a vector, code still runs the same)
+	rho_hat = np.mean(a2, axis = 0)         # (100,) vector
+	rho_hat = np.tile(rho_hat, (m, 1))      # (10000, 100) matrix (Could just leave it as a vector, code still runs the same)
 
 	delta3 = np.multiply(a3 - arr_y, a3 * (1 - a3))   # (10000, 225)
 	delta2 = np.multiply(np.dot(delta3, arr_W2) + global_beta * (-(global_rho / rho_hat) + ((1 - global_rho) / (1 - rho_hat))), a2 * (1 - a2))
 	# delta2 is a (10000, 25) matrix
 	
 	# Compute the partial derivatives
-	pd_W1 = np.dot(delta2.T, arr_x)  # (25, 225)
-	pd_W2 = np.dot(delta3.T, a2)     # (225, 25)
+	pd_W1 = np.dot(delta2.T, arr_x)   # (100, 225)
+	pd_W2 = np.dot(delta3.T, a2)      # (225, 100)
 	pd_b1 = np.mean(delta2, axis = 0) # (25,) vector
 	pd_b2 = np.mean(delta3, axis = 0) # (225,) vector
 
@@ -108,13 +108,17 @@ def weights_bias():
 	# Initialize parameters randomly based on layer sizes.
 	# We'll choose weights uniformly from the interval [-r, r]
 	r  = 0.12
-	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (25, 225) matrix
+
+	# Generate a seed so our andom values remain the same through each run
+	np.random.seed(7)
+
+	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (100, 225) matrix
 	random_weight1 = random_weight1 * 2 * r - r
-	random_weight2 = np.random.rand(global_visible_size, global_hidden_size)     # (225, 25) matrix      
+	random_weight2 = np.random.rand(global_visible_size, global_hidden_size)     # (225, 100) matrix      
 	random_weight2 = random_weight2 * 2 * r - r
 
 	# Set up our bias term
-	bias1 = np.random.rand(global_hidden_size, 1)     # (25, 1) matrix
+	bias1 = np.random.rand(global_hidden_size, 1)     # (100, 1) matrix
 	bias1 = bias1 * 2 * r - r
 	bias2 = np.random.rand(global_visible_size, 1)    # (225, 1) matrix
 	bias2 = bias2 * 2 * r - r

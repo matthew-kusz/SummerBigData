@@ -1,0 +1,9 @@
+You chose Namespace(Beta=5.0, Lambda=0.0001, Rho=0.01)
+(10000, 225)
+Cost before minimization: 83.0852
+Warning: Desired error not necessarily achieved due to precision loss.
+         Current function value: 4.041906
+         Iterations: 51
+         Function evaluations: 139
+         Gradient evaluations: 127
+Cost after minimization: 4.04191

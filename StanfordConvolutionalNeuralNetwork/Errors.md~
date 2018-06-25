@@ -1,0 +1,11 @@
+finalWeightsMNISTSize10000Patches15x15L1e-05B1.0Rho0.01HL25
+The average difference between the output pixel and the input pixel is 0.213608.
+
+finalWeightsMNISTSize10000Patches15x15L0.0001B1.0Rho0.01HL25
+The average difference between the output pixel and the input pixel is 0.209805.
+
+finalWeightsMNISTSize10000Patches15x15L0.001B1.0Rho0.01HL25
+The average difference between the output pixel and the input pixel is 0.33669.
+
+finalWeightsMNISTSize10000Patches15x15L0.01B1.0Rho0.01HL25
+The average difference between the output pixel and the input pixel is 0.516647.

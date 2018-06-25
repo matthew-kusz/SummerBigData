@@ -5,8 +5,9 @@ import scipy.io
 import math
 
 ####### Global variables #######
-global_visible_size = 225
-global_hidden_size = 25
+global_patch_dim = 15
+global_visible_size = global_patch_dim ** 2
+global_hidden_size = 100
 
 ####### Definitions #######
 # Sigmoid function
@@ -45,15 +46,15 @@ patches = np.reshape(patches, (len(patches) / global_visible_size, global_visibl
 m = len(patches)
 n = len(patches[0])
 
-# We need our values in patches and a3_finalto range from 0 to 1
+# We need our values in patches and a3_final to range from 0 to 1
 old_min = -1
 old_max = 1
 new_min = 0
 new_max = 1
 patches = ((patches - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
 
-# Import the images we need
-theta_final = np.genfromtxt('outputs/finalWeightsMNISTSize10000Patches15x15L0.0001B3Rho0.01.out')
+# Import the weights we need
+theta_final = np.genfromtxt('outputs/HL100/finalWeightsMNISTSize10000Patches15x15L0.01B1.0Rho0.01HL100.out')
 
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 a3_final, a2_final = feedforward(W1_final, W2_final, b1_final, b2_final, patches)
@@ -72,66 +73,73 @@ for i in range(m):
 print "The average difference between the output pixel and the input pixel is %g." %(np.mean(error))
 
 # Plot an image of a1 and a3 side by side to see how accurate the output is to the original
-blackspace = np.ones((8,1))
-blackspace2 = np.ones((1,17))
-all1 = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
-for i in range (10):
-	temp = np.reshape(patches[i*1000], (15, 15))
-	temp2 = np.reshape(a3_final[i*1000], (15, 15))
-	all1[i] = np.concatenate((temp, blackspace, temp2), axis = 1)
+comparison1 = []
+comparison2 = []
 
-all_all = np.concatenate((all1[0], blackspace2, all1[1], blackspace2, all1[2], blackspace2, all1[3], blackspace2, all1[4], blackspace2, all1[5], blackspace2, all1[6], blackspace2, all1[7], blackspace2, all1[8], blackspace2, all1[9]), axis = 0)
+# Set up the number of columns and rows that we want in our grid
+num_row = 10
+num_col = 2
 
+# Dividers
+blackbar_length = 2
+black_space = np.zeros((global_patch_dim, blackbar_length))
+black_space2 = np.zeros((blackbar_length, global_patch_dim * num_col + num_col * blackbar_length - blackbar_length))
+
+# Setting up our grid
+for i in range(num_row):
+	for j in range(num_col):
+		if (j == 0):
+			comparison1 = np.reshape(patches[i*1000], (global_patch_dim, global_patch_dim))
+		else:
+			temp = np.reshape(a3_final[i*1000], (global_patch_dim, global_patch_dim))
+			comparison1 = np.concatenate((comparison1, black_space, temp), axis = 1)
+
+	if (i == 0):
+		comparison2 = comparison1
+	else:
+		comparison2 = np.concatenate((comparison2, black_space2, comparison1), axis = 0)
+
+# Displaying the grid			
 a = plt.figure(1)
-plt.imshow(all_all, cmap = 'binary', interpolation = 'none')
+plt.imshow(comparison2, cmap = 'binary', interpolation = 'none')
 a.show()
 
-# This code is ugly, sorry
-images = [[0], [0], [0], [0], [0]]
-images2 = [[0], [0], [0], [0], [0]]
-images3 = [[0], [0], [0], [0], [0]]
-images4 = [[0], [0], [0], [0], [0]]
-images5 = [[0], [0], [0], [0], [0]]
-for i in range(5):
-	x = W1_final[i] / math.sqrt(np.sum(W1_final[i] ** 2))
-	x = np.reshape(x, (15, 15))
-	images[i] = x
+####### Visualizing our max activations #######
+# Find the max activations
+y = W1_final / np.reshape(np.sqrt(np.sum(W1_final ** 2, axis = 1)), (len(W1_final), 1))
 
-for i in range(5):
-	x = W1_final[i + 5] / math.sqrt(np.sum(W1_final[i + 5] ** 2))
-	x = np.reshape(x, (15, 15))
-	images2[i] = x
+# Now let's show all of the inputs
+images1 = []
+images2 = []
 
-for i in range(5):
-	x = W1_final[i + 10] / math.sqrt(np.sum(W1_final[i + 10] ** 2))
-	x = np.reshape(x, (15, 15))
-	images3[i] = x
+# Set up the number of columns and rows that we want in our grid
+num_row = 10
+num_col = 10
 
-for i in range(5):
-	x = W1_final[i + 15] / math.sqrt(np.sum(W1_final[i + 15] ** 2))
-	x = np.reshape(x, (15, 15))
-	images4[i] = x
+# Dividers
+blackbar_length = 2
+black_space = np.ones((global_patch_dim, blackbar_length)) * np.max(y)
+black_space2 = np.ones((blackbar_length, global_patch_dim * num_col + num_col * blackbar_length - blackbar_length)) * np.amax(y)
 
-for i in range(5):
-	x = W1_final[i + 20] / math.sqrt(np.sum(W1_final[i + 20] ** 2))
-	x = np.reshape(x, (15, 15))
-	images5[i] = x
+# Setting up our grid
+for i in range(num_row):
+	for j in range(num_col):
+		if (j == 0):
+			images1 = np.reshape(y[j + i * num_col], (global_patch_dim, global_patch_dim))
 
-# Stitch the images together horizontally
-set_up = np.concatenate((images, images2, images3, images4, images5), axis = 1)
-black_space = np.ones((8, 1)) * set_up.max()
-black_space2 = np.ones((1, 44)) * set_up.max()
+		else:
+			temp = np.reshape(y[j + i * num_col], (global_patch_dim, global_patch_dim))
+			images1 = np.concatenate((images1, black_space, temp), axis = 1)
+			
+	if (i == 0):
+		images2 = images1
+	else:
+		images2 = np.concatenate((images2, black_space2, images1), axis = 0)
 
-all_img = np.concatenate((images[0], black_space, images[1], black_space, images[2], black_space, images[3], black_space, images[4]), axis = 1)
-all_img2 = np.concatenate((images2[0], black_space, images2[1], black_space, images2[2], black_space, images2[3], black_space, images2[4]), axis = 1)
-all_img3 = np.concatenate((images3[0], black_space, images3[1], black_space, images3[2], black_space, images3[3], black_space, images3[4]), axis = 1)
-all_img4 = np.concatenate((images4[0], black_space, images4[1], black_space, images4[2], black_space, images4[3], black_space, images4[4]), axis = 1)
-all_img5 = np.concatenate((images5[0], black_space, images5[1], black_space, images5[2], black_space, images5[3], black_space, images5[4]), axis = 1)
-
-# Now stitch them vertically
-all_images = np.concatenate((all_img, black_space2, all_img2, black_space2, all_img3, black_space2, all_img4, black_space2, all_img5), axis = 0)
-d = plt.figure(3)
-plt.imshow(all_images, cmap = 'binary', interpolation = 'none')
+# Displaying the grid
+d = plt.figure(2)
+plt.imshow(images2, cmap = 'binary', interpolation = 'none')
 d.show()
 
+# Allows us to view all images at once
 raw_input()

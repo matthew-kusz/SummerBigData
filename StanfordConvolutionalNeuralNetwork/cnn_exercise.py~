@@ -15,9 +15,13 @@ global_patch_dim = 15
 global_visible_size = global_patch_dim ** 2
 globel_output_size = global_visible_size
 global_hidden_size = 100
-global_pool_dim = 2
+global_pool_dim = 5
 
 ####### Definitions #######
+# Sigmoid function
+def sigmoid(value):
+	return 1.0 / (1.0 + np.exp(-value))
+
 # Reading in MNIST data files
 def read_idx(filename, n=None):
 	with gzip.open(filename) as f:
@@ -29,21 +33,17 @@ def read_idx(filename, n=None):
 		return arr
 
 # Checking the convolution code
-def check_conv(im, conv_feat, mu, ZCA, W1, b1):
+def check_conv(im, conv_feat, W1, b1):
 	m = len(im)
 	for i in range(1000):
 		# Pick a random data patch
 		feature_num = np.random.randint(0, global_hidden_size - 1)
-		image_num = np.random.randint(0, 7)
+		image_num = np.random.randint(0, m)
 		image_row = np.random.randint(0, global_image_dim - global_patch_dim)
 		image_col = np.random.randint(0, global_image_dim - global_patch_dim)
 	
-		patch = im[image_num, image_row: image_row + global_patch_dim, image_col: image_col + global_patch_dim, :]
-		# Flatten the image in groups of color
-		patch = np.concatenate((patch[:,:,0].flatten(), patch[:,:,1].flatten(), patch[:,:,2].flatten()))
-		patch -= np.ravel(mean_patches)
-		patch = patch.reshape(1,192)
-		patch = np.dot(patch, ZCA_matrix)
+		patch = im[image_num, image_row: image_row + global_patch_dim, image_col: image_col + global_patch_dim]
+		patch = patch.reshape(1, global_patch_dim ** 2)
 		
 		features = sigmoid(np.dot(patch, W1.T) + np.tile(np.ravel(b1), (m, 1)))
 		
@@ -87,33 +87,6 @@ def check_pool():
 
 	return
 
-# Set up our weights and bias terms
-def weights_bias():
-	# Initialize parameters randomly based on layer sizes.
-	# We'll choose weights uniformly from the interval [-r, r]
-	r  = 0.12
-	random_weight1 = np.random.rand(global_hidden_size, global_input_size)     # (200, 784) matrix
-	random_weight1 = random_weight1 * 2 * r - r
-	random_weight2 = np.random.rand(global_input_size, global_hidden_size)     # (784, 200) matrix      
-	random_weight2 = random_weight2 * 2 * r - r
-
-	# Set up our bias term
-	bias1 = np.random.rand(global_hidden_size, 1)     # (200, 1) matrix
-	bias1 = bias1 * 2 * r - r
-	bias2 = np.random.rand(global_input_size, 1)    # (784, 1) matrix
-	bias2 = bias2 * 2 * r - r
-
-	# Combine these into a 1-dimension vector
-	random_weight1_1D = np.ravel(random_weight1)
-	bias1_1D = np.ravel(bias1)
-	random_weight2_1D = np.ravel(random_weight2)
-	bias2_1D = np.ravel(bias2)
-
-	# Create a vector theta = W1 + W2 + b1 + b2
-	theta_vals = np.concatenate((random_weight1_1D, random_weight2_1D, bias1_1D, bias2_1D))	
-	
-	return theta_vals
-
 # Change our weights and bias terms back into their proper shapes
 def reshape(theta):
 	W1 = np.reshape(theta[0:global_hidden_size * global_visible_size], (global_hidden_size, global_visible_size))
@@ -127,10 +100,10 @@ def reshape(theta):
 
 # Extract the MNIST training data sets
 def get_train(size):
-	x_vals = read_idx('data/train-images-idx3-ubyte.gz', size)
+	x_vals = read_idx('provided_data/train-images-idx3-ubyte.gz', size)
 	x_vals = x_vals / 255.0
 	x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
-	y_vals = read_idx('data/train-labels-idx1-ubyte.gz', size)
+	y_vals = read_idx('provided_data/train-labels-idx1-ubyte.gz', size)
 	y_vals = np.reshape(y_vals, (len(y_vals), 1))
 	print x_vals.shape
 	print y_vals.shape
@@ -139,10 +112,10 @@ def get_train(size):
 
 # Extract the MNIST testing data sets
 def get_train(size):
-	x_vals = read_idx('data/t10k-images-idx3-ubyte.gz', size)
+	x_vals = read_idx('provided_data/t10k-images-idx3-ubyte.gz', size)
 	x_vals = x_vals / 255.0
 	test_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
-	y_vals = read_idx('data/t10k-labels-idx1-ubyte.gz', size)
+	y_vals = read_idx('provided_data/t10k-labels-idx1-ubyte.gz', size)
 	test_labels = np.reshape(y_vals, (len(y_vals), 1))
 	print test_vals.shape
 	print test_labels.shape
@@ -150,8 +123,8 @@ def get_train(size):
 	return test_vals, test_labels
 
 ####### Code #######
-# Grab the weights that we need
-final_theta = np.genfromtxt('outputs/finalWeightsMNISTSize10000Patches15x15L0.0001B3Rho0.01.out')
+# Import the weights we need
+final_theta = np.genfromtxt('outputs/finalWeightsMNISTSize10000Patches15x15L0.0001B1.0Rho0.01HL25.out')
 
 # We need to reshape our final_theta values and only use W1 and b1
 W1_final, W2_final, b1_final, b2_final = reshape(final_theta)
@@ -159,24 +132,27 @@ W1_final, W2_final, b1_final, b2_final = reshape(final_theta)
 # Extract the MNIST training data sets
 train_images, train_labels = get_train(global_num_images)
 num_train_images = len(train_images)
-'''
+
+# Reshape our images so that they are (m , 28, 28)
+train_images = np.reshape(train_images, (len(train_images), len(train_images[0]) / global_image_dim, len(train_images[0]) / global_image_dim))
+
 # FOR TESTING OUR CONVOLUTION AND POOLING CODE
 # Grab a small amount of images to test our convolve code on
-train_test_images = train_images[0:8, :, :, :]
+train_test_images = train_images[0:8, :]
 
 # Implement convolution
 convolved_features = cnn_convolve.convolve(global_patch_dim, global_hidden_size,
-	train_test_images, W1_final, b1_final, ZCA_matrix, mean_patches)
+	train_test_images, W1_final, b1_final)
 
 # We will now check our convolution
-check_conv(train_test_images, convolved_features, mean_patches, ZCA_matrix, W1_final, b1_final)
+check_conv(train_test_images, convolved_features, W1_final, b1_final)
 
 # Implement pooling
 pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 
 # Now we need to test if our pooling is correct
 check_pool()
-'''
+
 '''
 # Now to start running the full data set
 # We need to run our convolution and pooling 50 features at a time so we don't run out of memory
