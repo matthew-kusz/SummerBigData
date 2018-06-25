@@ -1,4 +1,4 @@
-#PBS -N softmaxPooled2x2L0.001HL200
+#PBS -N softmaxPooled7x7L0.0001
 #PBS -l walltime=01:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u cnn_softmax.py >& softmaxPooled2x2L0.001HL200.log
+python -u cnn_softmax2.py >& softmaxPooled7x7L0.0001.log

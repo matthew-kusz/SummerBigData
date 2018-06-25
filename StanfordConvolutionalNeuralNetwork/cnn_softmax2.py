@@ -13,7 +13,7 @@ import time
 global_num_images = 60000
 global_step = 0
 global_image_dim = 28
-global_pooled_dim = 2
+global_pooled_dim = 7
 global_image_channels = 0
 global_visible_size = 0    # Will be determined later
 global_lambda = 1e-4
@@ -202,13 +202,13 @@ def ConfuMat(a3, y, amount):
 
 ####### Code #######
 # Import the files we want and reshape them into the correct dimension
-train = np.genfromtxt('outputs/convPoolTrainFeaturesSize60000StepSize50.out')
+train = np.genfromtxt('outputs/convPoolTrainFeaturesSize30000StepSize50-2.out')
 train = np.reshape(train, (100, 60000, global_pooled_dim, global_pooled_dim))
 train = np.swapaxes(train, 0, 1)
 train = np.reshape(train, (train.shape[0], len(train.ravel()) / train.shape[0]))   # (60k, 4900)
 print 'Dimensions of train', train.shape
 
-test = np.genfromtxt('outputs/convPoolTestFeaturesSize10000StepSize50.out')
+test = np.genfromtxt('outputs/convPoolTestFeaturesSize10000StepSize50-2.out')
 test = np.reshape(test, (100, 10000, global_pooled_dim, global_pooled_dim))
 test = np.swapaxes(test, 0, 1)
 test = np.reshape(test, (test.shape[0], len(test.ravel()) / test.shape[0]))   # (10k, 4090)

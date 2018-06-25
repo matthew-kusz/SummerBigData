@@ -165,8 +165,8 @@ def ConfuMat(a3, y, amount):
 		numFeatures [ y[i] , 0 ] += 1
 	
 	a3avg /= numFeatures
-	# a3avg *= 100
-	# a3avg = np.rint(a3avg)
+	a3avg *= amount
+	a3avg = np.rint(a3avg)
 	
 	yAxLabels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 	xAxLabels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
