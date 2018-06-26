@@ -1,1 +1,1 @@
-This file convolves and pools STL-10 images.
+This file convolves and pools STL-10 features.

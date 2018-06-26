@@ -1,1 +1,1 @@
-This file convolves and pools MNIST digits.
+This file convolves and pools MNIST features.
