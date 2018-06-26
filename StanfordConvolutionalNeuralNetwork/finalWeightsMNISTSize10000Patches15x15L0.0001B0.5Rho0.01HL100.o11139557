@@ -1,0 +1,16 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/StanfordConvolutionalNeuralNetwork
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=01:00:37
+walltime=01:00:44
+mem=0.227 GB
+vmem=0.759 GB
+-----------------------
+Resource units charged (estimate):
+0.404 RUs
+-----------------------
