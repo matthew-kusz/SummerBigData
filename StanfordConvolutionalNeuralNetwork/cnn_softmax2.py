@@ -11,9 +11,10 @@ import time
 
 ####### Global variables #######
 global_num_images = 60000
+global_num_labels = 10000
 global_step = 0
 global_image_dim = 28
-global_pooled_dim = 7
+global_pooled_dim = 2
 global_image_channels = 0
 global_visible_size = 0    # Will be determined later
 global_lambda = 1e-4
@@ -131,7 +132,7 @@ def reshape(theta):
 
 	return W1, b1
 
-# Extract the MNIST training data sets
+# Extract the MNIST training dataset
 def get_train(size):
 	x_vals = read_idx('provided_data/train-images-idx3-ubyte.gz', size)
 	x_vals = x_vals / 255.0
@@ -142,7 +143,7 @@ def get_train(size):
 	
 	return x_vals, y_vals
 
-# Extract the MNIST testing data sets
+# Extract the MNIST testing dataset
 def get_test(size):
 	x_vals = read_idx('provided_data/t10k-images-idx3-ubyte.gz', size)
 	x_vals = x_vals / 255.0
@@ -154,7 +155,7 @@ def get_test(size):
 	return x_vals, y_vals
 
 # Confusion matrix
-def ConfuMat(a3, y, amount):
+def confu_mat(a3, y, amount):
 	# Actual x Predicted
 	a3avg = np.zeros((a3.shape[1], a3.shape[1]))
 	# number in each feature
@@ -202,38 +203,32 @@ def ConfuMat(a3, y, amount):
 
 ####### Code #######
 # Import the files we want and reshape them into the correct dimension
-train = np.genfromtxt('outputs/convPoolTrainFeaturesSize30000StepSize50-2.out')
+train = np.genfromtxt('outputs/convPoolTrainFeaturesSize60000StepSize50.out')
 train = np.reshape(train, (100, 60000, global_pooled_dim, global_pooled_dim))
 train = np.swapaxes(train, 0, 1)
-train = np.reshape(train, (train.shape[0], len(train.ravel()) / train.shape[0]))   # (60k, 4900)
+train = np.reshape(train, (train.shape[0], len(train.ravel()) / train.shape[0]))   # (60k, 400)
 print 'Dimensions of train', train.shape
 
-test = np.genfromtxt('outputs/convPoolTestFeaturesSize10000StepSize50-2.out')
+test = np.genfromtxt('outputs/convPoolTestFeaturesSize10000StepSize50.out')
 test = np.reshape(test, (100, 10000, global_pooled_dim, global_pooled_dim))
 test = np.swapaxes(test, 0, 1)
-test = np.reshape(test, (test.shape[0], len(test.ravel()) / test.shape[0]))   # (10k, 4090)
+test = np.reshape(test, (test.shape[0], len(test.ravel()) / test.shape[0]))   # (10k, 400)
 print 'Dimensions of test', test.shape
 
 global_visible_size = train.shape[1]
 
-# Extract the MNIST training data sets
-train_images, train_labels = get_train(global_num_images)
-num_train_images = len(train_images)
+# Extract the MNIST training dataset
+__, train_labels = get_train(global_num_images)
+num_train_images = global_num_images
 
-# Reshape our images so that they are (num_train_images , 28, 28)
-train_images = np.reshape(train_images, (len(train_images), len(train_images[0]) / global_image_dim, len(train_images[0]) / global_image_dim))
-
-# Used to set up grad_check (works for full data set)
+# Used to set up grad_check (works for full dataset)
 train_labels = train_labels[0: train.shape[0]]
 
-# Extract the MNIST testing data sets
-test_images, test_labels = get_test(global_num_images)
-num_test_images = len(test_images)
+# Extract the MNIST testing dataset
+__, test_labels = get_test(global_num_labels)
+num_test_images = global_num_labels
 
-# Reshape our images so that they are (num_test_images , 28, 28)
-test_images = np.reshape(test_images, (len(test_images), len(test_images[0]) / global_image_dim, len(test_images[0]) / global_image_dim))
-
-# Used to set up grad_check (works for full data set)
+# Used to set up grad_check (works for full dataset)
 test_labels = test_labels[0: test.shape[0]]
 
 # Need to know how many training inputs we have
@@ -242,7 +237,7 @@ m = train.shape[0]
 # Create our weights and bias terms
 theta = weights_bias()
 
-# Set up an array that will be either 1 or 0 depending on what we are looking at
+# Set up a matrix that will be either 1 or 0 depending on what we are looking at
 y_vals_train = np.zeros((len(train_labels), global_num_classes))
 for i in range(global_num_classes):
 	# Set up an array with the values that stand for each label
@@ -320,6 +315,6 @@ avg_acc = avg_acc / len(correct_guess)
 print avg_acc
 
 # Let's create a confusion matrix
-ConfuMat(prob_all, test_labels, y_digits)
+confu_mat(prob_all, test_labels, y_digits)
 
 
