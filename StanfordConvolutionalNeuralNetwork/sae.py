@@ -18,9 +18,9 @@ args = parser.parse_args()
 global_patch_dim = 15
 global_visible_size = global_patch_dim ** 2
 global_hidden_size = 100
-global_rho = args.Rho;                # desired average activation of the hidden units (sparsity parameter). (0.01)
-global_lambda = args.Lambda;          # weight decay parameter (1e-3)
-global_beta = args.Beta;              # weight of sparsity penalty term (1)
+global_rho = args.Rho;                # desired average activation of the hidden units (sparsity parameter)
+global_lambda = args.Lambda;          # weight decay parameter
+global_beta = args.Beta;              # weight of sparsity penalty term
 
 print 'You chose', args
 

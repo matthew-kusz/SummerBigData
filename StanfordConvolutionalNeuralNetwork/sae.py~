@@ -96,7 +96,7 @@ def backprop(theta, arr_x, arr_y):
 	del_b1 = pd_b1
 	del_b2 = pd_b2
 
-	# Changed the gradients into a one dimensional vector
+	# Change the gradients into a one dimensional vector
 	del_W1 = np.ravel(del_W1)
 	del_W2 = np.ravel(del_W2)
 	D_vals = np.concatenate((del_W1, del_W2, del_b1, del_b2))
@@ -109,7 +109,7 @@ def weights_bias():
 	# We'll choose weights uniformly from the interval [-r, r]
 	r  = 0.12
 
-	# Generate a seed so our andom values remain the same through each run
+	# Generate a seed so our random values remain the same through each run
 	np.random.seed(7)
 
 	random_weight1 = np.random.rand(global_hidden_size, global_visible_size)     # (100, 225) matrix
