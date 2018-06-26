@@ -14,7 +14,7 @@ global_image_dim = 64
 global_image_channels = 3
 global_pooled_dim = 3
 global_visible_size = 0    # Will be determined later
-global_lambda = 1e-5
+global_lambda = 1e-3
 global_num_classes = 4   
 
 ####### Definitions #######

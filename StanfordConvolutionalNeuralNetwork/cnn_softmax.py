@@ -17,9 +17,11 @@ global_image_dim = 28
 global_image_channels = 0
 global_pooled_dim = 2
 global_visible_size = 0    # Will be determined later
-global_hidden_size = 100
+global_hidden_size = 36
 global_lambda = 1e-4
 global_num_classes = 10    
+
+print "Our lambda value is", global_lambda
 
 ####### Definitions #######
 # Sigmoid function

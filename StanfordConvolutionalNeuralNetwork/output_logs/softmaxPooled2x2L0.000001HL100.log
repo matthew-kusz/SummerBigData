@@ -1,0 +1,22 @@
+Our lambda value is  1e-06
+Dimensions of train (60000, 400)
+Dimensions of test (10000, 400)
+(60000, 784) (60000, 1)
+(10000, 784) (10000, 1)
+Cost before minimization: 2.38249
+Global step: 50
+Global step: 100
+Global step: 150
+Cost after minimization: 0.0766052
+Total time for minimization = 411.054 seconds
+[[ 98.87755102]
+ [ 99.29515419]
+ [ 97.86821705]
+ [ 97.82178218]
+ [ 97.75967413]
+ [ 97.08520179]
+ [ 97.39039666]
+ [ 96.692607  ]
+ [ 96.40657084]
+ [ 96.33300297]]
+[ 97.55301578]

@@ -1,5 +1,5 @@
-#PBS -N softmaxFullDataSetHL100Lambda1e-5
-#PBS -l walltime=00:10:00
+#PBS -N softmaxFullDataSetLambda1e-4HL100
+#PBS -l walltime=00:20:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u cnn_softmax.py >& output_logs/softmaxFullDataSetLambdaHL1001e-5.log
+python -u cnn_softmax.py >& softmaxFullDataSetLambda1e-4HL100.log

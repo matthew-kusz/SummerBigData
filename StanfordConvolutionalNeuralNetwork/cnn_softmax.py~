@@ -17,9 +17,11 @@ global_image_dim = 28
 global_image_channels = 0
 global_pooled_dim = 2
 global_visible_size = 0    # Will be determined later
-global_hidden_size = 100
+global_hidden_size = 36
 global_lambda = 1e-4
 global_num_classes = 10    
+
+print "Our lambda value is ", global_lambda
 
 ####### Definitions #######
 # Sigmoid function
@@ -215,7 +217,7 @@ m = train.shape[0]
 # Create our weights and bias terms
 theta = weights_bias()
 
-# Set up an array that will be either 1 or 0 depending on what we are looking at
+# Set up a matrix that will be either 1 or 0 depending on what we are looking at
 y_vals_train = np.zeros((len(train_labels), global_num_classes))
 for i in range(global_num_classes):
 	# Set up an array with the values that stand for each label
