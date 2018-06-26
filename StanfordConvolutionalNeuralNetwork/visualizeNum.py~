@@ -54,7 +54,7 @@ new_max = 1
 patches = ((patches - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
 
 # Import the weights we need
-theta_final = np.genfromtxt('outputs/finalWeightsMNISTSize10000Patches15x15L0.0001B3.0Rho0.01HL100.out')
+theta_final = np.genfromtxt('outputs/HL100/finalWeightsMNISTSize10000Patches15x15L0.0001B0.5Rho0.01HL100.out')
 
 W1_final, W2_final, b1_final, b2_final = reshape(theta_final)
 a3_final, a2_final = feedforward(W1_final, W2_final, b1_final, b2_final, patches)
