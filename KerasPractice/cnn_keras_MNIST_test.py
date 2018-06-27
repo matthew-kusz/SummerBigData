@@ -1,0 +1,62 @@
+# Import the necessary packages
+import struct as st
+import gzip
+import numpy as np
+from keras.models import Sequential, load_model
+from keras.layers import Dense
+
+####### Global variables #######
+global_num_train = 60000
+global_num_test = 10000
+global_input_layer = 784
+global_hidden_layer1 = 350
+global_output_layer = 10
+global_epochs = 20
+global_batch_size = 100
+
+model_file = 'models/ModelDataSize'+str(global_num_train)+'Epoch'+ str(global_epochs)+'BatchSize'+ str(global_batch_size)
+weights_file = 'weights/WeightsDataSize'+str(global_num_train)+'Epoch'+ str(global_epochs)+'BatchSize'+ str(global_batch_size)
+
+####### Definitions #######
+# Reading in MNIST data files
+def read_idx(filename, n=None):
+	with gzip.open(filename) as f:
+		zero, dtype, dims = st.unpack('>HBB', f.read(4))
+		shape = tuple(st.unpack('>I', f.read(4))[0] for d in range(dims))
+		arr = np.fromstring(f.read(), dtype=np.uint8).reshape(shape)
+		if not n is None:
+			arr = arr[:n]
+		return arr
+
+# Extract the MNIST testing data sets
+def get_test(size):
+	x_vals = read_idx('data/t10k-images-idx3-ubyte.gz', size)
+	x_vals = x_vals / 255.0
+	x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
+	y_vals = read_idx('data/t10k-labels-idx1-ubyte.gz', size)
+	y_vals = np.reshape(y_vals, (len(y_vals), 1))
+	print x_vals.shape, y_vals.shape
+	
+	return x_vals, y_vals
+
+# Test the accuracy of our model
+def accuracy(model, arr_test, arr_labels):      #testY is HotEncoded!!
+	prediction = model.predict(arr_test)
+	prediction = np.array(np.argmax(prediction, axis = 1))
+	accur = np.array([1 for (a,b) in zip(prediction, arr_labels) if a==b ]).sum() / (global_num_test + 0.0)
+
+	return accur, prediction
+
+####### Code #######
+# Extract the MNIST testing data sets
+test_images, test_labels = get_test(global_num_test)
+
+print test_labels[0:5]
+
+model = load_model(model_file)
+model.load_weights(weights_file)
+
+
+accuracy, prediction = accuracy(model, test_images, test_labels)
+
+print accuracy
