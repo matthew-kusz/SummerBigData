@@ -122,7 +122,7 @@ def get_test(size):
 
 ####### Code #######
 # Import the weights we need
-final_theta = np.genfromtxt('outputs/HL100/finalWeightsMNISTSize10000Patches15x15L0.001B0.5Rho0.05HL100.out')
+final_theta = np.genfromtxt('outputs/HL100/finalWeightsMNISTSize10000Patches15x15L0.0001B0.5Rho0.01HL100.out')
 
 # We need to reshape our final_theta values and only use W1 and b1
 W1_final, W2_final, b1_final, b2_final = reshape(final_theta)
@@ -185,16 +185,16 @@ for i in range(global_hidden_size / step_size):
 		train_images, Wt, bt)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_train[feature_start: feature_end, :, :, :] = pooled_features
-	'''
+
 	print 'Convolving and pooling test images.'
 	convolved_features = cnn_convolve.convolve(global_patch_dim, step_size,
 		test_images, Wt, bt)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_test[feature_start: feature_end, :, :, :] = pooled_features
-	'''
+
 
 
 # Save our data for later	
-np.savetxt('outputs/convPoolTrainFeaturesSize60000StepSize50-2.out', np.ravel(pooled_features_train))
-#np.savetxt('outputs/convPoolTestFeaturesSize10000StepSize50-2.out', np.ravel(pooled_features_test))
+np.savetxt('outputs/convPoolTrainFeaturesSize60000StepSize50V2.out', np.ravel(pooled_features_train))
+np.savetxt('outputs/convPoolTestFeaturesSize10000StepSize50V2.out', np.ravel(pooled_features_test))
 

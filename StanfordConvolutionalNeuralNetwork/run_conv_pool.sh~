@@ -1,4 +1,4 @@
-#PBS -N convPoolMNISTLabelsSize10000Patches15x15L0.001B0.5Rho0.05HL100-2
+#PBS -N convPoolMNISTImages60kSize10000Patches15x15L0.001B0.5Rho0.05HL100-2
 #PBS -l walltime=03:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u cnn_exercise.py >& output_logs/convPoolMNISTLabelsSize10000Patches15x15L0.001B0.5Rho0.05HL100-2.log
+python -u cnn_exercise.py >& output_logs/convPoolMNISTImages60kSize10000Patches15x15L0.001B0.5Rho0.05HL100-2.log

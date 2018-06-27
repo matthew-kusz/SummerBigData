@@ -179,7 +179,7 @@ for i in range(global_hidden_size / step_size):
 	print 'Step %g: features %g to %g' %(i + 1, feature_start + 1, feature_end)
 	Wt = W1_final[feature_start: feature_end, :]
 	bt = b1_final[feature_start: feature_end, :]
-	'''
+
 	print 'Convolving and pooling train images.'
 	convolved_features = cnn_convolve.convolve(global_patch_dim, step_size,
 		train_images, Wt, bt)
@@ -191,9 +191,10 @@ for i in range(global_hidden_size / step_size):
 		test_images, Wt, bt)
 	pooled_features = cnn_pooling.pooling(global_pool_dim, convolved_features)
 	pooled_features_test[feature_start: feature_end, :, :, :] = pooled_features
+	'''
 
 
 # Save our data for later	
-#np.savetxt('outputs/convPoolTrainFeaturesSize60000StepSize50-2.out', np.ravel(pooled_features_train))
-np.savetxt('outputs/convPoolTestFeaturesSize10000StepSize50-2.out', np.ravel(pooled_features_test))
+np.savetxt('outputs/convPoolTrainFeaturesSize60000StepSize50-2.out', np.ravel(pooled_features_train))
+#np.savetxt('outputs/convPoolTestFeaturesSize10000StepSize50-2.out', np.ravel(pooled_features_test))
 

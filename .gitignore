@@ -10,5 +10,8 @@ StanfordConvolutionalNeuralNetwork/outputs/convPoolTestFeaturesSize10000StepSize
 
 StanfordConvolutionalNeuralNetwork/outputs/convPoolTrainFeaturesSize60000StepSize50.out
 
+StanfordConvolutionalNeuralNetwork/outputs/convPoolTestFeaturesSize10000StepSize50V3.out
+
+StanfordConvolutionalNeuralNetwork/outputs/convPoolTrainFeaturesSize60000StepSize50V3.out
 
 
