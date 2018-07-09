@@ -6,7 +6,6 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D, Activation
 import matplotlib.image as mpimg       # reading images to numpy arrays
 import scipy.ndimage as ndi            # finding the center of the leaves
-import zipfile
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
@@ -17,6 +16,7 @@ from keras.wrappers.scikit_learn import KerasClassifier
 ####### Global Variables #######
 global_num_train = 990
 global_num_test = 594
+global_total_img = global_num_train + global_num_test
 global_input_layer = 192
 global_hidden_layer1 = 350
 global_hidden_layer2 = 100
@@ -26,25 +26,27 @@ global_batch_size = 10
 global_num_classes = 99
 
 ####### Definitions #######
-def visualize():
-	# Open the zip file that contains the images
-	images = zipfile.ZipFile('data_provided/images.zip')
-	for info in images.infolist():
-		ifile = mpimg.imread(images.open(info))
-		print ifile.type
-		plt.imshow(ifile, cmap = 'binary')
-		plt.show()
-		
-	'''
-	# Using scipy to find the center of the leaf
-	img = mpimg.imread('data_provided/images/10.jpg')
-	center_y, center_x = ndi.center_of_mass(img)
+# Look at what some of the leaves look like
+def visualize(images):
+	#center_y, center_x = ndi.center_of_mass(img)
 	
-	plt.imshow(img, cmap = 'binary')
-	plt.scatter(center_x, center_y)
+	plt.imshow(images[0], cmap = 'binary')
+	#plt.scatter(center_x, center_y)
 	plt.show()
-	'''
+
 	return
+
+# Set up all of the images in a matrix
+def grab_images():
+	
+	matrix = np.zeros((2, global_total_img))
+	images_list = []
+	for i in range(global_total_img):
+		img = mpimg.imread('data_provided/unzip_images/images/' + str(i + 1) + '.jpg')
+		matrix[:,i] = np.shape(img)
+		images_list.append(img)
+
+	return images_list
 
 # Test the accuracy of our model
 def accuracy(model, arr_test, arr_labels):
@@ -84,9 +86,6 @@ test_ids = test.pop('id')
 x_train = StandardScaler().fit(train).transform(train)
 x_test = StandardScaler().fit(test).transform(test)
 
-# Visualize what each type of leaf looks like
-visualize()
-stop
 # Setting up the Keras neural network
 # Create our model (currently has 2 hidden layers and using softmax regression)
 model = Sequential()
@@ -95,6 +94,21 @@ model.add(Dense(global_hidden_layer1, input_dim = global_input_layer, activation
 model.add(Dense(global_hidden_layer2, activation = 'relu'))
 model.add(Dense(global_output_layer, activation = 'softmax'))
 
+# Load up all of the images
+img_list = grab_images()
+# We will want to learn features on the images that belong to our training set
+train_list = []
+place = 0
+for j in range(len(train_ids)):
+	for i in range(global_total_img):
+		i = int(train_ids[j: j+1]) - 1
+		if (int(train_ids[j: j+1]) == i + 1):
+			train_list.append(img_list[i])
+			break
+
+# Visualize a leaf or two
+visualize(train_list)
+stop
 # Compile our model
 model.compile(optimizer = 'SGD', loss='categorical_crossentropy', metrics=['accuracy'])
 print model.summary()
@@ -123,7 +137,7 @@ for i in range(len(y_pred)):
 		x = np.append(x, np.argmax(y_pred[i]))
 		x_val = np.append(x_val, test_ids[i])
 
-x2 = np.ones(99)
+x2 = np.ones(global_num_classes)
 for i in range (len(x2)):
 	x2[i] = i
 for i in range(len(x)):
