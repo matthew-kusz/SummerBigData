@@ -6,6 +6,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D, Activation
 import matplotlib.image as mpimg       # reading images to numpy arrays
 import scipy.ndimage as ndi            # finding the center of the leaves
+import zipfile
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
@@ -26,7 +27,14 @@ global_num_classes = 99
 
 ####### Definitions #######
 def visualize():
-
+	# Open the zip file that contains the images
+	images = zipfile.ZipFile('data_provided/images.zip')
+	for info in images.infolist():
+		ifile = images.open(info)
+		print ifile.type
+		plt.imshow(ifile, cmap = 'binary')
+		plt.show()
+		
 	'''
 	# Using scipy to find the center of the leaf
 	img = mpimg.imread('data_provided/images/10.jpg')
@@ -37,8 +45,6 @@ def visualize():
 	plt.show()
 	'''
 	return
-
-#def 
 
 # Test the accuracy of our model
 def accuracy(model, arr_test, arr_labels):
@@ -64,7 +70,6 @@ y_raw = train.pop('species')
 le = LabelEncoder()
 y = le.fit(y_raw).transform(y_raw)
 classes = le.classes_
-print classes
 y_train = np_utils.to_categorical(y)
 
 # Extract the id of each leaf
@@ -79,11 +84,9 @@ test_ids = test.pop('id')
 x_train = StandardScaler().fit(train).transform(train)
 x_test = StandardScaler().fit(test).transform(test)
 
-
-
 # Visualize what each type of leaf looks like
-# visualize()
-
+visualize()
+stop
 # Setting up the Keras neural network
 # Create our model (currently has 2 hidden layers and using softmax regression)
 model = Sequential()

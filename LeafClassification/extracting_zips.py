@@ -1,0 +1,5 @@
+import zipfile
+
+zip_ref = zipfile.ZipFile('data_provided/images.zip', 'r')
+zip_ref.extractall('data_provided/unzip_images')
+zip_ref.close()
