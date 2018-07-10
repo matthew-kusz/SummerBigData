@@ -60,6 +60,37 @@ def accuracy(model, arr_test, arr_labels):
 
 	return accur, prediction
 
+# Plot model statistics for keras models
+# From https://www.kaggle.com/limitpointinf0/leaf-classifier-knn-nn?scriptVersionId=3352828
+def plt_perf(name, p_loss=False, p_acc=False, val=False, size=(15,9), save=False):
+	if p_loss or p_acc:
+		if p_loss:
+			plt.figure(figsize = size)
+			plt.title('Loss')
+			plt.plot(name.history['loss'], 'b', label='loss')
+			if val:
+				plt.plot(name.history['val_loss'], 'r', label='val_loss')
+			plt.xlabel('Epochs')
+			plt.ylabel('Value')
+			plt.legend()
+			plt.show()
+			if save:
+				plt.savefig('loss.png')
+		if p_acc:
+			plt.figure(figsize = size)
+			plt.title('Accuracy')
+			plt.plot(name.history['acc'], 'b', label='acc')
+			if val:
+ 				plt.plot(name.history['val_acc'], 'r', label='val_acc')
+			plt.xlabel('Epochs')
+ 			plt.ylabel('Value')
+			plt.legend()
+ 			plt.show()
+			if save:
+ 				plt.savefig('acc.png')
+	else:
+		print('No plotting since all parameters set to false.')
+
 ####### Code #######
 # We need to extract the data given
 # Set up our training data
@@ -106,7 +137,9 @@ visualize(train_list)
 model = Sequential()
 
 model.add(Dense(global_hidden_layer1, input_dim = global_input_layer, activation = 'relu'))
+model.add(Dropout(0.2))
 model.add(Dense(global_hidden_layer2, activation = 'relu'))
+model.add(Dropout(0.2))
 model.add(Dense(global_output_layer, activation = 'softmax'))
 
 # Compile our model
@@ -116,10 +149,10 @@ print model.summary()
 '''
 Fit our model
 Early stopping helps prevent over fitting but stopping out fitting function 
-if our val_loss doesn't decrease after a certain number of epochs (Called patience)
+if our val_loss doesn't decrease after a certain number of epochs (called patience)
 '''
-early_stopper= EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='auto')
-model.fit(x_train, y_train, epochs= global_epochs, batch_size = global_batch_size, verbose=1,
+early_stopper= EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='auto')
+history = model.fit(x_train, y_train, epochs= global_epochs, batch_size = global_batch_size, verbose=1,
     validation_split=0.1, shuffle=True, callbacks=[early_stopper])
 
 '''
@@ -129,19 +162,27 @@ scores = model.evaluate(x_train, y_train)
 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 '''
 
-# Let's see how accurace our model is
+# plt_perf(history, p_loss=True, p_acc=True, val=True)
+
+# Test our model on the test set
 y_pred = model.predict_proba(x_test)
 print '\n'
 
+'''
+Let's see how accurace our model is
+WARNING
+This is based solely on low probability for guess = incorrect
+Has been tested and shows correct guesses majority of the time (bad)
+'''
 x = []
 x_val = []
 total = 0
 for i in range(len(y_pred)):
-	if (np.amax(y_pred[i]) < 0.7):
+	if (np.amax(y_pred[i]) < 0.5):
 		x = np.append(x, np.argmax(y_pred[i]))
 		x_val = np.append(x_val, test_ids[i])
 		total += 1
-print 'Total number of < 0.7 predictions: %g' %(total)
+print 'Total number of < 0.5 predictions: %g' %(total)
 
 x2 = np.ones(global_num_classes)
 for i in range (len(x2)):
@@ -150,12 +191,17 @@ for i in range(len(x)):
 	for j in range(len(x2)):
 		if (x2[j] == x[i]):	
 			print classes[j]
-			print test_ids[i]
+			print int(x_val[i])
+			img = mpimg.imread('data_provided/unzip_images/images/' + str(int(x_val[i])) + '.jpg')
+			plt.title(classes[j])
+			plt.imshow(img, cmap = 'binary')
+			# plt.show()
 
-
+# Set up the predictions into the correct format to submit to Kaggle
 y_pred = pd.DataFrame(y_pred,index=test_ids,columns=classes)
-
-fp = open('submissionTest.csv','w')
+'''
+fp = open('submissionTest2.csv','w')
 fp.write(y_pred.to_csv())
+'''
+print 'Finished.'
 
-print 'finished.'
