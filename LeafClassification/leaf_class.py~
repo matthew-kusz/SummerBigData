@@ -86,14 +86,6 @@ test_ids = test.pop('id')
 x_train = StandardScaler().fit(train).transform(train)
 x_test = StandardScaler().fit(test).transform(test)
 
-# Setting up the Keras neural network
-# Create our model (currently has 2 hidden layers and using softmax regression)
-model = Sequential()
-
-model.add(Dense(global_hidden_layer1, input_dim = global_input_layer, activation = 'relu'))
-model.add(Dense(global_hidden_layer2, activation = 'relu'))
-model.add(Dense(global_output_layer, activation = 'softmax'))
-
 # Load up all of the images
 img_list = grab_images()
 # We will want to learn features on the images that belong to our training set
@@ -109,6 +101,15 @@ for j in range(len(train_ids)):
 # Visualize a leaf or two
 visualize(train_list)
 stop
+
+# Setting up the Keras neural network
+# Create our model (currently has 2 hidden layers and using softmax regression)
+model = Sequential()
+
+model.add(Dense(global_hidden_layer1, input_dim = global_input_layer, activation = 'relu'))
+model.add(Dense(global_hidden_layer2, activation = 'relu'))
+model.add(Dense(global_output_layer, activation = 'softmax'))
+
 # Compile our model
 model.compile(optimizer = 'SGD', loss='categorical_crossentropy', metrics=['accuracy'])
 print model.summary()

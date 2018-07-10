@@ -73,7 +73,7 @@ le = LabelEncoder()
 y = le.fit(y_raw).transform(y_raw)
 classes = le.classes_
 y_train = np_utils.to_categorical(y)
-
+print classes
 # Extract the id of each leaf
 train_ids = train.pop('id')
 
