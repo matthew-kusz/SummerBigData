@@ -12,8 +12,9 @@ from keras.utils import np_utils		 # Used to set up one-hot scheme
 from keras.callbacks import EarlyStopping 	 # Used to prevent overfitting
 from keras.callbacks import ModelCheckpoint      # Gives us the best weights obtained during fitting
 import argparse
+import os
 
-
+from keras.preprocessing.image import img_to_array, load_img
 ####### Global Variables #######
 parser = argparse.ArgumentParser()
 parser.add_argument('disp_stats', 
@@ -53,9 +54,10 @@ def visualize(images):
 	#plt.scatter(center_x, center_y)
 	plt.show()
 	'''
+	print images.shape
 	# Setting up our grid
-	num_row = 20
-	num_col = 20
+	num_row = 10
+	num_col = 10
 	global_patch_dim = 8
 	for i in range(num_row):
 		for j in range(num_col):
@@ -74,7 +76,7 @@ def visualize(images):
 	# Displaying the grid
 	d = plt.figure(2)
 	print images2.shape
-	plt.imshow(images2, cmap = 'binary', interpolation = 'none')
+	plt.imshow(images[0,:,:,0], cmap = 'binary', interpolation = 'none')
 	d.show()
 	raw_input()
 	return
@@ -139,22 +141,89 @@ def create_model_softmax():
 	mod.add(Dense(global_output_layer, activation = 'softmax'))
 
 	return mod
+################################################
+################################################
+def resize_img(img, max_dim=96):
+    """
+    Resize the image to so the maximum side is of size max_dim
+    Returns a new image of the right size
+    """
+    # Get the axis with the larger dimension
+    max_ax = max((0, 1), key=lambda i: img.size[i])
+    # Scale both axes so the image's largest dimension is max_dim
+    scale = max_dim / float(img.size[max_ax])
+    return img.resize((int(img.size[0] * scale), int(img.size[1] * scale)))
 
+root = 'data_provided/unzip_images'
+def load_image_data(ids, max_dim=96, center=True):
+    """
+    Takes as input an array of image ids and loads the images as numpy
+    arrays with the images resized so the longest side is max-dim length.
+    If center is True, then will place the image in the center of
+    the output array, otherwise it will be placed at the top-left corner.
+    """
+    # Initialize the output array
+    # NOTE: Theano users comment line below and
+    X = np.empty((len(ids), max_dim, max_dim, 1))
+    # X = np.empty((len(ids), 1, max_dim, max_dim)) # uncomment this
+    for i, idee in enumerate(ids):
+        # Turn the image into an array
+        x = resize_img(load_img(os.path.join(root, 'images', str(idee) + '.jpg'), grayscale=True), max_dim=max_dim)
+        x = img_to_array(x)
+        # Get the corners of the bounding box for the image
+        # NOTE: Theano users comment the two lines below and
+        length = x.shape[0]
+        width = x.shape[1]
+        # length = x.shape[1] # uncomment this
+        # width = x.shape[2] # uncomment this
+        if center:
+            h1 = int((max_dim - length) / 2)
+            h2 = h1 + length
+            w1 = int((max_dim - width) / 2)
+            w2 = w1 + width
+        else:
+            h1, w1 = 0, 0
+            h2, w2 = (length, width)
+        # Insert into image matrix
+        # NOTE: Theano users comment line below and
+        X[i, h1:h2, w1:w2, 0:1] = x
+        # X[i, 0:1, h1:h2, w1:w2] = x  # uncomment this
+    # Scale the array values so they are between 0 and 1
+    return np.around(X / 255.0)
+
+################################################
+################################################
 """
 Resize the image to so the maximum side is of size max_dim
 Returns a new image of the right size
 """
+'''
 def resize_img(img, max_dim=96):
     	# Get the axis with the larger dimension
     	max_ax = max((0, 1), key=lambda i: img.shape[i])
     	# Scale both axes so the image's largest dimension is max_dim
    	scale = max_dim / float(img.shape[max_ax])
+	print scale
+	print img.shape
     	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale), 1))
-
+'''
 def reshape_img(images, max_dim = 96, center = True):
+	'''
+	minimum = 0
+	for k in range(len(images)):
+		minimum = min((0, 1), key=lambda i: images[k].shape[i])
+	new_img = np.empty((minimum, minimum, 1))
+	print minimum
+	for i in range(len(images)):
+		new_img[i] = imresize(images[i], (minimum, minimum, 1))
+		new_img[i] /= 255
+	'''
+
 	modified = np.empty((len(images), max_dim, max_dim, 1))
 	for i in range(len(images)):
 		x = resize_img(images[i], max_dim = max_dim)
+		# print x[20:50,20:50,0]
+		break
 		length = x.shape[0]
 		width = x.shape[1]
 		if center:
@@ -167,8 +236,9 @@ def reshape_img(images, max_dim = 96, center = True):
           		h2, w2 = (length, width)
 	
 		modified[i, h1:h2, w1:w2, 0:1] = x
-	
-	return np.around(modified / 255.0)
+
+	stop
+	return np.around(modified / 255.0) #new_img
 
 ####### Code #######
 # We need to extract the data given
@@ -211,6 +281,9 @@ for j in range(len(train_ids)):
 		if (int(train_ids[j: j+1]) == i + 1):
 			train_list.append(img_list[i])
 			break
+train_mod_list = load_image_data(train_ids)
+visualize(train_mod_list)
+stop
 '''
 # FIXME
 # We need to reshape our images so they are all the same dimensions
@@ -220,6 +293,7 @@ train_mod_list = reshape_img(train_list)
 visualize(train_mod_list)
 stop
 '''
+
 # Setting up the Keras neural network
 # Create our model (currently has 2 hidden layers and using softmax regression)
 model = create_model_softmax()

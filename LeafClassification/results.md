@@ -160,5 +160,7 @@ epochs = 364
 
 batch = 10
 
-val_loss = 0.00477
+val_loss = 0.00518
+
+Kaggle_score = 0.03567
 
