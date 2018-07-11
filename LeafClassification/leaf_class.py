@@ -9,21 +9,35 @@ import scipy.ndimage as ndi            	   	 # Finding the center of the leaves
 from sklearn.preprocessing import LabelEncoder   # Preprocessing
 from sklearn.preprocessing import StandardScaler # Preprocessing
 from keras.utils import np_utils		 # Used to set up one-hot scheme
-from keras.callbacks import EarlyStopping 	 # Used to prevernt overfitting
+from keras.callbacks import EarlyStopping 	 # Used to prevent overfitting
+from keras.callbacks import ModelCheckpoint      # Gives us the best weights obtained during fitting
+import argparse
+
 
 ####### Global Variables #######
+parser = argparse.ArgumentParser()
+parser.add_argument('disp_stats', 
+	help = 'Use 1/0 (True/False) to indicate if you want to display model stats or not.', type = int)
+parser.add_argument('save_stats', 
+	help = 'Use 1/0 (True/False) to indicate if you want to save model stats or not.', type = int)
+parser.add_argument('save_prob', 
+	help = 'Use 1/0 (True/False) to indicate if you want to save probabilities or not.', type = int)
+parser.add_argument('global_max_epochs', help = 'Max amount of epochs allowed.', type = int)
+parser.add_argument('global_batch_size', help = 'Numer of samples per gradient update.', type = int)
+
+args = parser.parse_args()
+
 global_num_train = 990
 global_num_test = 594
 global_total_img = global_num_train + global_num_test
 global_input_layer = 192
-global_hidden_layer1 = 350
-global_hidden_layer2 = 100
+global_hidden_layers = [500, 500, 500]
 global_output_layer = 99
-global_epochs = 400 # 200
-global_batch_size = 10
 global_num_classes = 99
-filename1 = 'lossEpoch' + str(global_epochs) + 'Batch' + str(global_batch_size) + 'Softmax.png'
-filename2 = 'accEpoch' + str(global_epochs) + 'Batch' + str(global_batch_size) + 'Softmax.png'
+
+filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
+filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
+filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.csv'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
 np.random.seed(1)
@@ -31,11 +45,36 @@ np.random.seed(1)
 ####### Definitions #######
 # Look at what some of the leaves look like
 def visualize(images):
+	'''
 	#center_y, center_x = ndi.center_of_mass(img)
 	print images[0,:,:,0].shape
-	plt.imshow(images[50,:,:,0], cmap = 'binary')
+	allm = np.concatenate((images[0,:,:,0], images[1,:,:,0], images[2,:,:,0], images[3,:,:,0]))
+	plt.imshow(allm, cmap = 'binary')
 	#plt.scatter(center_x, center_y)
 	plt.show()
+	'''
+	# Setting up our grid
+	num_row = 20
+	num_col = 20
+	global_patch_dim = 8
+	for i in range(num_row):
+		for j in range(num_col):
+			if (j == 0):
+				images1 = images[j]
+	
+			else:
+				temp = images[j]
+				images1 = np.concatenate((images1, temp), axis = 1)
+			
+		if (i == 0):
+			images2 = images1
+		else:
+			images2 = np.concatenate((images2, images1), axis = 0)
+
+	# Displaying the grid
+	d = plt.figure(2)
+	plt.imshow(images2, cmap = 'binary', interpolation = 'none')
+	d.show()
 
 	return
 
@@ -88,10 +127,14 @@ def plt_perf(name, p_loss=False, p_acc=False, val=False, size=(15,9), save=False
 def create_model_softmax():
 	mod = Sequential()
 
-	mod.add(Dense(global_hidden_layer1, input_dim = global_input_layer, activation = 'relu'))
+	mod.add(Dense(global_hidden_layers[0], input_dim = global_input_layer, activation = 'relu'))
 	mod.add(Dropout(0.2))
-	mod.add(Dense(global_hidden_layer2, activation = 'relu'))
-	mod.add(Dropout(0.2))
+	
+	if (len(global_hidden_layers) > 1):
+		for i in range(len(global_hidden_layers) - 1):
+			mod.add(Dense(global_hidden_layers[i + 1], activation = 'relu'))
+			mod.add(Dropout(0.2))
+	
 	mod.add(Dense(global_output_layer, activation = 'softmax'))
 
 	return mod
@@ -168,6 +211,7 @@ for j in range(len(train_ids)):
 			train_list.append(img_list[i])
 			break
 '''
+# FIXME
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = reshape_img(train_list)
 
@@ -186,10 +230,12 @@ print model.summary()
 Fit our model
 Early stopping helps prevent over fitting by stopping our fitting function 
 if our val_loss doesn't decrease after a certain number of epochs (called patience)
+Model checkpoint saves the best weights obtained during training
 '''
-early_stopper= EarlyStopping(monitor = 'val_loss', patience = 20, verbose = 1, mode = 'auto')
-history = model.fit(x_train, y_train, epochs = global_epochs, batch_size = global_batch_size, verbose = 1,
-    validation_split = 0.1, shuffle = True, callbacks = [early_stopper])
+early_stopper= EarlyStopping(monitor = 'val_loss', patience = 100, verbose = 1, mode = 'auto')
+model_checkpoint = ModelCheckpoint('bestWeights1.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
+history = model.fit(x_train, y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
+	verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
 
 '''
 INCORRECT CODE
@@ -199,7 +245,11 @@ print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 '''
 
 # Check Keras' statistics
-plt_perf(history, p_loss = True, p_acc = True, val = True, save = True)
+if args.disp_stats:
+	plt_perf(history, p_loss = True, p_acc = True, val = True, save = args.save_stats)
+
+# Reload our best weights
+model.load_weights('bestWeights1.hdf5')
 
 # Test our model on the test set
 y_pred = model.predict_proba(x_test)
@@ -236,9 +286,10 @@ for i in range(len(x)):
 '''
 # Set up the predictions into the correct format to submit to Kaggle
 y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
-'''
-fp = open('submissionEpoch' + str(global_epochs) + 'Batch' + str(global_batch_size) + 'Softmax.csv','w')
-fp.write(y_pred.to_csv())
-'''
+
+if args.save_prob:
+	fp = open(filename3,'w')
+	fp.write(y_pred.to_csv())
+
 print 'Finished.'
 
