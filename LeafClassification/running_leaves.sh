@@ -1,4 +1,4 @@
-#PBS -N leavesHL11000HL21000HL31000
+#PBS -N leavesHL1500HL2500HL3500
 #PBS -l walltime=00:30:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u leaf_class.py 0 0 0 1000 10 >& outputHL11000HL21000HL31000.log
+python -u leaf_class.py 0 0 0 1000 10 >& outputHL1500HL2500HL3500.log

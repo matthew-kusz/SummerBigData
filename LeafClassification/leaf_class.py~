@@ -31,7 +31,7 @@ global_num_train = 990
 global_num_test = 594
 global_total_img = global_num_train + global_num_test
 global_input_layer = 192
-global_hidden_layers = [1000, 1000, 1000]
+global_hidden_layers = [400, 280, 140]
 global_output_layer = 99
 global_num_classes = 99
 
@@ -60,10 +60,10 @@ def visualize(images):
 	for i in range(num_row):
 		for j in range(num_col):
 			if (j == 0):
-				images1 = images[j]
+				images1 = images[j,:,:,0]
 	
 			else:
-				temp = images[j]
+				temp = images[j,:,:,0]
 				images1 = np.concatenate((images1, temp), axis = 1)
 			
 		if (i == 0):
@@ -73,9 +73,10 @@ def visualize(images):
 
 	# Displaying the grid
 	d = plt.figure(2)
+	print images2.shape
 	plt.imshow(images2, cmap = 'binary', interpolation = 'none')
 	d.show()
-
+	raw_input()
 	return
 
 # Set up all of the images in a matrix
@@ -233,7 +234,7 @@ if our val_loss doesn't decrease after a certain number of epochs (called patien
 Model checkpoint saves the best weights obtained during training
 '''
 early_stopper= EarlyStopping(monitor = 'val_loss', patience = 100, verbose = 1, mode = 'auto')
-model_checkpoint = ModelCheckpoint('bestWeights1.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
+model_checkpoint = ModelCheckpoint('bestWeights.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
 history = model.fit(x_train, y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
 	verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
 
@@ -249,7 +250,7 @@ if args.disp_stats:
 	plt_perf(history, p_loss = True, p_acc = True, val = True, save = args.save_stats)
 
 # Reload our best weights
-model.load_weights('bestWeights1.hdf5')
+model.load_weights('bestWeights.hdf5')
 
 # Test our model on the test set
 y_pred = model.predict_proba(x_test)
