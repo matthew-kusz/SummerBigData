@@ -13,6 +13,7 @@ from keras.callbacks import EarlyStopping 	 # Used to prevent overfitting
 from keras.callbacks import ModelCheckpoint      # Gives us the best weights obtained during fitting
 import argparse
 import os
+from scipy.misc import imresize
 
 from keras.preprocessing.image import img_to_array, load_img
 ####### Global Variables #######
@@ -62,10 +63,10 @@ def visualize(images):
 	for i in range(num_row):
 		for j in range(num_col):
 			if (j == 0):
-				images1 = images[j,:,:,0]
+				images1 = images[j + i * num_col,:,:,0]
 	
 			else:
-				temp = images[j,:,:,0]
+				temp = images[j + i * num_col,:,:,0]
 				images1 = np.concatenate((images1, temp), axis = 1)
 			
 		if (i == 0):
@@ -76,7 +77,7 @@ def visualize(images):
 	# Displaying the grid
 	d = plt.figure(2)
 	print images2.shape
-	plt.imshow(images[0,:,:,0], cmap = 'binary', interpolation = 'none')
+	plt.imshow(images2, cmap = 'binary', interpolation = 'none')
 	d.show()
 	raw_input()
 	return
@@ -208,17 +209,19 @@ def resize_img(img, max_dim=96):
     	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale), 1))
 '''
 def reshape_img(images, max_dim = 96, center = True):
-	'''
-	minimum = 0
+	
+	minimum = 1e6
 	for k in range(len(images)):
-		minimum = min((0, 1), key=lambda i: images[k].shape[i])
-	new_img = np.empty((minimum, minimum, 1))
-	print minimum
-	for i in range(len(images)):
-		new_img[i] = imresize(images[i], (minimum, minimum, 1))
-		new_img[i] /= 255
-	'''
+		min_dim = min((0, 1), key=lambda i: images[k].shape[i])
+		if (images[k].shape[min_dim] < minimum):
+			minimum = images[k].shape[min_dim]
+	new_img = np.zeros((len(images), minimum, minimum))
 
+	for i in range(len(images)):
+		new_img[i] = imresize(images[i], (minimum, minimum))
+		new_img[i] /= 255
+	
+	'''
 	modified = np.empty((len(images), max_dim, max_dim, 1))
 	for i in range(len(images)):
 		x = resize_img(images[i], max_dim = max_dim)
@@ -236,9 +239,9 @@ def reshape_img(images, max_dim = 96, center = True):
           		h2, w2 = (length, width)
 	
 		modified[i, h1:h2, w1:w2, 0:1] = x
+	'''
 
-	stop
-	return np.around(modified / 255.0) #new_img
+	return  new_img #np.around(modified / 255.0)
 
 ####### Code #######
 # We need to extract the data given
@@ -281,11 +284,11 @@ for j in range(len(train_ids)):
 		if (int(train_ids[j: j+1]) == i + 1):
 			train_list.append(img_list[i])
 			break
-'''
+
 train_mod_list = load_image_data(train_ids)
 visualize(train_mod_list)
 stop
-
+'''
 # FIXME
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = reshape_img(train_list)
@@ -308,7 +311,7 @@ Early stopping helps prevent over fitting by stopping our fitting function
 if our val_loss doesn't decrease after a certain number of epochs (called patience)
 Model checkpoint saves the best weights obtained during training
 '''
-early_stopper= EarlyStopping(monitor = 'val_loss', patience = 100, verbose = 1, mode = 'auto')
+early_stopper= EarlyStopping(monitor = 'val_loss', patience = 50, verbose = 1, mode = 'auto')
 model_checkpoint = ModelCheckpoint('bestWeights.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
 history = model.fit(x_train, y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
 	verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
