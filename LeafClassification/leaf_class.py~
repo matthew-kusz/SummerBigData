@@ -57,16 +57,16 @@ def visualize(images):
 	'''
 	print images.shape
 	# Setting up our grid
-	num_row = 10
-	num_col = 10
+	num_row = 3
+	num_col = 3
 	global_patch_dim = 8
 	for i in range(num_row):
 		for j in range(num_col):
 			if (j == 0):
-				images1 = images[j + i * num_col,:,:]
+				images1 = images[j + i * num_col,:,:,0]
 	
 			else:
-				temp = images[j + i * num_col,:,:]
+				temp = images[j + i * num_col,:,:,0]
 				images1 = np.concatenate((images1, temp), axis = 1)
 			
 		if (i == 0):
@@ -77,8 +77,13 @@ def visualize(images):
 	# Displaying the grid
 	d = plt.figure(2)
 	print images2.shape
-	plt.imshow(images2, cmap = 'binary', interpolation = 'none')
+	plt.imshow(images[4], cmap = 'binary', interpolation = 'none')
 	d.show()
+
+	c = plt.figure(3)
+	print train_list[4].shape
+	plt.imshow(train_list[4], cmap = 'binary', interpolation = 'none')
+	c.show()
 	raw_input()
 	return
 
@@ -144,7 +149,7 @@ def create_model_softmax():
 	return mod
 ################################################
 ################################################
-def resize_img(img, max_dim=96):
+def resize_img(img, max_dim=165):
     """
     Resize the image to so the maximum side is of size max_dim
     Returns a new image of the right size
@@ -156,7 +161,7 @@ def resize_img(img, max_dim=96):
     return img.resize((int(img.size[0] * scale), int(img.size[1] * scale)))
 
 root = 'data_provided/unzip_images'
-def load_image_data(ids, max_dim=96, center=True):
+def load_image_data(ids, max_dim=165, center=True):
     """
     Takes as input an array of image ids and loads the images as numpy
     arrays with the images resized so the longest side is max-dim length.
@@ -218,7 +223,7 @@ def reshape_img(images, max_dim = 96, center = True):
 	new_img = np.zeros((len(images), minimum, minimum))
 
 	for i in range(len(images)):
-		new_img[i] = imresize(images[i], (minimum, minimum))
+		new_img[i] = imresize(images[i], (minimum, minimum), interp = 'nearest')
 		new_img[i] /= 255
 	
 	'''
