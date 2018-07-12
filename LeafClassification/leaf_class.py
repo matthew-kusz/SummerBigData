@@ -130,11 +130,12 @@ def plt_perf(name, p_loss=False, p_acc=False, val=False, size=(15,9), save=False
 	return
 '''
 def creat_model_conv():
-	model.add(Conv2D(filters = 32, kernel_size = (20, 20), padding = 'Same', input_shape(92, 92, 1))
-	model.add(Conv2D(filters = 32, kernel_size = (10, 10), padding = 'Same')
-	model.add(MaxPool2D(pool_size = (2, 2)))
-	model.add(Dropout(0.2))
-	moddl.add(Flatten())
+	mod2 = Sequantial()
+	mod2.add(Conv2D(filters = 32, kernel_size = (20, 20), padding = 'Same', input_shape(92, 92, 1))
+	mod2.add(Conv2D(filters = 32, kernel_size = (10, 10), padding = 'Same')
+	mod2.add(MaxPool2D(pool_size = (2, 2)))
+	mod2.add(Dropout(0.2))
+	mod2.add(Flatten())
 	return
 '''
 # Model set-up for softmax regression
@@ -294,11 +295,11 @@ for j in range(len(train_ids)):
 		if (int(train_ids[j: j+1]) == i + 1):
 			train_list.append(img_list[i])
 			break
-'''
-train_mod_list = load_image_data(train_ids)
-visualize(train_mod_list)
-stop
 
+train_mod_list = load_image_data(train_ids)
+# visualize(train_mod_list)
+
+'''
 # FIXME
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = reshape_img(train_list)
@@ -314,7 +315,7 @@ model = create_model_softmax()
 # Compile our model
 model.compile(optimizer = 'SGD', loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-plot_model(model, to_file = 'model.png')
+plot_model(model, to_file = 'model.png', show_shapes = True)
 
 '''
 Fit our model
@@ -322,7 +323,7 @@ Early stopping helps prevent over fitting by stopping our fitting function
 if our val_loss doesn't decrease after a certain number of epochs (called patience)
 Model checkpoint saves the best weights obtained during training
 '''
-early_stopper= EarlyStopping(monitor = 'val_loss', patience = 50, verbose = 1, mode = 'auto')
+early_stopper= EarlyStopping(monitor = 'val_loss', patience = 800, verbose = 1, mode = 'auto')
 model_checkpoint = ModelCheckpoint('bestWeights.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
 history = model.fit(x_train, y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
 	verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
