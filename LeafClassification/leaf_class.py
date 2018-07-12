@@ -308,7 +308,7 @@ train_mod_list = load_image_data(train_ids)
 print train_mod_list.shape
 count = 0
 for j in range(len(y)):
-	if y[j] == 54:
+	if y[j] == 78:
 		print j
 		count += 1
 		if count < 6:
@@ -317,16 +317,16 @@ for j in range(len(y)):
 	
 			else:
 				temp = train_mod_list[j,:,:,0]
-				pics = np.concatenate((pics, temp), axis = 0)
+				pics = np.concatenate((pics, temp), axis = 1)
 		else:
 			if (count == 6):
 				pics2 = train_mod_list[j,:,:,0]
 	
 			else:
 				temp = train_mod_list[j,:,:,0]
-				pics2 = np.concatenate((pics2, temp), axis = 0)
+				pics2 = np.concatenate((pics2, temp), axis = 1)
 
-al = np.concatenate((pics, pics2), axis = 1)
+al = np.concatenate((pics, pics2), axis = 0)
 
 d = plt.figure(1)
 plt.imshow(al, cmap = 'binary', interpolation = 'none')
