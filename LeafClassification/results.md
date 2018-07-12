@@ -164,3 +164,54 @@ val_loss = 0.00518
 
 Kaggle_score = 0.03567
 
+------------------
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 3
+
+epochs = 364
+
+batch = 10
+
+val_loss = 0.00486
+
+Kaggle_score = 0.03507
+
+------------------
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 3
+
+epochs = 115
+
+batch = 10
+
+val_loss = 0.04717
+
+Kaggle_score = 0.05514
+
+------------------
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 2
+
+epochs = 211
+
+batch = 10
+
+val_loss = 0.02094
