@@ -76,13 +76,13 @@ def visualize(images):
 
 	# Displaying the grid
 	d = plt.figure(2)
-	print images[23,:,:,0].shape
-	plt.imshow(images[23,:,:,0], cmap = 'binary', interpolation = 'none')
+	print images[4,:,:,0].shape
+	plt.imshow(images[4,:,:,0], cmap = 'binary', interpolation = 'none')
 	d.show()
 
 	c = plt.figure(3)
-	print train_list[23].shape
-	plt.imshow(train_list[23], cmap = 'binary', interpolation = 'none')
+	print train_list[4].shape
+	plt.imshow(train_list[4], cmap = 'binary', interpolation = 'none')
 	c.show()
 	raw_input()
 	return

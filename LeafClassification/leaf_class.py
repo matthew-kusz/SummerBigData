@@ -76,13 +76,13 @@ def visualize(images):
 
 	# Displaying the grid
 	d = plt.figure(2)
-	print images[24,:,:,0].shape
-	plt.imshow(images[24,:,:,0], cmap = 'binary', interpolation = 'none')
+	print images[4,:,:,0].shape
+	plt.imshow(images[4,:,:,0], cmap = 'binary', interpolation = 'none')
 	d.show()
 
 	c = plt.figure(3)
-	print train_list[24].shape
-	plt.imshow(train_list[24], cmap = 'binary', interpolation = 'none')
+	print train_list[4].shape
+	plt.imshow(train_list[4], cmap = 'binary', interpolation = 'none')
 	c.show()
 	raw_input()
 	return
@@ -149,7 +149,7 @@ def create_model_softmax():
 	return mod
 ################################################
 ################################################
-def resize_img(img, max_dim=500):
+def resize_img(img, max_dim=750):
     """
     Resize the image to so the maximum side is of size max_dim
     Returns a new image of the right size
@@ -161,7 +161,7 @@ def resize_img(img, max_dim=500):
     return img.resize((int(img.size[0] * scale), int(img.size[1] * scale)))
 
 root = 'data_provided/unzip_images'
-def load_image_data(ids, max_dim=500, center=True):
+def load_image_data(ids, max_dim=750, center=True):
     """
     Takes as input an array of image ids and loads the images as numpy
     arrays with the images resized so the longest side is max-dim length.
