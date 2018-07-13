@@ -1,7 +1,7 @@
 # Import the necessary packages
 import numpy as np
 import matplotlib
-# matplotlib.use('Agg')                           # For running on the supercomputer
+matplotlib.use('Agg')                            # For running on the supercomputer
 import matplotlib.pyplot as plt
 import pandas as pd                         	 # For reading in and writing files
 from keras.models import Sequential        	 # Linearly sets up model
@@ -158,6 +158,7 @@ def create_model_softmax():
 	return mod1
 
 ################################################
+# From https://www.kaggle.com/abhmul/keras-convnet-lb-0-0052-w-visualization/notebook
 ################################################
 """
 Resize the image to so the maximum side is of size max_dim
@@ -300,9 +301,9 @@ for j in range(len(train_ids)):
 			train_list.append(img_list[i])
 			break
 
-
-
+# Resize our images so they all have the same dimensions
 train_mod_list = load_image_data(train_ids)
+'''
 ###########################
 # FIXME TEMPORARY CODE
 print train_mod_list.shape
@@ -336,8 +337,10 @@ ax.axes.get_yaxis().set_visible(False)
 d.show()
 raw_input()
 ###########################
+
 # visualize(train_mod_list)
 stop
+'''
 '''
 # FIXME
 # We need to reshape our images so they are all the same dimensions
