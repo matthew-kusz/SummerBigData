@@ -21,9 +21,10 @@ args = parser.parse_args()
 global_step = 0
 global_input_size  = 28 * 28
 global_hidden_size = 200
-global_rho = args.Rho / 100.0;           # desired average activation of the hidden units (sparsity parameter). (0.1)
-global_lambda = args.Lambda / 10000000.0;     # weight decay parameter (3e-2)
-global_beta = args.Beta / 100.0;         # weight of sparsity penalty term (3)
+# Had to set up args like this in order to submit an array of jobs (Could not input decimals)
+global_rho = args.Rho / 100.0                # desired average activation of the hidden units (sparsity parameter). (0.1)
+global_lambda = args.Lambda / 10000000.0     # weight decay parameter (3e-2)
+global_beta = args.Beta / 100.0;             # weight of sparsity penalty term (3)
 
 print 'You chose', args
 
@@ -135,7 +136,7 @@ def weights_bias():
 	# Set up our bias term
 	bias1 = np.random.rand(global_hidden_size, 1)     # (200, 1) matrix
 	bias1 = bias1 * 2 * r - r
-	bias2 = np.random.rand(global_input_size, 1)    # (784, 1) matrix
+	bias2 = np.random.rand(global_input_size, 1)      # (784, 1) matrix
 	bias2 = bias2 * 2 * r - r
 
 	# Combine these into a 1-dimension vector
@@ -171,7 +172,7 @@ labels_train = np.reshape(labels_train, (len(labels_train), 1))
 print train.shape
 print labels_train.shape
 
-# Need to know how many inputs we have
+# Need to know how many data points we have
 m = len(train)
 
 # Create our weights and bias terms
@@ -182,13 +183,16 @@ y = train
 
 '''
 # Check that our cost function is working
+train = train[0:10]
+m = len(train)
+y = train
 cost_test = reg_cost(theta1, train, y)
 print cost_test
-# We had a cost value of 38 (from 20 nodes instead of 200)
+# We had a cost value of 119.4 (from 20 nodes instead of 200)
 
 # Gradient checking from scipy to see if our backprop function is working properly. Theta_vals needs to be a 1-D vector.
 print scipy.optimize.check_grad(reg_cost, backprop, theta1, train, y)
-# Recieved a value of 6e-5
+# Recieved a value of 9.7e-5
 '''
 
 print 'Cost before minimization: %g' %(reg_cost(theta1, train, y))
@@ -203,7 +207,7 @@ print 'Cost after minimization: %g' %(reg_cost(theta_new, train, y))
 time_finish2 = time.time()
 
 # Save to a file to use later
-np.savetxt(filename, theta_new, delimiter = ',')
+#np.savetxt(filename, theta_new, delimiter = ',')
 
 print 'Total time for minimization = %g' %(time_finish2 - time_start2)
 

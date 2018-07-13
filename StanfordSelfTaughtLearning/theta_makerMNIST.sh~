@@ -17,4 +17,4 @@ fi
 module load python/2.7.8
 #
 # This is the command the runs the python script
-python -u stlMNIST.py 300000 10 500 >& outputStlRho0.1Beta0.5MNISTLambda0.03.log
+python -u stlMNIST.py 300000 10 50 >& outputStlRho0.1Beta0.5MNISTLambda0.03.log
