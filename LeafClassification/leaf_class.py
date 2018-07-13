@@ -1,7 +1,7 @@
 # Import the necessary packages
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')                            # For running on the supercomputer
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd                         	 # For reading in and writing files
 from keras.models import Sequential        	 # Linearly sets up model
@@ -10,12 +10,14 @@ import matplotlib.image as mpimg           	 # Reading images to numpy arrays
 import scipy.ndimage as ndi            	   	 # Finding the center of the leaves
 from sklearn.preprocessing import LabelEncoder   # Preprocessing
 from sklearn.preprocessing import StandardScaler # Preprocessing
+from sklearn.metrics.pairwise import cosine_similarity
 from keras.utils import np_utils, plot_model     # Used to set up one-hot scheme, visualizing my model
 from keras.callbacks import EarlyStopping 	 # Used to prevent overfitting
 from keras.callbacks import ModelCheckpoint      # Gives us the best weights obtained during fitting
 import argparse
 import os
 from scipy.misc import imresize
+import visualize
 
 from keras.preprocessing.image import img_to_array, load_img
 ####### Global Variables #######
@@ -48,45 +50,9 @@ filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch
 np.random.seed(1)
 
 ####### Definitions #######
-# Look at what some of the leaves look like
-def visualize(images):
-	'''
-	#center_y, center_x = ndi.center_of_mass(img)
-	print images[0,:,:,0].shape
-	allm = np.concatenate((images[0,:,:,0], images[1,:,:,0], images[2,:,:,0], images[3,:,:,0]))
-	plt.imshow(allm, cmap = 'binary')
-	#plt.scatter(center_x, center_y)
-	plt.show()
-	'''
-	# Setting up our grid
-	num_row = 3
-	num_col = 3
-	global_patch_dim = 8
-	for i in range(num_row):
-		for j in range(num_col):
-			if (j == 0):
-				images1 = images[j + i * num_col,:,:,0]
-	
-			else:
-				temp = images[j + i * num_col,:,:,0]
-				images1 = np.concatenate((images1, temp), axis = 1)
-			
-		if (i == 0):
-			images2 = images1
-		else:
-			images2 = np.concatenate((images2, images1), axis = 0)
-
-	# Displaying the grid
-	d = plt.figure(2)
-	plt.imshow(images2, cmap = 'binary', interpolation = 'none')
-	d.show()
-
-	raw_input()
-	return
-
 # Set up all of the images in a matrix
-def grab_images():
-	
+def grab_images(tr_ids, te_ids):
+	# Full set
 	matrix = np.zeros((2, global_total_img))
 	images_list = []
 	for i in range(global_total_img):
@@ -94,42 +60,18 @@ def grab_images():
 		matrix[:,i] = np.shape(img)
 		images_list.append(img)
 
-	return images_list
+	# We will want to learn features on the images that belong to our training set	
+	train_list = []
+	for i, img in enumerate(tr_ids):
+		train_list.append(images_list[img - 1])
+	
+	# We might want to look at some test images too	
+	test_list = []
+	for i, img in enumerate(te_ids):
+		test_list.append(images_list[img - 1])
 
-# Plot model statistics for keras models
-# From https://www.kaggle.com/limitpointinf0/leaf-classifier-knn-nn?scriptVersionId=3352828
-def plt_perf(name, p_loss=False, p_acc=False, val=False, size=(15,9), save=False):
-	if p_loss or p_acc:
-		if p_loss:
-			plt.figure(figsize = size)
-			plt.title('Loss')
-			plt.plot(name.history['loss'], 'b', label='loss')
-			if val:
-				plt.plot(name.history['val_loss'], 'r', label='val_loss')
-			plt.xlabel('Epochs')
-			plt.ylabel('Value')
-			plt.legend()
-			# plt.show()
-			if save:
-				print 'Saving loss...'
-				plt.savefig(filename1)
-		if p_acc:
-			plt.figure(figsize = size)
-			plt.title('Accuracy')
-			plt.plot(name.history['acc'], 'b', label='acc')
-			if val:
- 				plt.plot(name.history['val_acc'], 'r', label='val_acc')
-			plt.xlabel('Epochs')
- 			plt.ylabel('Value')
-			plt.legend()
- 			# plt.show()
-			if save:
-				print 'Saving accuracy...'
- 				plt.savefig(filename2)
-	else:
-		print('No plotting since all parameters set to false.')
+	return images_list, train_list, test_list
 
-	return
 '''
 def creat_model_conv():
 	mod2 = Sequantial()
@@ -164,7 +106,8 @@ def create_model_softmax():
 Resize the image to so the maximum side is of size max_dim
 Returns a new image of the right size
 """
-def resize_img(img, max_dim=1000):
+'''
+def resize_img(img, max_dim):
     	# Get the axis with the larger dimension
     	max_ax = max((0, 1), key=lambda i: img.size[i])
 
@@ -172,14 +115,15 @@ def resize_img(img, max_dim=1000):
     	scale = max_dim / float(img.size[max_ax])
 
     	return img.resize((int(img.size[0] * scale), int(img.size[1] * scale)))
-
+'''
 """
 Takes as input an array of image ids and loads the images as numpy
 arrays with the images resized so the longest side is max-dim length.
 If center is True, then will place the image in the center of
 the output array, otherwise it will be placed at the top-left corner.
 """
-def load_image_data(ids, max_dim=1000, center=True):
+'''
+def load_image_data(ids, max_dim=165, center=True):
     	# Initialize the output array
    	X = np.empty((len(ids), max_dim, max_dim, 1))
 
@@ -187,6 +131,11 @@ def load_image_data(ids, max_dim=1000, center=True):
         	# Turn the image into an array
         	x = resize_img(load_img(os.path.join(path, 'images', str(idee) + '.jpg'), grayscale=True), max_dim=max_dim)
         	x = img_to_array(x)
+
+		print x.shape
+		d = plt.figure(1)
+		plt.imshow(x[:,:,0], cmap = 'binary', interpolation = 'none')
+		d.show()
 
         	# Get the corners of the bounding box for the image
         	length = x.shape[0]
@@ -202,45 +151,38 @@ def load_image_data(ids, max_dim=1000, center=True):
         	
 		# Insert into image matrix
         	X[i, h1:h2, w1:w2, 0:1] = x
+		print X[i,:,:,0].shape
+		c = plt.figure(2)
+		plt.imshow(X[i,:,:,0], cmap = 'binary', interpolation = 'none')
+		c.show()
+		#raw_input()
+		break
 
     	# Scale the array values so they are between 0 and 1
     	return np.around(X / 255.0)
-
+'''
 ################################################
 ################################################
 """
 Resize the image to so the maximum side is of size max_dim
 Returns a new image of the right size
 """
-'''
-def resize_img(img, max_dim=96):
+
+def resize_img(img, max_dim):
     	# Get the axis with the larger dimension
     	max_ax = max((0, 1), key=lambda i: img.shape[i])
     	# Scale both axes so the image's largest dimension is max_dim
    	scale = max_dim / float(img.shape[max_ax])
-	print scale
-	print img.shape
-    	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale), 1))
-'''
+    	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale)))
+
 def reshape_img(images, max_dim = 96, center = True):
 	
-	minimum = 1e6
-	for k in range(len(images)):
-		min_dim = min((0, 1), key=lambda i: images[k].shape[i])
-		if (images[k].shape[min_dim] < minimum):
-			minimum = images[k].shape[min_dim]
-	new_img = np.zeros((len(images), minimum, minimum))
+	modified = np.zeros((len(images), max_dim, max_dim, 1))
+	for i in range(len(images)):
+		temp = resize_img(images[i], max_dim = max_dim)
+		x = imresize(images[i], (temp.shape[0], temp.shape[1]), interp = 'nearest').reshape(temp.shape[0], 
+			temp.shape[1], 1)
 
-	for i in range(len(images)):
-		new_img[i] = imresize(images[i], (minimum, minimum), interp = 'nearest')
-		new_img[i] /= 255
-	
-	'''
-	modified = np.empty((len(images), max_dim, max_dim, 1))
-	for i in range(len(images)):
-		x = resize_img(images[i], max_dim = max_dim)
-		# print x[20:50,20:50,0]
-		break
 		length = x.shape[0]
 		width = x.shape[1]
 		if center:
@@ -253,9 +195,8 @@ def reshape_img(images, max_dim = 96, center = True):
           		h2, w2 = (length, width)
 	
 		modified[i, h1:h2, w1:w2, 0:1] = x
-	'''
 
-	return  new_img #np.around(modified / 255.0)
+	return  np.around(modified / 255.0)
 
 ####### Code #######
 # We need to extract the data given
@@ -269,7 +210,6 @@ y_raw = train.pop('species')
 le = LabelEncoder()
 # fit() calculates the mean and std, transform() centers and scales data
 y = le.fit(y_raw).transform(y_raw)
-print y[0:20]
 			
 # Grab the classes (will be used to set up our submition file)
 classes = le.classes_
@@ -290,66 +230,24 @@ x_train = StandardScaler().fit_transform(train)
 x_test = StandardScaler().fit_transform(test)
 
 # Load up all of the images
-img_list = grab_images()
-
-# We will want to learn features on the images that belong to our training set
-train_list = []
-for j in range(len(train_ids)):
-	for i in range(global_total_img):
-		i = int(train_ids[j: j+1]) - 1
-		if (int(train_ids[j: j+1]) == i + 1):
-			train_list.append(img_list[i])
-			break
-
-# Resize our images so they all have the same dimensions
-train_mod_list = load_image_data(train_ids)
-'''
-###########################
-# FIXME TEMPORARY CODE
-print train_mod_list.shape
-count = 0
-for j in range(len(y)):
-	if y[j] == 78:
-		print j
-		count += 1
-		if count < 6:
-			if (count == 1):
-				pics = train_mod_list[j,:,:,0]
+print 'Loading images...'
+img_list, train_list, test_list = grab_images(train_ids, test_ids)
+print 'Finished.'
 	
-			else:
-				temp = train_mod_list[j,:,:,0]
-				pics = np.concatenate((pics, temp), axis = 1)
-		else:
-			if (count == 6):
-				pics2 = train_mod_list[j,:,:,0]
-	
-			else:
-				temp = train_mod_list[j,:,:,0]
-				pics2 = np.concatenate((pics2, temp), axis = 1)
-
-al = np.concatenate((pics, pics2), axis = 0)
-
-d = plt.figure(1)
-plt.imshow(al, cmap = 'binary', interpolation = 'none')
-ax = plt.gca()
-ax.axes.get_xaxis().set_visible(False)
-ax.axes.get_yaxis().set_visible(False)
-d.show()
-raw_input()
-###########################
-
-# visualize(train_mod_list)
-stop
-'''
-'''
-# FIXME
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = reshape_img(train_list)
+# FIXME
+temp = np.where(y == 3)
+print temp[0][0]
 
-# Visualize a leaf or two
-visualize(train_mod_list)
+temp1 = []
+for i in range(len(temp[0])):
+	temp1.append(train_mod_list[temp[0][i],:,:,0])
+
+print np.mean(cosine_similarity(temp1[0], temp1[1]))
 stop
-'''
+# Visualize a leaf or two
+visualize.visualize_leaves(train_mod_list, y, show1 = False, show2 = False)
 
 # Setting up the Keras neural network
 model = create_model_softmax()
@@ -357,7 +255,7 @@ model = create_model_softmax()
 # Compile our model
 model.compile(optimizer = 'SGD', loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-plot_model(model, to_file = 'model.png', show_shapes = True)
+# plot_model(model, to_file = 'model.png', show_shapes = True)
 
 '''
 Fit our model
@@ -365,7 +263,7 @@ Early stopping helps prevent over fitting by stopping our fitting function
 if our val_loss doesn't decrease after a certain number of epochs (called patience)
 Model checkpoint saves the best weights obtained during training
 '''
-early_stopper= EarlyStopping(monitor = 'val_loss', patience = 800, verbose = 1, mode = 'auto')
+early_stopper= EarlyStopping(monitor = 'val_loss', patience =200, verbose = 1, mode = 'auto')
 model_checkpoint = ModelCheckpoint('bestWeights.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
 history = model.fit(x_train, y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
 	verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
@@ -373,7 +271,7 @@ history = model.fit(x_train, y_train, epochs = args.global_max_epochs, batch_siz
 # Check Keras' statistics
 if args.disp_stats:
 	print 'Displaying stats...'
-	plt_perf(history, p_loss = True, p_acc = True, val = True, save = args.save_stats)
+	visualize.plt_perf(history, filename1, filename2, p_loss = True, p_acc = True, val = True, save = args.save_stats)
 
 # Reload our best weights
 model.load_weights('bestWeights.hdf5')
