@@ -1,7 +1,7 @@
 # Import the necessary packages
 import numpy as np
 import matplotlib
-#matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd                         	 # For reading in and writing files
 from keras.models import Sequential        	 # Linearly sets up model
@@ -72,22 +72,26 @@ def grab_images(tr_ids, te_ids):
 
 	return images_list, train_list, test_list
 
-'''
-def creat_model_conv():
-	mod2 = Sequantial()
-	mod2.add(Conv2D(filters = 32, kernel_size = (20, 20), padding = 'Same', input_shape(92, 92, 1))
-	mod2.add(Conv2D(filters = 32, kernel_size = (10, 10), padding = 'Same')
-	mod2.add(MaxPool2D(pool_size = (2, 2)))
+# Model set-up for CNN
+def create_model_conv():
+
+	mod2 = Sequential()
+	mod2.add(Conv2D(input_shape = (92, 92, 1), filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same'))
+	mod2.add(MaxPool2D(pool_size = (20, 20)))
 	mod2.add(Dropout(0.2))
 	mod2.add(Flatten())
-	return
-'''
+	mod2.add(Dense(100, activation = "relu"))
+	mod2.add(Dropout(0.5))
+	mod2.add(Dense(99, activation = "softmax"))
+	
+	return mod2
+
 # Model set-up for softmax regression
 def create_model_softmax():
 		
 	mod1 = Sequential()
 	mod1.add(Dense(global_hidden_layers[0], input_dim = global_input_layer, activation = 'relu'))
-	mod1.add(Dropout(0.2))
+	mod1.add(Dropout(0.3))
 	
 	if (len(global_hidden_layers) > 1):
 		for i in range(len(global_hidden_layers) - 1):
@@ -175,7 +179,7 @@ def resize_img(img, max_dim):
    	scale = max_dim / float(img.shape[max_ax])
     	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale)))
 
-def reshape_img(images, max_dim = 500, center = True):
+def reshape_img(images, max_dim = 92, center = True):
 	
 	modified = np.zeros((len(images), max_dim, max_dim, 1))
 	for i in range(len(images)):
@@ -239,12 +243,12 @@ train_mod_list = reshape_img(train_list)
 
 # Look at images and some stats of leaves
 if args.leaf_stats:
-	# visualize.image_similarity(train_mod_list, y, classes)
+	visualize.image_similarity(train_mod_list, y, classes)
 	visualize.visualize_leaves(train_mod_list, y, classes, show1 = False, show2 = True)
 
-stop
 # Setting up the Keras neural network
 model = create_model_softmax()
+# model = create_model_conv()
 
 # Compile our model
 model.compile(optimizer = 'SGD', loss = 'categorical_crossentropy', metrics = ['accuracy'])
@@ -257,10 +261,11 @@ Early stopping helps prevent over fitting by stopping our fitting function
 if our val_loss doesn't decrease after a certain number of epochs (called patience)
 Model checkpoint saves the best weights obtained during training
 '''
-early_stopper= EarlyStopping(monitor = 'val_loss', patience =200, verbose = 1, mode = 'auto')
+
+early_stopper= EarlyStopping(monitor = 'val_loss', patience = 200, verbose = 1, mode = 'auto')
 model_checkpoint = ModelCheckpoint('bestWeights.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
 history = model.fit(x_train, y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
-	verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
+	verbose = 0, validation_split = 0.2, shuffle = True, callbacks = [early_stopper, model_checkpoint])
 
 # Check Keras' statistics
 if args.disp_stats:

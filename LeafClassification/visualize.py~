@@ -38,10 +38,10 @@ def visualize_leaves(images, y, classes, show1, show2):
 		a.show()
 
 	if show2:
-		'''
+		
 		for i in range(len(classes)):
 			print i, classes[i]
-		'''	 
+			 
 		species = input('What leaf species would you like to look at? ')
 		print 'You chose', classes[species]
 

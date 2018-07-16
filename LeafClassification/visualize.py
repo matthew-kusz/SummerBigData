@@ -107,7 +107,7 @@ def plt_perf(name, f1, f2, p_loss=False, p_acc=False, val=False, size=(15,9), sa
 			plt.xlabel('Epochs')
 			plt.ylabel('Value')
 			plt.legend()
-			plt.show()
+			# plt.show()
 			if save:
 				print 'Saving loss...'
 				plt.savefig(f1)
@@ -120,7 +120,7 @@ def plt_perf(name, f1, f2, p_loss=False, p_acc=False, val=False, size=(15,9), sa
 			plt.xlabel('Epochs')
  			plt.ylabel('Value')
 			plt.legend()
- 			plt.show()
+ 			# plt.show()
 			if save:
 				print 'Saving accuracy...'
  				plt.savefig(f2)

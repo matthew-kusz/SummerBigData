@@ -5,14 +5,17 @@ import numpy as np
 # from keras.utils.np_utils import to_categorical # convert to one-hot-encoding
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D
+from keras.callbacks import EarlyStopping 	 # Used to prevent overfitting
+from keras.callbacks import ModelCheckpoint # Gives us the best weights obtained during fitting
 
 ####### Global variables #######
-global_num_train = 60000
+global_num_train = 100
+global_num_test = 10000
 global_input_layer = 784
-global_hidden_layer1 = 350
+global_hidden_layers = [400, 280, 140]
 global_output_layer = 10
-global_epochs = 1
-global_batch_size = 86
+global_max_epochs = 100
+global_batch_size = 100
 global_num_classes = 10
 
 # So our random values stay the same for each run
@@ -40,10 +43,41 @@ def get_train(size):
 	
 	return x_vals, y_vals
 
+# Extract the MNIST testing data sets
+def get_test(size):
+	x_vals = read_idx('data/t10k-images-idx3-ubyte.gz', size)
+	x_vals = x_vals / 255.0
+	x_vals = np.reshape(x_vals, (x_vals.shape[0], (x_vals.shape[1] * x_vals.shape[2])))
+	y_vals = read_idx('data/t10k-labels-idx1-ubyte.gz', size)
+	y_vals = np.reshape(y_vals, (len(y_vals), 1))
+	print x_vals.shape, y_vals.shape
+	
+	return x_vals, y_vals
+
+# Model set-up for softmax regression
+def create_model_softmax():
+		
+	mod1 = Sequential()
+	mod1.add(Dense(global_hidden_layers[0], input_dim = global_input_layer, activation = 'relu'))
+	mod1.add(Dropout(0.2))
+	
+	if (len(global_hidden_layers) > 1):
+		for i in range(len(global_hidden_layers) - 1):
+			mod1.add(Dense(global_hidden_layers[i + 1], activation = 'relu'))
+			mod1.add(Dropout(0.2))
+	
+	mod1.add(Dense(global_output_layer, activation = 'softmax'))
+
+	
+	return mod1
+
 ####### Code #######
 # Extract the MNIST training data sets
 train_images, train_labels = get_train(global_num_train)
 m = len(train_images)
+
+# Extract the MNIST testing data sets
+test_images, test_labels = get_test(global_num_test)
 
 # Set up a matrix that will be either 1 or 0 depending on what we are looking at
 # Y_train = to_categorical(Y_train, num_classes = 10)
@@ -61,10 +95,8 @@ for i in range(global_num_classes):
 
 # Setting up the Keras neural network
 # Create our model (currently has 1 hidden layer and using softmax regression)
-model = Sequential()
-'''
-model.add(Dense(global_hidden_layer1, input_dim = global_input_layer, activation = 'relu'))
-model.add(Dense(global_output_layer, activation = 'softmax'))
+model = create_model_softmax()
+
 '''
 #NOT MY CODE
 train_images = np.reshape(train_images, (m, 28, 28, 1))
@@ -90,20 +122,24 @@ model.add(Flatten())
 model.add(Dense(256, activation = "relu"))
 model.add(Dropout(0.5))
 model.add(Dense(10, activation = "softmax"))
-
-#optimizer = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
-
+'''
 
 # Compile our model
 model.compile(optimizer = 'SGD', loss='categorical_crossentropy', metrics=['accuracy'])
 print model.summary()
 
 # Fit our model
-model.fit(train_images, y_vals_train, epochs= global_epochs, batch_size = global_batch_size)
+early_stopper= EarlyStopping(monitor = 'val_loss', patience =50, verbose = 1, mode = 'auto')
+model_checkpoint = ModelCheckpoint('bestWeights2.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
+history = model.fit(train_images, y_vals_train, epochs = global_max_epochs, batch_size = global_batch_size,
+verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
+
+# Reload our best weights
+model.load_weights('bestWeights2.hdf5')
 
 # Evaluate our model
-scores = model.evaluate(train_images, y_vals_train)
-print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+#scores = model.evaluate(test_images, test_labels)
+#print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
 # Save our model and weights
 #model.save('models/ModelDataSize'+str(m)+'Epoch'+ str(global_epochs)+'BatchSize'+ str(global_batch_size))

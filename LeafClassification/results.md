@@ -215,3 +215,22 @@ epochs = 211
 batch = 10
 
 val_loss = 0.02094
+
+------------------
+Set patience to 200
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 3
+
+epochs = 814
+
+batch = 10
+
+val_loss = 0.00286
+
+Kaggle_score = 0.02302

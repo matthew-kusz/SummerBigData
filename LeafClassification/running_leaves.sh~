@@ -1,5 +1,5 @@
-#PBS -N leavesHL1500HL2500HL3500
-#PBS -l walltime=00:30:00
+#PBS -N TESTING
+#PBS -l walltime=01:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe
@@ -12,9 +12,9 @@ else
         cd $PBS_O_WORKDIR
         echo $PBS_O_WORKDIR
 fi
-#
+
 # Setup GPU code
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u leaf_class.py 1 1 0 1000 10 >& outputHL1500HL2500HL3500.log
+python -u leaf_class.py 1 1 1 0 2000 20 >& TESTING.log
