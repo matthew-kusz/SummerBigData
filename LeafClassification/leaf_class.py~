@@ -15,11 +15,10 @@ from keras.utils import np_utils, plot_model     # Used to set up one-hot scheme
 from keras.callbacks import EarlyStopping 	 # Used to prevent overfitting
 from keras.callbacks import ModelCheckpoint      # Gives us the best weights obtained during fitting
 import argparse
-import os
 from scipy.misc import imresize
 import visualize
+import sys
 
-from keras.preprocessing.image import img_to_array, load_img
 ####### Global Variables #######
 parser = argparse.ArgumentParser()
 parser.add_argument('disp_stats', 
@@ -28,6 +27,8 @@ parser.add_argument('save_stats',
 	help = 'Use 1/0 (True/False) to indicate if you want to save model stats or not.', type = int)
 parser.add_argument('save_prob', 
 	help = 'Use 1/0 (True/False) to indicate if you want to save probabilities or not.', type = int)
+parser.add_argument('leaf_stats', 
+	help = 'Use 1/0 (True/False) to indicate if you want to display leaf images and stats or not.', type = int)
 parser.add_argument('global_max_epochs', help = 'Max amount of epochs allowed.', type = int)
 parser.add_argument('global_batch_size', help = 'Numer of samples per gradient update.', type = int)
 
@@ -175,7 +176,7 @@ def resize_img(img, max_dim):
    	scale = max_dim / float(img.shape[max_ax])
     	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale)))
 
-def reshape_img(images, max_dim = 96, center = True):
+def reshape_img(images, max_dim = 500, center = True):
 	
 	modified = np.zeros((len(images), max_dim, max_dim, 1))
 	for i in range(len(images)):
@@ -199,6 +200,8 @@ def reshape_img(images, max_dim = 96, center = True):
 	return  np.around(modified / 255.0)
 
 ####### Code #######
+print sys.version
+
 # We need to extract the data given
 # Set up our training data
 train = pd.read_csv('data_provided/train.csv')
@@ -236,19 +239,13 @@ print 'Finished.'
 	
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = reshape_img(train_list)
-# FIXME
-temp = np.where(y == 73)
-print temp[0][0]
 
-temp1 = []
-for i in range(len(temp[0])):
-	temp1.append(train_mod_list[temp[0][i],:,:,0])
+# Look at images and some stats of leaves
+if args.leaf_stats:
+	visualize.image_similarity(train_mod_list, y, classes)
+	visualize.visualize_leaves(train_mod_list, y, classes, show1 = False, show2 = True)
 
-print np.mean(cosine_similarity(temp1[0], temp1[1]))
 stop
-# Visualize a leaf or two
-visualize.visualize_leaves(train_mod_list, y, show1 = False, show2 = False)
-
 # Setting up the Keras neural network
 model = create_model_softmax()
 

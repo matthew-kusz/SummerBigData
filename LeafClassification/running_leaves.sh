@@ -17,4 +17,4 @@ fi
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u leaf_class.py 1 1 0 1000 10 >& outputHL1500HL2500HL3500.log
+python -u leaf_class.py 0 0 0 1000 10 >& outputHL1500HL2500HL3500.log

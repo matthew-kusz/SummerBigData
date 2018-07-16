@@ -1,12 +1,11 @@
 # Import the necessary packages
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')                            # For running on the supercomputer
 import matplotlib.pyplot as plt
+from sklearn.metrics.pairwise import cosine_similarity
 
 ####### Definitions #######
 # Look at what some of the leaves look like
-def visualize_leaves(images, y, show1, show2):
+def visualize_leaves(images, y, classes, show1, show2):
 	'''
 	#center_y, center_x = ndi.center_of_mass(img)
 	print images[0,:,:,0].shape
@@ -39,11 +38,16 @@ def visualize_leaves(images, y, show1, show2):
 		a.show()
 
 	if show2:
-		print y[0:20]
+		
+		for i in range(len(classes)):
+			print i, classes[i]
+			 
+		species = input('What leaf species would you like to look at? ')
+		print 'You chose ', classes[species]
+
 		count = 0
 		for j in range(len(y)):
-			if y[j] == 73:
-				print j
+			if y[j] == species:
 				count += 1
 				if count < 6:
 					if (count == 1):
@@ -72,9 +76,27 @@ def visualize_leaves(images, y, show1, show2):
 		raw_input()
 	return
 
+# Checking how similar each inage is to one another of the same leaf species
+def image_similarity(train, y, classes):
+	
+	for i in range(len(classes)):
+		temp = np.where(y == i)
+
+		temp1 = []
+		for j in range(len(temp[0])):
+			temp1.append(train[temp[0][j],:,:,0])
+
+		summ = 0	
+		for k in range(len(temp1) - 1):
+			summ += np.asscalar(cosine_similarity(temp1[0].reshape(1,-1), temp1[k + 1].reshape(1,-1)))
+
+		print classes[i], ' cosine similarity: ', summ / (len(temp1) - 1)
+
+	return
+
 # Plot model statistics for keras models
 # From https://www.kaggle.com/limitpointinf0/leaf-classifier-knn-nn?scriptVersionId=3352828
-def plt_perf(name, p_loss=False, p_acc=False, val=False, size=(15,9), save=False, f1, f2):
+def plt_perf(name, f1, f2, p_loss=False, p_acc=False, val=False, size=(15,9), save=False):
 	if p_loss or p_acc:
 		if p_loss:
 			plt.figure(figsize = size)
