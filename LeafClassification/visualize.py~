@@ -38,12 +38,12 @@ def visualize_leaves(images, y, classes, show1, show2):
 		a.show()
 
 	if show2:
-		
+		'''
 		for i in range(len(classes)):
 			print i, classes[i]
-			 
+		'''	 
 		species = input('What leaf species would you like to look at? ')
-		print 'You chose ', classes[species]
+		print 'You chose', classes[species]
 
 		count = 0
 		for j in range(len(y)):
@@ -90,7 +90,7 @@ def image_similarity(train, y, classes):
 		for k in range(len(temp1) - 1):
 			summ += np.asscalar(cosine_similarity(temp1[0].reshape(1,-1), temp1[k + 1].reshape(1,-1)))
 
-		print classes[i], ' cosine similarity: ', summ / (len(temp1) - 1)
+		print classes[i], 'cosine similarity:', summ / (len(temp1) - 1)
 
 	return
 
@@ -107,7 +107,7 @@ def plt_perf(name, f1, f2, p_loss=False, p_acc=False, val=False, size=(15,9), sa
 			plt.xlabel('Epochs')
 			plt.ylabel('Value')
 			plt.legend()
-			# plt.show()
+			plt.show()
 			if save:
 				print 'Saving loss...'
 				plt.savefig(f1)
@@ -120,11 +120,11 @@ def plt_perf(name, f1, f2, p_loss=False, p_acc=False, val=False, size=(15,9), sa
 			plt.xlabel('Epochs')
  			plt.ylabel('Value')
 			plt.legend()
- 			# plt.show()
+ 			plt.show()
 			if save:
 				print 'Saving accuracy...'
  				plt.savefig(f2)
 	else:
-		print('No plotting since all parameters set to false.')
+		print 'No plotting since all parameters set to false.'
 
 	return

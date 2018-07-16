@@ -17,7 +17,6 @@ from keras.callbacks import ModelCheckpoint      # Gives us the best weights obt
 import argparse
 from scipy.misc import imresize
 import visualize
-import sys
 
 ####### Global Variables #######
 parser = argparse.ArgumentParser()
@@ -200,8 +199,6 @@ def reshape_img(images, max_dim = 500, center = True):
 	return  np.around(modified / 255.0)
 
 ####### Code #######
-print sys.version
-
 # We need to extract the data given
 # Set up our training data
 train = pd.read_csv('data_provided/train.csv')
