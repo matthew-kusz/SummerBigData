@@ -4,8 +4,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd                         	 # For reading in and writing files
-from keras.models import Sequential        	 # Linearly sets up model
-from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D, Activation
+from keras.models import Sequential, Model       # Linearly sets up model
+from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D, Activation, concatenate, Input
 import matplotlib.image as mpimg           	 # Reading images to numpy arrays
 import scipy.ndimage as ndi            	   	 # Finding the center of the leaves
 from sklearn.preprocessing import LabelEncoder   # Preprocessing
@@ -14,9 +14,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from keras.utils import np_utils, plot_model     # Used to set up one-hot scheme, visualizing my model
 from keras.callbacks import EarlyStopping 	 # Used to prevent overfitting
 from keras.callbacks import ModelCheckpoint      # Gives us the best weights obtained during fitting
+from keras.optimizers import SGD
 import argparse
 from scipy.misc import imresize
 import visualize
+from sklearn.decomposition import PCA
 
 ####### Global Variables #######
 parser = argparse.ArgumentParser()
@@ -40,6 +42,7 @@ global_input_layer = 192
 global_hidden_layers = [400, 280, 140]
 global_output_layer = 99
 global_num_classes = 99
+global_max_dim = 50
 
 path = 'data_provided/unzip_images'
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
@@ -71,37 +74,65 @@ def grab_images(tr_ids, te_ids):
 		test_list.append(images_list[img - 1])
 
 	return images_list, train_list, test_list
-
+'''
 # Model set-up for CNN
 def create_model_conv():
 
 	mod2 = Sequential()
-	mod2.add(Conv2D(input_shape = (92, 92, 1), filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same'))
-	mod2.add(MaxPool2D(pool_size = (20, 20)))
+	mod2.add(Conv2D(input_shape = (50, 50, 1), filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same'))
+	mod2.add(MaxPool2D(pool_size = (25, 25)))
 	mod2.add(Dropout(0.2))
 	mod2.add(Flatten())
-	mod2.add(Dense(100, activation = "relu"))
-	mod2.add(Dropout(0.5))
-	mod2.add(Dense(99, activation = "softmax"))
+	mod2.add(Dense(192, activation = "relu"))
+	mod2.add(Dropout(0.2))
+	# mod2.add(Dense(99, activation = "softmax"))
 	
 	return mod2
-
+'''
 # Model set-up for softmax regression
 def create_model_softmax():
 		
-	mod1 = Sequential()
+	mod1 = Sequential()	
+	
 	mod1.add(Dense(global_hidden_layers[0], input_dim = global_input_layer, activation = 'relu'))
 	mod1.add(Dropout(0.3))
 	
 	if (len(global_hidden_layers) > 1):
 		for i in range(len(global_hidden_layers) - 1):
 			mod1.add(Dense(global_hidden_layers[i + 1], activation = 'relu'))
-			mod1.add(Dropout(0.2))
+			mod1.add(Dropout(0.2))	
 	
 	mod1.add(Dense(global_output_layer, activation = 'softmax'))
 
 	
 	return mod1
+
+def combined_model():
+
+	first_input = Input(shape=(global_max_dim, global_max_dim, 1))
+	x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same')(first_input)
+	x = MaxPool2D(pool_size = (25, 25))(x)
+	x = Dropout(0.2)(x)
+	x = Flatten()(x)
+	x = Dense(192, activation = "relu")(x)
+	final_first_input_layer = Dropout(0.2)(x)
+
+	second_input = Input(shape=(global_input_layer, ))
+
+	merge_one = concatenate([final_first_input_layer, second_input])
+
+	x = Dense(global_hidden_layers[0], activation = 'relu')(merge_one)
+	x = Dropout(0.2)(x)
+	
+	if (len(global_hidden_layers) > 1):
+		for i in range(len(global_hidden_layers) - 1):
+			x = Dense(global_hidden_layers[i + 1], activation = 'relu')(x)
+			x = Dropout(0.2)(x)
+	
+	final = Dense(global_output_layer, activation = 'softmax')(x)
+	model = Model(inputs=([first_input, second_input]), outputs=final)
+
+	return model
 
 ################################################
 # From https://www.kaggle.com/abhmul/keras-convnet-lb-0-0052-w-visualization/notebook
@@ -179,7 +210,7 @@ def resize_img(img, max_dim):
    	scale = max_dim / float(img.shape[max_ax])
     	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale)))
 
-def reshape_img(images, max_dim = 92, center = True):
+def reshape_img(images, max_dim, center = True):
 	
 	modified = np.zeros((len(images), max_dim, max_dim, 1))
 	for i in range(len(images)):
@@ -228,32 +259,78 @@ test = pd.read_csv('data_provided/test.csv')
 
 # Extract the id of each leaf
 test_ids = test.pop('id')
-
+'''
 # fit_transform() calculates the mean and std and also centers and scales data
 x_train = StandardScaler().fit_transform(train)
 x_test = StandardScaler().fit_transform(test)
-
+'''
 # Load up all of the images
 print 'Loading images...'
 img_list, train_list, test_list = grab_images(train_ids, test_ids)
 print 'Finished.'
 	
 # We need to reshape our images so they are all the same dimensions
-train_mod_list = reshape_img(train_list)
+train_mod_list = reshape_img(train_list, global_max_dim)
+test_mod_list = reshape_img(test_list, global_max_dim)
+'''
+# Let's try to get some engineered features
+train_width = np.zeros((len(train_mod_list), 1)) 
+train_height = np.zeros((len(train_mod_list), 1))
+train_asp_ratio = np.zeros((len(train_mod_list), 1))
+train_square = np.zeros((len(train_mod_list), 1))
+test_width = np.zeros((len(test_mod_list), 1))
+test_height = np.zeros((len(test_mod_list), 1))
+test_asp_ratio = np.zeros((len(test_mod_list), 1))
+test_square = np.zeros((len(test_mod_list), 1))
+
+for i in range(len(train_mod_list)):
+	train_width[i] = train_list[i].shape[1]
+	train_height[i] = train_list[i].shape[0]
+	train_asp_ratio[i] = train_list[i].shape[1] / train_list[i].shape[0]
+	train_square[i] = train_list[i].shape[1] * train_list[i].shape[0]
+
+for i in range(len(test_mod_list)):
+	test_width[i] = test_list[i].shape[1]
+	test_height[i] = test_list[i].shape[0]
+	test_asp_ratio[i] = test_list[i].shape[1] / test_list[i].shape[0]
+	test_square[i] = test_list[i].shape[1] * test_list[i].shape[0]
+
+train = np.concatenate((train, train_width, train_height, train_asp_ratio, train_square), axis = 1)
+test = np.concatenate((test, test_width, test_height, test_asp_ratio, test_square), axis = 1)
+global_input_layer += 4
+'''
+'''
+# Let's apply PCA to the images and then add them to our pre-extracted features and see what we get
+pca = PCA(0.80)
+pca.fit(train_mod_list.reshape(len(train_mod_list), 50 * 50))
+global_input_layer += pca.n_components_
+print pca.n_components_
+train_PCA = pca.transform(train_mod_list.reshape(len(train_mod_list), 50 * 50))
+test_PCA = pca.transform(test_mod_list.reshape(len(test_mod_list), 50 * 50))
+
+train = np.concatenate((train, train_PCA), axis = 1)
+test = np.concatenate((test, test_PCA), axis = 1)
+'''
+x_train = StandardScaler().fit_transform(train)
+x_test = StandardScaler().fit_transform(test)
 
 # Look at images and some stats of leaves
 if args.leaf_stats:
 	visualize.image_similarity(train_mod_list, y, classes)
 	visualize.visualize_leaves(train_mod_list, y, classes, show1 = False, show2 = True)
 
+# test_mod_list = reshape_img(test_list)
+# visualize.visualize_leaves(test_mod_list, y, classes, show1 = True, show2 = False)
 # Setting up the Keras neural network
-model = create_model_softmax()
+# model = create_model_softmax()
 # model = create_model_conv()
+model = combined_model()
 
 # Compile our model
-model.compile(optimizer = 'SGD', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
+model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-# plot_model(model, to_file = 'model.png', show_shapes = True)
+plot_model(model, to_file = 'modelCombined.png', show_shapes = True)
 
 '''
 Fit our model
@@ -262,10 +339,10 @@ if our val_loss doesn't decrease after a certain number of epochs (called patien
 Model checkpoint saves the best weights obtained during training
 '''
 
-early_stopper= EarlyStopping(monitor = 'val_loss', patience = 200, verbose = 1, mode = 'auto')
-model_checkpoint = ModelCheckpoint('bestWeights.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
-history = model.fit(x_train, y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
-	verbose = 0, validation_split = 0.2, shuffle = True, callbacks = [early_stopper, model_checkpoint])
+early_stopper= EarlyStopping(monitor = 'val_loss', patience = 500, verbose = 1, mode = 'auto')
+model_checkpoint = ModelCheckpoint('bestWeights2.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
+history = model.fit(([train_mod_list, x_train]), y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
+	verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
 
 # Check Keras' statistics
 if args.disp_stats:
@@ -273,28 +350,31 @@ if args.disp_stats:
 	visualize.plt_perf(history, filename1, filename2, p_loss = True, p_acc = True, val = True, save = args.save_stats)
 
 # Reload our best weights
-model.load_weights('bestWeights.hdf5')
+model.load_weights('bestWeights2.hdf5')
 
 # Test our model on the test set
 y_pred = model.predict_proba(x_test)
 print '\n'
+'''
+indices = np.zeros((len(y_pred), 1))
+for i in range(len(y_pred)):
+	indices[i] = np.argmax(y_pred[i])
 
-# Set up the predictions into the correct format to submit to Kaggle
-y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
+for i in range(len(classes)):
+	temp = np.where(indices == i)
 
-if args.save_prob:
-	print 'Saving to file...'
-	fp = open(filename3,'w')
-	fp.write(y_pred.to_csv())
+	if len(temp[0]) != 6:
+		print i, len(temp[0])
 
-print 'Finished.'
-
+visualize.visualize_leaves(test_mod_list, indices, classes, show1 = False, show2 = True)
+'''
 '''
 Let's see how accurace our model is
 WARNING
 This is based solely on low probability for guess = incorrect
 Has been tested and shows correct guesses majority of the time (bad)
-
+'''
+'''
 x = []
 x_val = []
 total = 0
@@ -316,6 +396,16 @@ for i in range(len(x)):
 			img = mpimg.imread('data_provided/unzip_images/images/' + str(int(x_val[i])) + '.jpg')
 			plt.title(classes[j])
 			plt.imshow(img, cmap = 'binary')
-			# plt.show()
+			plt.show()
 '''
+
+# Set up the predictions into the correct format to submit to Kaggle
+y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
+
+if args.save_prob:
+	print 'Saving to file...'
+	fp = open(filename3,'w')
+	fp.write(y_pred.to_csv())
+
+print 'Finished.'
 

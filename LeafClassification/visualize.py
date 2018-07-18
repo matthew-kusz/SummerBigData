@@ -16,8 +16,8 @@ def visualize_leaves(images, y, classes, show1, show2):
 	'''
 	if show1:
 		# Setting up our grid
-		num_row = 3
-		num_col = 3
+		num_row = 15
+		num_col = 15
 		for i in range(num_row):
 			for j in range(num_col):
 				if (j == 0):
@@ -39,25 +39,50 @@ def visualize_leaves(images, y, classes, show1, show2):
 
 	if show2:
 		
+		# Give a list of the id associated with each species
 		for i in range(len(classes)):
 			print i, classes[i]
-			 
+		
+		# Ask for what species to display	 
 		species = input('What leaf species would you like to look at? ')
 		print 'You chose', classes[species]
 
+		# Find how many images of that species there is
+		hold = []
+		num_img = 0
+		for i in range(len(y)):
+			if y[i] == species:
+				num_img += 1
+				hold.append(i)
+
+		# Check if we have an odd amount of images (relevant for displaying the test leaves afer predictions)
+		if num_img % 2 != 0:
+			print 'Number of images is not even!'
+			# Print the odd image separately
+			c = plt.figure(1)
+			plt.imshow(images[hold[num_img - 1],:,:,0], cmap = 'binary', interpolation = 'none')
+			ax = plt.gca()
+			ax.axes.get_xaxis().set_visible(False)
+			ax.axes.get_yaxis().set_visible(False)
+			c.show()
+			num_img -= 1	
+		
+		# Display the images in 2 rows
 		count = 0
 		for j in range(len(y)):
 			if y[j] == species:
 				count += 1
-				if count < 6:
+				# First row
+				if count < (num_img / 2) + 1:
 					if (count == 1):
 						pics = images[j,:,:,0]
 		
 					else:
 						temp = images[j,:,:,0]
 						pics = np.concatenate((pics, temp), axis = 1)
-				else:
-					if (count == 6):
+				# Second row
+				elif count > (num_img / 2) and count < num_img + 1:
+					if (count == (num_img / 2) + 1):
 						pics2 = images[j,:,:,0]
 	
 					else:
@@ -66,17 +91,18 @@ def visualize_leaves(images, y, classes, show1, show2):
 	
 		al = np.concatenate((pics, pics2), axis = 0)
 
-		b = plt.figure(2)
+		b = plt.figure(num_img)
 		plt.imshow(al, cmap = 'binary', interpolation = 'none')
 		ax = plt.gca()
 		ax.axes.get_xaxis().set_visible(False)
 		ax.axes.get_yaxis().set_visible(False)
 		b.show()
+
 	if show1 or show2:
 		raw_input()
 	return
 
-# Checking how similar each inage is to one another of the same leaf species
+# Checking how similar each image is to one another of the same leaf species
 def image_similarity(train, y, classes):
 	
 	for i in range(len(classes)):

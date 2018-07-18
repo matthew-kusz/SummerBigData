@@ -234,3 +234,67 @@ batch = 10
 val_loss = 0.00286
 
 Kaggle_score = 0.02302
+
+------------------
+
+Set patience to 400
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 3
+
+epochs = 730
+
+batch = 10
+
+val_loss = 0.00217
+
+momentum = 0.9
+
+------------------
+
+Set patience to 400
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 3
+
+epochs = 803
+
+batch = 10
+
+val_loss = 0.00195
+
+momentum = 1.7
+
+decay = 0.5
+
+------------------
+
+Set patience to 500
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 3
+
+epochs = 2134
+
+batch = 22
+
+val_loss = 0.00160
+
+momentum = 0.9
+
+decay = 1e-6
