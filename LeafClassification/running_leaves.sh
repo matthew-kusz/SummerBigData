@@ -1,5 +1,5 @@
-#PBS -N TESTINGCombined
-#PBS -l walltime=01:00:00
+#PBS -N TESTINGCombined100
+#PBS -l walltime=02:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe
@@ -17,4 +17,4 @@ fi
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u leaf_class.py 1 1 1 0 3000 30 >& TESTINGCombined.log
+python -u leaf_class.py 0 0 1 0 100 30 >& TESTINGCombined100.log

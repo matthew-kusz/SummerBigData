@@ -298,3 +298,99 @@ val_loss = 0.00160
 momentum = 0.9
 
 decay = 1e-6
+
+------------------
+
+Set patience to 300
+
+Image dim (50, 50)
+
+Conv2d = 8 (5, 5)
+
+MaxPool = (25, 25)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 5
+
+epochs = 702
+
+batch = 30
+
+val_loss = 0.00073
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.02694
+
+------------------
+
+Set patience to 300
+
+Image dim (50, 50)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (25, 25)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 5
+
+epochs = 261
+
+batch = 30
+
+val_loss = 0.0011
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.03293
+
+------------------
+
+Set patience to 300
+
+Image dim (50, 50)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (25, 25)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 5
+
+epochs = 967
+
+batch = 30
+
+val_loss = 0.0056
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.03521

@@ -14,6 +14,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from keras.utils import np_utils, plot_model     # Used to set up one-hot scheme, visualizing my model
 from keras.callbacks import EarlyStopping 	 # Used to prevent overfitting
 from keras.callbacks import ModelCheckpoint      # Gives us the best weights obtained during fitting
+from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD
 import argparse
 from scipy.misc import imresize
@@ -42,7 +43,7 @@ global_input_layer = 192
 global_hidden_layers = [400, 280, 140]
 global_output_layer = 99
 global_num_classes = 99
-global_max_dim = 50
+global_max_dim = 100
 
 path = 'data_provided/unzip_images'
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
@@ -110,8 +111,11 @@ def create_model_softmax():
 def combined_model():
 
 	first_input = Input(shape=(global_max_dim, global_max_dim, 1))
-	x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same')(first_input)
-	x = MaxPool2D(pool_size = (25, 25))(x)
+	x = Conv2D(filters = 32, kernel_size = (5, 5), activation ='relu', padding = 'Same')(first_input)
+	x = MaxPool2D(pool_size = (10, 10))(x)
+	x = Dropout(0.2)(x)
+	x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same')(x)
+	x = MaxPool2D(pool_size = (5, 5))(x)
 	x = Dropout(0.2)(x)
 	x = Flatten()(x)
 	x = Dense(192, activation = "relu")(x)
@@ -246,7 +250,7 @@ le = LabelEncoder()
 # fit() calculates the mean and std, transform() centers and scales data
 y = le.fit(y_raw).transform(y_raw)
 			
-# Grab the classes (will be used to set up our submition file)
+# Grab the classes (will be used to set up our submission file)
 classes = le.classes_
 # Setting up one-hot scheme
 y_train = np_utils.to_categorical(y)
@@ -272,6 +276,7 @@ print 'Finished.'
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = reshape_img(train_list, global_max_dim)
 test_mod_list = reshape_img(test_list, global_max_dim)
+y_val = y[global_num_train - 99: global_num_train]
 '''
 # Let's try to get some engineered features
 train_width = np.zeros((len(train_mod_list), 1)) 
@@ -314,6 +319,9 @@ test = np.concatenate((test, test_PCA), axis = 1)
 x_train = StandardScaler().fit_transform(train)
 x_test = StandardScaler().fit_transform(test)
 
+train_mod_val = train_mod_list[global_num_train - 99: global_num_train]
+x_train_val = x_train[global_num_train - 99: global_num_train]
+
 # Look at images and some stats of leaves
 if args.leaf_stats:
 	visualize.image_similarity(train_mod_list, y, classes)
@@ -330,7 +338,7 @@ model = combined_model()
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
 model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-plot_model(model, to_file = 'modelCombined.png', show_shapes = True)
+#plot_model(model, to_file = 'modelCombined.png', show_shapes = True)
 
 '''
 Fit our model
@@ -339,10 +347,26 @@ if our val_loss doesn't decrease after a certain number of epochs (called patien
 Model checkpoint saves the best weights obtained during training
 '''
 
-early_stopper= EarlyStopping(monitor = 'val_loss', patience = 300, verbose = 1, mode = 'auto')
-model_checkpoint = ModelCheckpoint('bestWeights2.hdf5', monitor = 'val_loss', verbose = 1, save_best_only = True)
+# Let's try augmenting our data
+datagen = ImageDataGenerator(rotation_range=20,
+    	zoom_range=0.2,
+   	horizontal_flip=True,
+   	vertical_flip=True,
+   	fill_mode='nearest')
+
+'''
 history = model.fit(([train_mod_list, x_train]), y_train, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
-	verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
+verbose = 0, validation_split = 0.1, shuffle = True, callbacks = [early_stopper, model_checkpoint])
+'''
+x_batch = datagen.flow(train_mod_list, batch_size = args.global_batch_size)
+
+
+model_file = 'bestWeights3.hdf5'
+early_stopper= EarlyStopping(monitor = 'val_loss', patience = 150, verbose = 1, mode = 'auto')
+model_checkpoint = ModelCheckpoint(model_file, monitor = 'val_loss', verbose = 1, save_best_only = True)
+history = model.fit_generator(([x_batch, x_train], y_train), epochs = args.global_max_epochs, steps_per_epoch = 29,
+	verbose = 0, validation_data = ([train_mod_val, x_train_val], y_val),
+	callbacks = [early_stopper, model_checkpoint])
 
 # Check Keras' statistics
 if args.disp_stats:
@@ -350,10 +374,10 @@ if args.disp_stats:
 	visualize.plt_perf(history, filename1, filename2, p_loss = True, p_acc = True, val = True, save = args.save_stats)
 
 # Reload our best weights
-model.load_weights('bestWeights2.hdf5')
+model.load_weights(model_file)
 
 # Test our model on the test set
-y_pred = model.predict_proba(x_test)
+y_pred = model.predict([test_mod_list, x_test])
 print '\n'
 '''
 indices = np.zeros((len(y_pred), 1))

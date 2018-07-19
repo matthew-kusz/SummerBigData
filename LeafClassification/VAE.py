@@ -14,7 +14,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from keras.layers import Lambda, Input, Dense
+from keras.layers import Lambda, Input, Dense, UpSampling2D, Conv2D, Dropout, MaxPool2D, Flatten
 from keras.models import Model
 from keras.datasets import mnist
 from keras.losses import mse, binary_crossentropy
@@ -80,6 +80,7 @@ def plot_results(models,
     z_mean, _, _ = encoder.predict(x_test,
                                    batch_size=batch_size)
     plt.figure(figsize=(12, 10))
+    black_marker = mpatches.Circle(4, radius = 0.1 color = 'black', label = 'species')
     plt.scatter(z_mean[:, 0], z_mean[:, 1], c = y_test)
     plt.colorbar()
     plt.xlabel("z[0]")
@@ -90,7 +91,7 @@ def plot_results(models,
     filename = os.path.join(model_name, "digits_over_latent.png")
     # display a 30x30 2D manifold of digits
     n = 15
-    digit_size = 92
+    digit_size = 100
     figure = np.zeros((digit_size * n, digit_size * n))
     # linearly spaced coordinates corresponding to the 2D plot
     # of digit classes in the latent space
@@ -148,7 +149,7 @@ def resize_img(img, max_dim):
    	scale = max_dim / float(img.shape[max_ax])
     	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale)))
 
-def reshape_img(images, max_dim = 92, center = True):
+def reshape_img(images, max_dim = 100, center = True):
 	
 	modified = np.zeros((len(images), max_dim, max_dim, 1))
 	for i in range(len(images)):
@@ -212,28 +213,34 @@ original_dim = image_size * image_size
 x_train = train_mod_list.reshape(-1, original_dim)
 x_test = test_mod_list.reshape(-1, original_dim)
 
-'''
-# MNIST dataset
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-image_size = x_train.shape[1]
-original_dim = image_size * image_size
-x_train = np.reshape(x_train, [-1, original_dim])
-x_test = np.reshape(x_test, [-1, original_dim])
-x_train = x_train.astype('float32') / 255
-x_test = x_test.astype('float32') / 255
-'''
+# FIXME
+temp = np.where(y == i)
+
+	temp1 = []
+	for j in range(len(temp[0])):
+		temp1.append(train[temp[0][j],:,:,0])
+
+
+
+
 # network parameters
 input_shape = (original_dim, )
 intermediate_dim = 512
 batch_size = 128
 latent_dim = 2
-epochs = 25
+epochs = 30
 
 # VAE model = encoder + decoder
 # build encoder model
 inputs = Input(shape=input_shape, name='encoder_input')
 x = Dense(intermediate_dim, activation='relu')(inputs)
+x = Dropout(0.2)(x)
+x = Dense(320, activation = "relu")(x)
+x = Dropout(0.2)(x)
+x = Dense(240, activation = "relu")(x)
+x = Dropout(0.2)(x)
+x = Dense(192, activation = "relu")(x)
 z_mean = Dense(latent_dim, name='z_mean')(x)
 z_log_var = Dense(latent_dim, name='z_log_var')(x)
 
@@ -248,7 +255,13 @@ plot_model(encoder, to_file='vae_mlp_encoder.png', show_shapes=True)
 
 # build decoder model
 latent_inputs = Input(shape=(latent_dim,), name='z_sampling')
-x = Dense(intermediate_dim, activation='relu')(latent_inputs)
+x = Dense(192, activation = "relu")(latent_inputs)
+x = Dropout(0.2)(x)
+x = Dense(240, activation = "relu")(x)
+x = Dropout(0.2)(x)
+x = Dense(320, activation = "relu")(x)
+x = Dropout(0.2)(x)
+x = Dense(intermediate_dim, activation='relu')(x)
 outputs = Dense(original_dim, activation='sigmoid')(x)
 
 # instantiate decoder model
@@ -296,6 +309,7 @@ if __name__ == '__main__':
     else:
         # train the autoencoder
         vae.fit(x_train,
+		shuffle = True,
                 epochs=epochs,
                 batch_size=batch_size,
                 validation_data=(x_test, None))
