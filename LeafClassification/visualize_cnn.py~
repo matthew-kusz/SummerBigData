@@ -18,7 +18,7 @@ global_num_test = 594
 global_total_img = global_num_train + global_num_test
 NUM_LEAVES = 3
 global_max_dim = 100
-model_fn = 'bestWeights.hdf5'
+model_fn = 'bestWeights2.hdf5'
 
 ####### Definitions #######
 # Set up all of the images in a matrix
