@@ -1,0 +1,143 @@
+Using TensorFlow backend.
+Loading images...
+Finished.
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+encoder_input (InputLayer)       (None, 10000)         0                                            
+____________________________________________________________________________________________________
+dense_1 (Dense)                  (None, 512)           5120512     encoder_input[0][0]              
+____________________________________________________________________________________________________
+dropout_1 (Dropout)              (None, 512)           0           dense_1[0][0]                    
+____________________________________________________________________________________________________
+dense_2 (Dense)                  (None, 320)           164160      dropout_1[0][0]                  
+____________________________________________________________________________________________________
+dropout_2 (Dropout)              (None, 320)           0           dense_2[0][0]                    
+____________________________________________________________________________________________________
+dense_3 (Dense)                  (None, 240)           77040       dropout_2[0][0]                  
+____________________________________________________________________________________________________
+dropout_3 (Dropout)              (None, 240)           0           dense_3[0][0]                    
+____________________________________________________________________________________________________
+dense_4 (Dense)                  (None, 192)           46272       dropout_3[0][0]                  
+____________________________________________________________________________________________________
+z_mean (Dense)                   (None, 2)             386         dense_4[0][0]                    
+____________________________________________________________________________________________________
+z_log_var (Dense)                (None, 2)             386         dense_4[0][0]                    
+____________________________________________________________________________________________________
+z (Lambda)                       (None, 2)             0           z_mean[0][0]                     
+                                                                   z_log_var[0][0]                  
+====================================================================================================
+Total params: 5,408,756
+Trainable params: 5,408,756
+Non-trainable params: 0
+____________________________________________________________________________________________________
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+z_sampling (InputLayer)      (None, 2)                 0         
+_________________________________________________________________
+dense_5 (Dense)              (None, 192)               576       
+_________________________________________________________________
+dropout_4 (Dropout)          (None, 192)               0         
+_________________________________________________________________
+dense_6 (Dense)              (None, 240)               46320     
+_________________________________________________________________
+dropout_5 (Dropout)          (None, 240)               0         
+_________________________________________________________________
+dense_7 (Dense)              (None, 320)               77120     
+_________________________________________________________________
+dropout_6 (Dropout)          (None, 320)               0         
+_________________________________________________________________
+dense_8 (Dense)              (None, 512)               164352    
+_________________________________________________________________
+dense_9 (Dense)              (None, 10000)             5130000   
+=================================================================
+Total params: 5,418,368
+Trainable params: 5,418,368
+Non-trainable params: 0
+_________________________________________________________________
+VAE_modified.py:351: UserWarning: Output "decoder" missing from loss dictionary. We assume this was done on purpose, and we will not be expecting any data to be passed to "decoder" during training.
+  vae.compile(optimizer='adam', loss = None)
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+encoder_input (InputLayer)   (None, 10000)             0         
+_________________________________________________________________
+encoder (Model)              [(None, 2), (None, 2), (N 5408756   
+_________________________________________________________________
+decoder (Model)              (None, 10000)             5418368   
+=================================================================
+Total params: 10,827,124
+Trainable params: 10,827,124
+Non-trainable params: 0
+_________________________________________________________________
+Training model...
+2018-07-23 17:22:15.879618: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2018-07-23 17:22:15.879659: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+Epoch 00000: val_loss improved from inf to 4093.67798, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00001: val_loss improved from 4093.67798 to 3499.38135, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00002: val_loss improved from 3499.38135 to 3288.02930, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00003: val_loss improved from 3288.02930 to 3158.94800, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00004: val_loss improved from 3158.94800 to 3055.68726, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00005: val_loss improved from 3055.68726 to 2948.16357, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00006: val_loss improved from 2948.16357 to 2847.04297, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00007: val_loss improved from 2847.04297 to 2733.15430, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00008: val_loss improved from 2733.15430 to 2638.07764, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00009: val_loss improved from 2638.07764 to 2439.49341, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00010: val_loss improved from 2439.49341 to 2342.90283, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00011: val_loss improved from 2342.90283 to 2271.20190, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00012: val_loss improved from 2271.20190 to 2250.22021, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00013: val_loss improved from 2250.22021 to 2237.81250, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00014: val_loss did not improve
+Epoch 00015: val_loss improved from 2237.81250 to 2180.61133, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00016: val_loss improved from 2180.61133 to 2121.88062, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00017: val_loss did not improve
+Epoch 00018: val_loss improved from 2121.88062 to 2119.42969, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00019: val_loss improved from 2119.42969 to 2067.35083, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00020: val_loss did not improve
+Epoch 00021: val_loss improved from 2067.35083 to 2033.34338, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00022: val_loss did not improve
+Epoch 00023: val_loss improved from 2033.34338 to 1992.35278, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00024: val_loss did not improve
+Epoch 00025: val_loss improved from 1992.35278 to 1962.66577, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00026: val_loss did not improve
+Epoch 00027: val_loss improved from 1962.66577 to 1880.38208, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00028: val_loss improved from 1880.38208 to 1859.68201, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00029: val_loss improved from 1859.68201 to 1855.83997, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00030: val_loss did not improve
+Epoch 00031: val_loss improved from 1855.83997 to 1835.18750, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00032: val_loss improved from 1835.18750 to 1807.91040, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00033: val_loss did not improve
+Epoch 00034: val_loss improved from 1807.91040 to 1779.46301, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00035: val_loss did not improve
+Epoch 00036: val_loss did not improve
+Epoch 00037: val_loss did not improve
+Epoch 00038: val_loss did not improve
+Epoch 00039: val_loss did not improve
+Epoch 00040: val_loss improved from 1779.46301 to 1766.61011, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00041: val_loss improved from 1766.61011 to 1752.47888, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00042: val_loss improved from 1752.47888 to 1662.62842, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00043: val_loss did not improve
+Epoch 00044: val_loss did not improve
+Epoch 00045: val_loss did not improve
+Epoch 00046: val_loss did not improve
+Epoch 00047: val_loss did not improve
+Epoch 00048: val_loss did not improve
+Epoch 00049: val_loss did not improve
+Epoch 00050: val_loss did not improve
+Epoch 00051: val_loss improved from 1662.62842 to 1623.39172, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00052: val_loss did not improve
+Epoch 00053: val_loss did not improve
+Epoch 00054: val_loss did not improve
+Epoch 00055: val_loss did not improve
+Epoch 00056: val_loss did not improve
+Epoch 00057: val_loss did not improve
+Epoch 00058: val_loss improved from 1623.39172 to 1585.82959, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00059: val_loss improved from 1585.82959 to 1577.86035, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00060: val_loss did not improve
+Epoch 00061: val_loss did not improve
+Epoch 00062: val_loss did not improve
+Epoch 00063: val_loss improved from 1577.86035 to 1576.27100, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00064: val_loss improved from 1576.27100 to 1542.73804, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5
+Epoch 00065: val_loss did not improve
+Epoch 00066: val_loss improved from 1542.73804 to 1530.02405, saving model to VAE/vae_mlp_leaves_weights_nn_dim100.h5

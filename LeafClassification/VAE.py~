@@ -26,6 +26,8 @@ from scipy.misc import imresize
 
 import pandas as pd  
 import numpy as np
+import matplotlib
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg           	 # Reading images to numpy arrays
 import argparse
@@ -75,11 +77,30 @@ def plot_results(models,
 	if e.errno != errno.EEXIST:
 	    raise
 
+    print (y_test.shape)
+    # Give a list of the id associated with each species
+    for i in range(len(classes)):
+	print (i, classes[i])
+		
+    # Ask for what species to display	 
+    species = input('What leaf species would you like to look at? ')
+    print ('You chose', classes[species])
+
+    temp = np.where(y_test == species)
+    temp1 = np.zeros((len(temp[0]), 100 * 100))
+    print (temp1.shape)
+    print (x_test.shape)
+    for j in range(len(temp[0])):
+	 temp1[j] = x_test[temp[0][j],:]
+
+
+
     filename = os.path.join(model_name, "vae_mean.png")
     # display a 2D plot of the digit classes in the latent space
     z_mean, _, _ = encoder.predict(x_test,
                                    batch_size=batch_size)
     plt.figure(figsize=(12, 10))
+    # black_marker = mpatches.Circle(4, radius = 0.1, color = 'black', label = classes[species])
     plt.scatter(z_mean[:, 0], z_mean[:, 1], c = y_test)
     plt.colorbar()
     plt.xlabel("z[0]")
@@ -115,7 +136,7 @@ def plot_results(models,
     plt.yticks(pixel_range, sample_range_y)
     plt.xlabel("z[0]")
     plt.ylabel("z[1]")
-    plt.imshow(figure, cmap='gnuplot2')
+    plt.imshow(figure, cmap='Greys_r')
     plt.savefig(filename)
     plt.show()
 
@@ -217,7 +238,7 @@ input_shape = (original_dim, )
 intermediate_dim = 512
 batch_size = 128
 latent_dim = 2
-epochs = 30
+epochs = 5
 
 # VAE model = encoder + decoder
 # build encoder model

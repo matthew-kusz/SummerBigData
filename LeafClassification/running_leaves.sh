@@ -1,5 +1,5 @@
-#PBS -N TESTINGCombinedTESTINGConvSize
-#PBS -l walltime=02:00:00
+#PBS -N CNNAugmented
+#PBS -l walltime=05:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe
@@ -17,4 +17,4 @@ fi
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u leaf_class.py 0 0 1 0 1000 30 >& TESTINGCombinedTESTINGConvSize.log
+python -u leaf_class.py 0 0 1 0 1000 25 >& CNNAugmented.log

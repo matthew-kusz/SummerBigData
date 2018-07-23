@@ -37,18 +37,18 @@ parser.add_argument('save_prob',
 parser.add_argument('leaf_stats', 
 	help = 'Use 1/0 (True/False) to indicate if you want to display leaf images and stats or not.', type = int)
 parser.add_argument('global_max_epochs', help = 'Max amount of epochs allowed.', type = int)
-parser.add_argument('global_batch_size', help = 'Numer of samples per gradient update.', type = int)
+parser.add_argument('global_batch_size', help = 'Number of samples per gradient update.', type = int)
 
 args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
 global_total_img = global_num_train + global_num_test
-global_input_layer = 192
+global_input_layer = 0    #TBD
 global_hidden_layers = [400, 280, 140]
 global_output_layer = 99
 global_num_classes = 99
-global_max_dim = 100
+global_max_dim = 50
 
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
@@ -58,45 +58,6 @@ filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch
 np.random.seed(1)
 
 ####### Definitions #######
-class ImageDataGenerator2(ImageDataGenerator):
-    def flow(self, X, y=None, batch_size=32, shuffle=True, seed=None,
-             save_to_dir=None, save_prefix='', save_format='jpeg'):
-        return NumpyArrayIterator2(
-            X, y, self,
-            batch_size=batch_size, shuffle=shuffle, seed=seed,
-            dim_ordering=self.dim_ordering,
-            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format)
-
-
-class NumpyArrayIterator2(NumpyArrayIterator):
-    def next(self):
-        # for python 2.x.
-        # Keeps under lock only the mechanism which advances
-        # the indexing of each batch
-        # see http://anandology.com/blog/using-iterators-and-generators/
-        with self.lock:
-            # We changed index_array to self.index_array
-            self.index_array, current_index, current_batch_size = next(self.index_generator)
-        # The transformation of images is not under thread lock so it can be done in parallel
-        batch_x = np.zeros(tuple([current_batch_size] + list(self.X.shape)[1:]))
-        for i, j in enumerate(self.index_array):
-            x = self.X[j]
-            x = self.image_data_generator.random_transform(x.astype('float32'))
-            x = self.image_data_generator.standardize(x)
-            batch_x[i] = x
-        if self.save_to_dir:
-            for i in range(current_batch_size):
-                img = array_to_img(batch_x[i], self.dim_ordering, scale=True)
-                fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix,
-                                                                  index=current_index + i,
-                                                                  hash=np.random.randint(1e4),
-                                                                  format=self.save_format)
-                img.save(os.path.join(self.save_to_dir, fname))
-        if self.y is None:
-            return batch_x
-        batch_y = self.y[self.index_array]
-        return batch_x, batch_y
-
 def grab_images(tr_ids, te_ids):
 	'''
 	Reads in image files to save to a list, then separates the pictures between training and testing ids
@@ -139,7 +100,7 @@ def create_model_softmax():
 		
 	mod1 = Sequential()	
 	
-	mod1.add(Dense(global_hidden_layers[0], input_dim = global_input_layer, init='uniform', activation = 'relu'))
+	mod1.add(Dense(global_hidden_layers[0], input_dim = global_input_layer, activation = 'relu'))
 	mod1.add(Dropout(0.3))
 	
 	# For loop allows for easier adding and removing of hidden layers adjusting their sizes
@@ -159,7 +120,7 @@ def create_model_combined():
 	'''
 	# Obtaining features from the images
 	first_input = Input(shape=(global_max_dim, global_max_dim, 1))
-	x = Conv2D(filters = 32, kernel_size = (25, 25), activation ='relu', padding = 'Same', strides = 2)(first_input)
+	x = Conv2D(filters = 32, kernel_size = (5, 5), activation ='relu', padding = 'Same')(first_input)
 	x = MaxPool2D(pool_size = (10, 10))(x)
 	x = Dropout(0.2)(x)
 	x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same')(x)
@@ -245,29 +206,49 @@ def reshape_img(images, max_dim, center = True):
 
 	return  np.around(modified / 255.0)
 
-def engineer_features():
-	train_width = np.zeros((len(train_mod_list), 1)) 
-	train_height = np.zeros((len(train_mod_list), 1))
-	train_asp_ratio = np.zeros((len(train_mod_list), 1))
-	train_square = np.zeros((len(train_mod_list), 1))
-	test_width = np.zeros((len(test_mod_list), 1))
-	test_height = np.zeros((len(test_mod_list), 1))
-	test_asp_ratio = np.zeros((len(test_mod_list), 1))
-	test_square = np.zeros((len(test_mod_list), 1))
+def engineered_features(train, test, tr_list, te_list):
+	'''
+	Create more features that can be obtained from characteristics of the images
 
-	for i in range(len(train_mod_list)):
-		train_width[i] = train_list[i].shape[1]
-		train_height[i] = train_list[i].shape[0]
-		train_asp_ratio[i] = train_list[i].shape[1] / train_list[i].shape[0]
-		train_square[i] = train_list[i].shape[1] * train_list[i].shape[0]
+	Parameters:
+	te_list - list of the training images
+	tr_list - list of the testing images
+	train - array of pre-extracted features for the training set
+	test - array of pre-extracted features for the testing set
 
-	for i in range(len(test_mod_list)):
-		test_width[i] = test_list[i].shape[1]
-		test_height[i] = test_list[i].shape[0]
-		test_asp_ratio[i] = test_list[i].shape[1] / test_list[i].shape[0]
-		test_square[i] = test_list[i].shape[1] * test_list[i].shape[0]
+	Return:
+	test_mod - array of pre-extracted features for the training set with engineered features
+	train_mod - array of pre-extracted features for the test set with engineered features
+	'''
+	# Initialize each array
+	tr_width = np.zeros((len(tr_list), 1)) 
+	tr_height = np.zeros((len(tr_list), 1))
+	tr_asp_ratio = np.zeros((len(tr_list), 1))
+	tr_square = np.zeros((len(tr_list), 1))
+	te_width = np.zeros((len(te_list), 1))
+	te_height = np.zeros((len(te_list), 1))
+	te_asp_ratio = np.zeros((len(te_list), 1))
+	te_square = np.zeros((len(te_list), 1))
 
-	return
+	# Calculate the features of the training images
+	for i in range(len(tr_list)):
+		tr_width[i] = tr_list[i].shape[1]
+		tr_height[i] = tr_list[i].shape[0]
+		tr_asp_ratio[i] = tr_list[i].shape[1] / tr_list[i].shape[0]
+		tr_square[i] = tr_list[i].shape[1] * tr_list[i].shape[0]
+
+	# Calculate the features of the test images
+	for i in range(len(te_list)):
+		te_width[i] = te_list[i].shape[1]
+		te_height[i] = te_list[i].shape[0]
+		te_asp_ratio[i] = te_list[i].shape[1] / te_list[i].shape[0]
+		te_square[i] = te_list[i].shape[1] * te_list[i].shape[0]
+
+	# Attach these features to the pre-extracted ones
+	train_mod = np.concatenate((train, tr_width, tr_height, tr_asp_ratio, tr_square), axis = 1)
+	test_mod = np.concatenate((test, te_width, te_height, te_asp_ratio, te_square), axis = 1)
+
+	return train_mod, test_mod
 
 def apply_PCA():
 
@@ -300,7 +281,7 @@ def combined_generator(imgen, X):
             # This is where that change to the source code we
             # made will come in handy. We can now access the indicies
             # of the images that imgen gave us.
-            x = X[imgen.index_array]
+            x = X[i]
             yield [batch_img, x], batch_y
 
 def augment_fit(mod, f1, t_list, x, y):
@@ -320,7 +301,10 @@ def augment_fit(mod, f1, t_list, x, y):
 
 	print 'Using the augmented data fit_generator.'
 
-	# Since fit_generator does not support validation_split we must create our own validation data first (10% of data)
+	'''
+	Since fit_generator does not support validation_split we must create our 
+	own validation data first (10% of data)
+	'''
 	t_val = t_list[global_num_train - 99: global_num_train]
 	x_val = x[global_num_train - 99: global_num_train]
 	y_val = y[global_num_train - 99: global_num_train]
@@ -346,8 +330,8 @@ def augment_fit(mod, f1, t_list, x, y):
 
 	spe = int(len(t_train) / args.global_batch_size)
 	# fit_generator fits the model on batches with real-time data augmentation
-	history = mod.fit_generator(combined_generator(x_batch, x_train), steps_per_epoch = spe, epochs = args.global_max_epochs,
-		verbose = 0, validation_data = ([t_val, x_val], y_val),
+	history = mod.fit_generator(combined_generator(x_batch, x_train), steps_per_epoch = spe,
+		epochs = args.global_max_epochs, verbose = 0, validation_data = ([t_val, x_val], y_val),
 		callbacks = [early_stopper, model_checkpoint])
 	
 	return history
@@ -366,11 +350,12 @@ def nn_fit(mod, f1, x, y):
 	'''
 
 	print 'Using the neural network fit.'
-	early_stopper= EarlyStopping(monitor = 'val_loss', patience = 280, verbose = 1, mode = 'auto')
+	early_stopper= EarlyStopping(monitor = 'val_loss', patience = 300, verbose = 1, mode = 'auto')
 	model_checkpoint = ModelCheckpoint(f1, monitor = 'val_loss', verbose = 1, save_best_only = True)
 
 	history = mod.fit(x, y, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
-		verbose = 0, validation_split = 0.15, shuffle = True, callbacks = [early_stopper, model_checkpoint])	
+		verbose = 0, validation_split = 0.1, shuffle = True, 
+		callbacks = [early_stopper, model_checkpoint])	
 
 	return history
 
@@ -389,11 +374,11 @@ def combined_fit(mod, f1, t_list, x, y):
 	'''
 
 	print 'Using the combined network fit.'
-	early_stopper= EarlyStopping(monitor = 'val_loss', patience = 280, verbose = 1, mode = 'auto')
+	early_stopper= EarlyStopping(monitor = 'val_loss', patience = 300, verbose = 1, mode = 'auto')
 	model_checkpoint = ModelCheckpoint(model_file, monitor = 'val_loss', verbose = 1, save_best_only = True)
 
 	history = mod.fit(([t_list, x]), y, epochs = args.global_max_epochs,
-		batch_size = args.global_batch_size, verbose = 0, validation_split = 0.15, shuffle = True,
+		batch_size = args.global_batch_size, verbose = 0, validation_split = 0.1, shuffle = True,
 		callbacks = [early_stopper, model_checkpoint])	
 
 	return history	
@@ -425,14 +410,17 @@ test = pd.read_csv('data_provided/test.csv')
 # Extract the id of each leaf
 test_ids = test.pop('id')
 
-# fit_transform() calculates the mean and std and also centers and scales data
-x_train = StandardScaler().fit_transform(train)
-x_test = StandardScaler().fit_transform(test)
-
 # Load up all of the images
 print 'Loading images...'
 img_list, train_list, test_list = grab_images(train_ids, test_ids)
 print 'Finished.'
+
+# Grab more features to train on
+train, test = engineered_features(train, test, train_list, test_list)
+
+# fit_transform() calculates the mean and std and also centers and scales data
+x_train = StandardScaler().fit_transform(train)
+x_test = StandardScaler().fit_transform(test)
 	
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = reshape_img(train_list, global_max_dim)
@@ -445,6 +433,9 @@ if args.leaf_stats:
 	visualize.visualize_leaves(train_mod_list, y, classes, show1 = True, show2 = True)
 	print 'Finished.'
 
+# Set up our input layer size
+global_input_layer = x_train.shape[1]
+
 # Setting up the Keras neural network
 # Choose a model
 # model = create_model_softmax()
@@ -454,7 +445,7 @@ model = create_model_combined()
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
 model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-#plot_model(model, to_file = 'modelCombined.png', show_shapes = True)
+# plot_model(model, to_file = 'modelCombined.png', show_shapes = True)
 
 '''
 Choose a fit for our model
@@ -462,7 +453,8 @@ Early stopping helps prevent over fitting by stopping our fitting function
 if our val_loss doesn't decrease after a certain number of epochs (called patience)
 Model checkpoint saves the best weights obtained during training
 '''
-model_file = 'bestWeights6.hdf5'
+
+model_file = 'bestWeights3.hdf5'
 # history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
 # history = nn_fit(model, model_file, x_train, y_train)
 history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
@@ -470,7 +462,8 @@ history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 # Check Keras' statistics
 if args.disp_stats:
 	print 'Displaying stats...'
-	visualize.plt_perf(history, filename1, filename2, p_loss = True, p_acc = True, val = True, save = args.save_stats)
+	visualize.plt_perf(history, filename1, filename2, p_loss = True, p_acc = True, val = True,
+		save = args.save_stats)
 	print 'Finished.'
 
 # Reload our best weights
@@ -531,7 +524,7 @@ y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
 
 # Save predictions to a csv file to submit
 if args.save_prob:
-	print 'Saving to file...'
+	print 'Saving to file', filename3, '...'
 	fp = open(filename3,'w')
 	fp.write(y_pred.to_csv())
 

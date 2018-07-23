@@ -17,7 +17,7 @@ global_num_train = 990
 global_num_test = 594
 global_total_img = global_num_train + global_num_test
 NUM_LEAVES = 3
-global_max_dim = 100
+global_max_dim = 50
 model_fn = 'bestWeights.hdf5'
 
 ####### Definitions #######
@@ -110,6 +110,50 @@ def get_dim(num):
     else:
         return (int(s)+1, int(s)+1)
 
+def engineered_features(train, test, tr_list, te_list):
+	'''
+	Create more features that can be obtained from characteristics of the images
+
+	Parameters:
+	te_list - list of the training images
+	tr_list - list of the testing images
+	train - array of pre-extracted features for the training set
+	test - array of pre-extracted features for the testing set
+
+	Return:
+	test_mod - array of pre-extracted features for the training set with engineered features
+	train_mod - array of pre-extracted features for the test set with engineered features
+	'''
+	# Initialize each array
+	tr_width = np.zeros((len(tr_list), 1)) 
+	tr_height = np.zeros((len(tr_list), 1))
+	tr_asp_ratio = np.zeros((len(tr_list), 1))
+	tr_square = np.zeros((len(tr_list), 1))
+	te_width = np.zeros((len(te_list), 1))
+	te_height = np.zeros((len(te_list), 1))
+	te_asp_ratio = np.zeros((len(te_list), 1))
+	te_square = np.zeros((len(te_list), 1))
+
+	# Calculate the features of the training images
+	for i in range(len(tr_list)):
+		tr_width[i] = tr_list[i].shape[1]
+		tr_height[i] = tr_list[i].shape[0]
+		tr_asp_ratio[i] = tr_list[i].shape[1] / tr_list[i].shape[0]
+		tr_square[i] = tr_list[i].shape[1] * tr_list[i].shape[0]
+
+	# Calculate the features of the test images
+	for i in range(len(te_list)):
+		te_width[i] = te_list[i].shape[1]
+		te_height[i] = te_list[i].shape[0]
+		te_asp_ratio[i] = te_list[i].shape[1] / te_list[i].shape[0]
+		te_square[i] = te_list[i].shape[1] * te_list[i].shape[0]
+
+	# Attach these features to the pre-extracted ones
+	train_mod = np.concatenate((train, tr_width, tr_height, tr_asp_ratio, tr_square), axis = 1)
+	test_mod = np.concatenate((test, te_width, te_height, te_asp_ratio, te_square), axis = 1)
+
+	return train_mod, test_mod
+
 # Load the best model
 model = load_model(model_fn)
 
@@ -148,8 +192,14 @@ print 'Finished.'
 train_mod_list = reshape_img(train_list, global_max_dim)
 test_mod_list = reshape_img(test_list, global_max_dim)
 
+# Grab more features to train on
+train, test = engineered_features(train, test, train_list, test_list)
+
 x_train = StandardScaler().fit_transform(train)
 x_test = StandardScaler().fit_transform(test)
+
+# Set up our input layer size
+global_input_layer = x_train.shape[1]
 
 X_img_val = train_mod_list[global_num_train - 99: global_num_train]
 X_num_val = x_train[global_num_train - 99: global_num_train]
@@ -187,7 +237,7 @@ for img_count, img_to_visualize in enumerate(imgs_to_visualize):
 
     # Show the original image
     plt.title("Image used: #%d (digit=%d)" % (img_to_visualize, y_val[img_to_visualize]))
-    imshow(X_img_val[img_to_visualize][:, :, 0], cmap='gray')
+    imshow(X_img_val[img_to_visualize][:, :, 0], cmap='gray', interpolation = 'none')
     plt.tight_layout()
     plt.show()
 

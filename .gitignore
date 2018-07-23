@@ -14,4 +14,7 @@ StanfordConvolutionalNeuralNetwork/outputs/convPoolTestFeaturesSize10000StepSize
 
 StanfordConvolutionalNeuralNetwork/outputs/convPoolTrainFeaturesSize60000StepSize50V3.out
 
+LeafClassification/VAE/vae_mlp_leaves_weights.h5
+
+LeafClassification/VAE/vae_mlp_leaves_weights_nn_dim100.h5
 

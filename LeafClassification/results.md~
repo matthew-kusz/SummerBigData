@@ -362,3 +362,223 @@ momentum = 0.9
 decay = 1e-6
 
 kaggle score = 0.03293
+
+------------------
+
+Set patience to 300
+
+Image dim (50, 50)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (25, 25)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 5
+
+epochs = 967
+
+batch = 30
+
+val_loss = 0.0056
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.03521
+
+------------------
+
+Set patience to 50
+
+Image dim (100, 100)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (10, 10)
+
+Conv2d = 8 (5, 5)
+
+MaxPool = (5, 5)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 7
+
+epochs = 163
+
+batch = 30
+
+val_loss = 0.00514
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.04349
+
+------------------
+
+Set patience to 50
+
+Image dim (50, 50)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (10, 10)
+
+Conv2d = 8 (5, 5)
+
+MaxPool = (5, 5)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 7
+
+epochs = 194
+
+batch = 30
+
+val_loss = 0.00254
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.03472
+
+------------------
+
+With added features
+
+Set patience to 50
+
+Image dim (50, 50)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (10, 10)
+
+Conv2d = 8 (5, 5)
+
+MaxPool = (5, 5)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 7
+
+epochs = 247
+
+batch = 30
+
+val_loss = 0.00212
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.03198
+
+------------------
+
+With added features
+
+Set patience to 300
+
+Image dim (50, 50)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (10, 10)
+
+Conv2d = 8 (5, 5)
+
+MaxPool = (5, 5)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 7
+
+epochs = 665
+
+batch = 30
+
+val_loss = 0.00064
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.02392
+
+------------------
+
+With added features
+
+Set patience to 300
+
+Image dim (50, 50)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (10, 10)
+
+Conv2d = 8 (5, 5)
+
+MaxPool = (5, 5)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 7
+
+epochs = 204
+
+batch = 25
+
+val_loss = 0.00127
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.01763 (Best)
+
+model_file = 'bestWeights.hdf5'
