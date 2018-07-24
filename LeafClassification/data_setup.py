@@ -6,8 +6,8 @@ from keras.utils import np_utils			 # Used to set up one-hot scheme
 from scipy.misc import imresize                  	 # For resizing the images
 from sklearn.decomposition import PCA           	 # Preprocessing
 from sklearn.preprocessing import LabelEncoder  	 # Preprocessing
-####### Definitions #######
 
+####### Definitions #######
 def grab_images(tr_ids, te_ids, tot_img):
 	'''
 	Reads in image files to save to a list, then separates the pictures between training and testing ids
