@@ -9,32 +9,22 @@ latent vector from a Gaussian distribution with mean=0 and std=1.
 "Auto-encoding variational bayes."
 https://arxiv.org/abs/1312.6114
 '''
-
-#from __future__ import absolute_import
-#from __future__ import division
-#from __future__ import print_function
-
 from keras.layers import Lambda, Input, Dense, UpSampling2D, Conv2D, Dropout, MaxPool2D, Flatten
 from keras.callbacks import ModelCheckpoint
 from keras.models import Model
-from keras.datasets import mnist
 from keras.losses import mse, binary_crossentropy
-from keras.utils import plot_model, np_utils
+from keras.utils import plot_model
 from keras import backend as K
-from sklearn.preprocessing import LabelEncoder   # Preprocessing
 from sklearn.preprocessing import StandardScaler # Preprocessing
-from scipy.misc import imresize
 
+import data_setup
 import pandas as pd  
 import numpy as np
 import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg           	 # Reading images to numpy arrays
 import argparse
-import os
-import errno
 
 ####### Global variables #######
 parser = argparse.ArgumentParser()
@@ -49,8 +39,7 @@ args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
-global_total_img = global_num_train + global_num_test
-global_max_dim = 100
+global_max_dim = 250
 
 ####### Definitions #######
 # reparameterization trick
@@ -128,15 +117,15 @@ def plot_results(models,
 
 	filename = 'VAE/vae_leaves/vae_mean_zoomed.png'
 	plt.figure(figsize=(12, 10))
-   	black_marker = mpatches.Circle(4, radius = 100, color = 'yellow', label = classes[species])
+   	black_marker = mpatches.Circle(8, radius = 100, color = 'yellow', label = classes[species])
 	plt.legend(handles=[black_marker], loc = 'best')
     	plt.scatter(z_mean[:, 0], z_mean[:, 1], c = y_test, cmap=custom_cmap)
 	plt.clim(0,98)
     	plt.colorbar()
    	plt.xlabel("z[0]")
     	plt.ylabel("z[1]")
-	plt.xlim(-2, 2)
-	plt.ylim(-2, 2)
+	plt.xlim(0, -5)
+	plt.ylim(0, 7)
     	plt.savefig(filename)
     	# plt.show()
 
@@ -147,8 +136,8 @@ def plot_results(models,
     	figure = np.zeros((leaf_size * n, leaf_size * n))
     	# linearly spaced coordinates corresponding to the 2D plot
     	# of leaf classes in the latent space
-    	grid_x = np.linspace(-2, 2, n)
-    	grid_y = np.linspace(-2, 2, n)[::-1]
+    	grid_x = np.linspace(0, -5, n)
+    	grid_y = np.linspace(0, 7, n)[::-1]
 
     	for i, yi in enumerate(grid_y):
         	for j, xi in enumerate(grid_x):
@@ -172,97 +161,17 @@ def plot_results(models,
     	plt.savefig(filename)
     	plt.show()
 
-# Set up all of the images in a matrix
-def grab_images(tr_ids, te_ids):
-	# Full set
-	matrix = np.zeros((2, global_total_img))
-	images_list = []
-	for i in range(global_total_img):
-		img = mpimg.imread('data_provided/unzip_images/images/' + str(i + 1) + '.jpg')
-		matrix[:,i] = np.shape(img)
-		images_list.append(img)
-
-	# We will want to learn features on the images that belong to our training set	
-	train_list = []
-	for i, img in enumerate(tr_ids):
-		train_list.append(images_list[img - 1])
-	
-	# We might want to look at some test images too	
-	test_list = []
-	for i, img in enumerate(te_ids):
-		test_list.append(images_list[img - 1])
-
-	return images_list, train_list, test_list
-
-def resize_img(img, max_dim):
-    	# Get the axis with the larger dimension
-    	max_ax = max((0, 1), key=lambda i: img.shape[i])
-    	# Scale both axes so the image's largest dimension is max_dim
-   	scale = max_dim / float(img.shape[max_ax])
-    	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale)))
-
-def reshape_img(images, max_dim, center = True):
-	
-	modified = np.zeros((len(images), max_dim, max_dim, 1))
-	for i in range(len(images)):
-		temp = resize_img(images[i], max_dim = max_dim)
-		x = imresize(images[i], (temp.shape[0], temp.shape[1]), 
-			interp = 'nearest').reshape(temp.shape[0], temp.shape[1], 1)
-
-		length = x.shape[0]
-		width = x.shape[1]
-		if center:
-			h1 = int((max_dim - length) / 2)
-           	 	h2 = h1 + length
-           		w1 = int((max_dim - width) / 2)
-          		w2 = w1 + width
-       		else:
-           		h1, w1 = 0, 0
-          		h2, w2 = (length, width)
-	
-		modified[i, h1:h2, w1:w2, 0:1] = x
-
-	return  np.around(modified / 255.0)
-
 ######## Code ########
-# We need to extract the data given
-# Set up our training data
-train = pd.read_csv('data_provided/train.csv')
-
-# Extract the species of each leaf
-y_raw = train.pop('species')
-
-# Label each species from 0 - n-1
-le = LabelEncoder()
-# fit() calculates the mean and std, transform() centers and scales data
-y = le.fit(y_raw).transform(y_raw)
-			
-# Grab the classes (will be used to set up our submition file)
-classes = le.classes_
-# Setting up one-hot scheme
-y_train = np_utils.to_categorical(y)
-
-# Extract the id of each leaf
-train_ids = train.pop('id')
-
-# Set up our testing data
-test = pd.read_csv('data_provided/test.csv')
-
-# Extract the id of each leaf
-test_ids = test.pop('id')
-
-# Load up all of the images
-print ('Loading images...')
-img_list, train_list, test_list = grab_images(train_ids, test_ids)
-print ('Finished.')
+# Set up the data given to us
+train_list, test_list, train_ids, test_ids, train, test, y, y_train, classes = data_setup.data()
 
 # fit_transform() calculates the mean and std and also centers and scales data
 x_train = StandardScaler().fit_transform(train)
 x_test = StandardScaler().fit_transform(test)
 
 # We need to reshape our images so they are all the same dimensions
-train_mod_list = reshape_img(train_list, global_max_dim)
-test_mod_list = reshape_img(test_list, global_max_dim)
+train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
+test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
 # Grab the dimensions we are using for our images
 image_size = global_max_dim
@@ -352,7 +261,7 @@ vae.compile(optimizer='adam', loss = None)
 vae.summary()
 plot_model(vae, to_file='VAE/vae_mlp.png', show_shapes=True)
 
-model_file = 'VAE/vae_mlp_leaves_weights_nn_dim100.h5'
+model_file = 'VAE/vae_mlp_leaves_weights_nn_dim250.h5'
 if args.load_model:
 	# load weights from a previous run
 	print 'Loading weights...'

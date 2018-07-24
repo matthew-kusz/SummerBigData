@@ -620,3 +620,41 @@ momentum = 0.9
 decay = 1e-6
 
 kaggle score = 0.02102
+
+------------------
+
+With added features
+
+Set patience to 300
+
+Image dim (100, 100)
+
+Conv2d = 32 (5, 5)
+
+MaxPool = (10, 10)
+
+Conv2d = 8 (5, 5)
+
+MaxPool = (5, 5)
+
+hl = 192
+
+hl1 = 400
+
+hl2 = 280
+
+hl3 = 140
+
+dropouts = 7
+
+epochs = 175
+
+batch = 25
+
+val_loss = 0.0013
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.02656

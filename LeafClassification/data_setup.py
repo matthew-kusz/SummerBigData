@@ -2,10 +2,13 @@
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import pandas as pd                         	 	 # For reading in and writing files
 import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
+import cv2
 from keras.utils import np_utils			 # Used to set up one-hot scheme
 from scipy.misc import imresize                  	 # For resizing the images
 from sklearn.decomposition import PCA           	 # Preprocessing
 from sklearn.preprocessing import LabelEncoder  	 # Preprocessing
+
+import matplotlib.pyplot as plt
 
 ####### Definitions #######
 def grab_images(tr_ids, te_ids, tot_img):
@@ -119,10 +122,12 @@ def engineered_features(train, test, tr_list, te_list):
 	tr_height = np.zeros((len(tr_list), 1))
 	tr_asp_ratio = np.zeros((len(tr_list), 1))
 	tr_square = np.zeros((len(tr_list), 1))
+	tr_mean = np.zeros((len(tr_list), 1))
 	te_width = np.zeros((len(te_list), 1))
 	te_height = np.zeros((len(te_list), 1))
 	te_asp_ratio = np.zeros((len(te_list), 1))
 	te_square = np.zeros((len(te_list), 1))
+	te_mean = np.zeros((len(te_list), 1))
 
 	# Calculate the features of the training images
 	for i in range(len(tr_list)):
@@ -130,6 +135,7 @@ def engineered_features(train, test, tr_list, te_list):
 		tr_height[i] = tr_list[i].shape[0]
 		tr_asp_ratio[i] = tr_list[i].shape[1] / tr_list[i].shape[0]
 		tr_square[i] = tr_list[i].shape[1] * tr_list[i].shape[0]
+		tr_mean[i] = np.mean(tr_list[i])
 
 	# Calculate the features of the test images
 	for i in range(len(te_list)):
@@ -137,21 +143,47 @@ def engineered_features(train, test, tr_list, te_list):
 		te_height[i] = te_list[i].shape[0]
 		te_asp_ratio[i] = te_list[i].shape[1] / te_list[i].shape[0]
 		te_square[i] = te_list[i].shape[1] * te_list[i].shape[0]
+		te_mean[i] = np.mean(te_list[i])
 
 	# Attach these features to the pre-extracted ones
-	train_mod = np.concatenate((train, tr_width, tr_height, tr_asp_ratio, tr_square), axis = 1)
-	test_mod = np.concatenate((test, te_width, te_height, te_asp_ratio, te_square), axis = 1)
+	train_mod = np.concatenate((train, tr_width, tr_height, tr_asp_ratio, tr_square, tr_mean), axis = 1)
+	test_mod = np.concatenate((test, te_width, te_height, te_asp_ratio, te_square, te_mean), axis = 1)
 
 	return train_mod, test_mod
 
-def apply_PCA():
+def more_features(train, test, tr_arr, te_arr):
+	print tr_arr[0].max()
+	ret, thresh = cv2.threshold(tr_arr[0], 127, 255, 0)
+	contours = cv2.findContours(thresh, 1, 2)
+	print thresh[0]
+	plt.imshow(thresh, cmap = 'binary', interpolation = 'none')
+	plt.show()
+	
+	cnt = contours[0]
+	M = cv2.moments(cnt)
+	print M
+	train_moments = np.zeros((len(tr_arr), 1))
+	for i in range(len(tr_arr)):
+		stop
+	return
 
+def apply_PCA(tr_mod_list, te_mod_list, max_dim):
+
+	tr_flat = np.zeros((len(tr_mod_list), 50 * 50))
+	for i in range(len(tr_mod_list)):
+		tr_flat[i] = tr_mod_list[i].ravel()
+
+	pca = PCA(n_components=50)
+	pca.fit(tr_flat)
+	print tr_flat[0].shape
+
+	'''
 	pca = PCA(0.80)
-	pca.fit(train_mod_list.reshape(len(train_mod_list), 50 * 50))
+	pca.fit(tr_mod_list.reshape(len(train_mod_list), max_dim * max_dim))
 	global_input_layer += pca.n_components_
 	print pca.n_components_
-	train_PCA = pca.transform(train_mod_list.reshape(len(train_mod_list), 50 * 50))
-	test_PCA = pca.transform(test_mod_list.reshape(len(test_mod_list), 50 * 50))
+	train_PCA = pca.transform(train_mod_list.reshape(len(train_mod_list), max_dim * max_dim))
+	test_PCA = pca.transform(test_mod_list.reshape(len(test_mod_list), max_dim * max_dim))
 
 	train = np.concatenate((train, train_PCA), axis = 1)
 	test = np.concatenate((test, test_PCA), axis = 1)
@@ -159,6 +191,8 @@ def apply_PCA():
 	train = np.concatenate((train, train_width, train_height, train_asp_ratio, train_square), axis = 1)
 	test = np.concatenate((test, test_width, test_height, test_asp_ratio, test_square), axis = 1)
 	global_input_layer += 4
+	'''
+	stop
 	return
 
 def data():

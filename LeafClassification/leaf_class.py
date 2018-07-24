@@ -80,11 +80,11 @@ def create_model_combined():
 	'''
 	# Obtaining features from the images
 	first_input = Input(shape=(global_max_dim, global_max_dim, 1))
-	x = Conv2D(filters = 32, kernel_size = (5, 5), activation ='relu', padding = 'Same')(first_input)
-	x = MaxPool2D(pool_size = (10, 10))(x)
+	x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', border_mode = 'Same')(first_input)
+	x = MaxPool2D(pool_size = (2, 2), strides = (2, 2))(x)
 	x = Dropout(0.2)(x)
-	x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same')(x)
-	x = MaxPool2D(pool_size = (5, 5))(x)
+	x = Conv2D(filters = 32, kernel_size = (5, 5), activation ='relu', border_mode = 'Same')(x)
+	x = MaxPool2D(pool_size = (2, 2), strides = (2, 2))(x)
 	x = Dropout(0.2)(x)
 	x = Flatten()(x)
 	x = Dense(192, activation = "relu")(x)
@@ -232,13 +232,17 @@ train_list, test_list, train_ids, test_ids, train, test, y, y_train, classes = d
 # Grab more features to train on
 train, test = data_setup.engineered_features(train, test, train_list, test_list)
 
-# fit_transform() calculates the mean and std and also centers and scales data
-x_train = StandardScaler().fit_transform(train)
-x_test = StandardScaler().fit_transform(test)
-	
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
+
+data_setup.apply_PCA(train_mod_list, test_mod_list, global_max_dim)
+
+#data_setup.more_features(train, test, train_list, test_list)
+
+# fit_transform() calculates the mean and std and also centers and scales data
+x_train = StandardScaler().fit_transform(train)
+x_test = StandardScaler().fit_transform(test)
 
 # Look at images and some stats of leaves
 if args.leaf_stats:
@@ -252,8 +256,8 @@ input_layer = x_train.shape[1]
 
 # Setting up the Keras neural network
 # Choose a model
-# model = create_model_softmax()
-model = create_model_combined()
+model = create_model_softmax()
+# model = create_model_combined()
 
 # Compile our model
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
@@ -268,10 +272,10 @@ if our val_loss doesn't decrease after a certain number of epochs (called patien
 Model checkpoint saves the best weights obtained during training
 '''
 
-model_file = 'bestWeights5.hdf5'
+model_file = 'bestWeights3.hdf5'
 # history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
-# history = nn_fit(model, model_file, x_train, y_train)
-history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
+history = nn_fit(model, model_file, x_train, y_train)
+# history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 
 # Check Keras' statistics
 if args.disp_stats:
@@ -284,7 +288,7 @@ if args.disp_stats:
 model.load_weights(model_file)
 
 # Test our model on the test set
-y_pred = model.predict([test_mod_list, x_test])
+y_pred = model.predict(x_test)
 print '\n'
 
 # FIXME ##################
