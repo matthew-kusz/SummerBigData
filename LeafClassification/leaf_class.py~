@@ -3,28 +3,26 @@
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import matplotlib                                	 # Imported for use of matplotlib.use('Agg') 
 #matplotlib.use('Agg')                            	 # Use if submitting job to the supercomputer
-import matplotlib.pyplot as plt                  	 # For plotting
 import pandas as pd                         	 	 # For reading in and writing files
-import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
 import scipy.ndimage as ndi            	   	 	 # Finding the center of the leaves
 import argparse                                  	 # For inputing values outside of the code
-from scipy.misc import imresize                  	 # For resizing the images
 import visualize                                 	 # Python code for visualizing images
+import data_setup                                        # Python code for seting up the data
 
 # sklearn
-from sklearn.preprocessing import LabelEncoder  	 # Preprocessing
-from sklearn.preprocessing import StandardScaler 	 # Preprocessing
 from sklearn.decomposition import PCA           	 # Preprocessing
+from sklearn.preprocessing import StandardScaler 	 # Preprocessing
 
 # Keras
 from keras.models import Sequential, Model      	 # Linearly sets up model, allows the use of keras' API
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D, Activation, concatenate, Input
-from keras.utils import np_utils, plot_model             # Used to set up one-hot scheme, visualizing model
+from keras.utils import plot_model            		 # Visualizing model
 from keras.callbacks import EarlyStopping 	         # Used to prevent overfitting
 from keras.callbacks import ModelCheckpoint              # Gives us the best weights obtained during fitting
 from keras.preprocessing.image import ImageDataGenerator, NumpyArrayIterator, array_to_img
  # Generate more images
 from keras.optimizers import SGD                         # Enable the modification of optimizer SGD
+
 
 ####### Global Variables #######
 parser = argparse.ArgumentParser()
@@ -43,8 +41,6 @@ args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
-global_total_img = global_num_train + global_num_test
-global_input_layer = 0    #TBD
 global_hidden_layers = [400, 280, 140]
 global_output_layer = 99
 global_num_classes = 99
@@ -58,40 +54,6 @@ filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch
 np.random.seed(1)
 
 ####### Definitions #######
-def grab_images(tr_ids, te_ids):
-	'''
-	Reads in image files to save to a list, then separates the pictures between training and testing ids
-
-	Parameters:
-	tr_ids - training image ids
-	te_ids - testing image ids
-
-	Returns:
-	images_list - full list of images
-	train_list - list only consisting of training images
-	test_list - list only consisting of testing images
-	'''	
-
-	# Full set
-	matrix = np.zeros((2, global_total_img))
-	images_list = []
-	for i in range(global_total_img):
-		img = mpimg.imread('data_provided/unzip_images/images/' + str(i + 1) + '.jpg')
-		matrix[:,i] = np.shape(img)
-		images_list.append(img)
-
-	# We will want to learn features on the images that belong to our training set	
-	train_list = []
-	for i, img in enumerate(tr_ids):
-		train_list.append(images_list[img - 1])
-	
-	# We might want to look at some test images too	
-	test_list = []
-	for i, img in enumerate(te_ids):
-		test_list.append(images_list[img - 1])
-
-	return images_list, train_list, test_list
-
 def create_model_softmax():
 	'''
 	This model uses only the pre-extracted features of the leaves to create a softmax regression model
@@ -100,7 +62,7 @@ def create_model_softmax():
 		
 	mod1 = Sequential()	
 	
-	mod1.add(Dense(global_hidden_layers[0], input_dim = global_input_layer, activation = 'relu'))
+	mod1.add(Dense(global_hidden_layers[0], input_dim = input_layer, activation = 'relu'))
 	mod1.add(Dropout(0.3))
 	
 	# For loop allows for easier adding and removing of hidden layers adjusting their sizes
@@ -130,7 +92,7 @@ def create_model_combined():
 	x = Dense(192, activation = "relu")(x)
 	final_first_input_layer = Dropout(0.2)(x)
 
-	second_input = Input(shape=(global_input_layer, ))
+	second_input = Input(shape=(input_layer, ))
 
 	# Merging features from images with pre-extracted features
 	merge_one = concatenate([final_first_input_layer, second_input])
@@ -149,124 +111,6 @@ def create_model_combined():
 
 	return model
 
-def resize_img(img, max_dim):
-	'''
-	Resize the image so the maximum side is of size max_dim
-	
-	Parameters:
-	img - image being resized
-	max_dim - maximum dimension of image that was requested
-
-	Returns a new image of the right size
-	'''
-
-    	# Get the axis with the larger dimension
-    	max_ax = max((0, 1), key=lambda i: img.shape[i])
-
-    	# Scale both axes so the image's largest dimension is max_dim
-   	scale = max_dim / float(img.shape[max_ax])
-
-    	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale)))
-
-def reshape_img(images, max_dim, center = True):
-	'''
-	Reshapes images to the requested dimensions
-
-	Parameters:
-	images - list of the images that are being resized
-	max_dim - maximum dimension of images that was requested
-	center - whether or not the picture will be placed in the center when modified
-
-	Returns a list of the modified images
-	'''
-
-	# Initialize the array that will hold the modified images
-	modified = np.zeros((len(images), max_dim, max_dim, 1))
-
-	# Reshape each image to the requested dimensions
-	for i in range(len(images)):
-		temp = resize_img(images[i], max_dim = max_dim)
-		x = imresize(images[i], (temp.shape[0], temp.shape[1]), interp = 'nearest').reshape(temp.shape[0], 
-			temp.shape[1], 1)
-
-		length = x.shape[0]
-		width = x.shape[1]
-
-		# Place in center of True
-		if center:
-			h1 = int((max_dim - length) / 2)
-           	 	h2 = h1 + length
-           		w1 = int((max_dim - width) / 2)
-          		w2 = w1 + width
-       		else:
-           		h1, w1 = 0, 0
-          		h2, w2 = (length, width)
-	
-		modified[i, h1:h2, w1:w2, 0:1] = x
-
-	return  np.around(modified / 255.0)
-
-def engineered_features(train, test, tr_list, te_list):
-	'''
-	Create more features that can be obtained from characteristics of the images
-
-	Parameters:
-	te_list - list of the training images
-	tr_list - list of the testing images
-	train - array of pre-extracted features for the training set
-	test - array of pre-extracted features for the testing set
-
-	Return:
-	test_mod - array of pre-extracted features for the training set with engineered features
-	train_mod - array of pre-extracted features for the test set with engineered features
-	'''
-	# Initialize each array
-	tr_width = np.zeros((len(tr_list), 1)) 
-	tr_height = np.zeros((len(tr_list), 1))
-	tr_asp_ratio = np.zeros((len(tr_list), 1))
-	tr_square = np.zeros((len(tr_list), 1))
-	te_width = np.zeros((len(te_list), 1))
-	te_height = np.zeros((len(te_list), 1))
-	te_asp_ratio = np.zeros((len(te_list), 1))
-	te_square = np.zeros((len(te_list), 1))
-
-	# Calculate the features of the training images
-	for i in range(len(tr_list)):
-		tr_width[i] = tr_list[i].shape[1]
-		tr_height[i] = tr_list[i].shape[0]
-		tr_asp_ratio[i] = tr_list[i].shape[1] / tr_list[i].shape[0]
-		tr_square[i] = tr_list[i].shape[1] * tr_list[i].shape[0]
-
-	# Calculate the features of the test images
-	for i in range(len(te_list)):
-		te_width[i] = te_list[i].shape[1]
-		te_height[i] = te_list[i].shape[0]
-		te_asp_ratio[i] = te_list[i].shape[1] / te_list[i].shape[0]
-		te_square[i] = te_list[i].shape[1] * te_list[i].shape[0]
-
-	# Attach these features to the pre-extracted ones
-	train_mod = np.concatenate((train, tr_width, tr_height, tr_asp_ratio, tr_square), axis = 1)
-	test_mod = np.concatenate((test, te_width, te_height, te_asp_ratio, te_square), axis = 1)
-
-	return train_mod, test_mod
-
-def apply_PCA():
-
-	pca = PCA(0.80)
-	pca.fit(train_mod_list.reshape(len(train_mod_list), 50 * 50))
-	global_input_layer += pca.n_components_
-	print pca.n_components_
-	train_PCA = pca.transform(train_mod_list.reshape(len(train_mod_list), 50 * 50))
-	test_PCA = pca.transform(test_mod_list.reshape(len(test_mod_list), 50 * 50))
-
-	train = np.concatenate((train, train_PCA), axis = 1)
-	test = np.concatenate((test, test_PCA), axis = 1)
-
-	train = np.concatenate((train, train_width, train_height, train_asp_ratio, train_square), axis = 1)
-	test = np.concatenate((test, test_width, test_height, test_asp_ratio, test_square), axis = 1)
-	global_input_layer += 4
-	return
-
 def combined_generator(imgen, X):
     '''
     A generator to train our keras neural network. It
@@ -281,7 +125,7 @@ def combined_generator(imgen, X):
             # This is where that change to the source code we
             # made will come in handy. We can now access the indicies
             # of the images that imgen gave us.
-            x = X[imgen.index_array]
+            x = X[i]
             yield [batch_img, x], batch_y
 
 def augment_fit(mod, f1, t_list, x, y):
@@ -323,14 +167,14 @@ def augment_fit(mod, f1, t_list, x, y):
    		fill_mode='nearest')
 
 	# Flow takes data & label arrays, generates batches of augmented data.
-	x_batch = datagen.flow(t_train, y_train, batch_size = args.global_batch_size)
+	x_batch = datagen.flow(t_train, y_train, batch_size = args.global_batch_size)	
 
 	early_stopper= EarlyStopping(monitor = 'val_loss', patience = 280, verbose = 1, mode = 'auto')
 	model_checkpoint = ModelCheckpoint(f1, monitor = 'val_loss', verbose = 1, save_best_only = True)
 
 	spe = int(len(t_train) / args.global_batch_size)
 	# fit_generator fits the model on batches with real-time data augmentation
-	history = mod.fit_generator((x_batch, x_train), steps_per_epoch = spe,
+	history = mod.fit_generator(combined_generator(x_batch, x_train), steps_per_epoch = spe,
 		epochs = args.global_max_epochs, verbose = 0, validation_data = ([t_val, x_val], y_val),
 		callbacks = [early_stopper, model_checkpoint])
 	
@@ -384,47 +228,19 @@ def combined_fit(mod, f1, t_list, x, y):
 	return history	
 
 ####### Code #######
-# We need to extract the data given
-# Set up our training data
-train = pd.read_csv('data_provided/train.csv')
-
-# Extract the species of each leaf
-y_raw = train.pop('species')
-
-# Label each species from 0 - n-1
-le = LabelEncoder()
-# fit() calculates the mean and std, transform() centers and scales data
-y = le.fit(y_raw).transform(y_raw)
-			
-# Grab the classes (will be used to set up our submission file)
-classes = le.classes_
-# Setting up one-hot scheme
-y_train = np_utils.to_categorical(y)
-
-# Extract the id of each leaf
-train_ids = train.pop('id')
-
-# Set up our testing data
-test = pd.read_csv('data_provided/test.csv')
-
-# Extract the id of each leaf
-test_ids = test.pop('id')
-
-# Load up all of the images
-print 'Loading images...'
-img_list, train_list, test_list = grab_images(train_ids, test_ids)
-print 'Finished.'
+# Set up the data given to us
+train_list, test_list, train_ids, test_ids, train, test, y, y_train, classes = data_setup.data()
 
 # Grab more features to train on
-train, test = engineered_features(train, test, train_list, test_list)
+train, test = data_setup.engineered_features(train, test, train_list, test_list)
 
 # fit_transform() calculates the mean and std and also centers and scales data
 x_train = StandardScaler().fit_transform(train)
 x_test = StandardScaler().fit_transform(test)
 	
 # We need to reshape our images so they are all the same dimensions
-train_mod_list = reshape_img(train_list, global_max_dim)
-test_mod_list = reshape_img(test_list, global_max_dim)
+train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
+test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
 # Look at images and some stats of leaves
 if args.leaf_stats:
@@ -434,7 +250,7 @@ if args.leaf_stats:
 	print 'Finished.'
 
 # Set up our input layer size
-global_input_layer = x_train.shape[1]
+input_layer = x_train.shape[1]
 
 # Setting up the Keras neural network
 # Choose a model
@@ -454,10 +270,10 @@ if our val_loss doesn't decrease after a certain number of epochs (called patien
 Model checkpoint saves the best weights obtained during training
 '''
 
-model_file = 'bestWeights3.hdf5'
-history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
+model_file = 'bestWeights5.hdf5'
+# history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
 # history = nn_fit(model, model_file, x_train, y_train)
-# history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
+history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 
 # Check Keras' statistics
 if args.disp_stats:
