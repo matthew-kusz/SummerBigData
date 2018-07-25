@@ -191,10 +191,9 @@ def more_features(train, test, tr_arr, te_arr):
     		cv2.line(tr_arr[0],start,end,[0,255,0],2)
     		cv2.circle(tr_arr[0],far,5,[0,0,255],-1)
 
-	cv2.imshow('img',tr_arr[0])
-
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+	plt.imshow(tr_arr[0], cmap = 'gray', interpolation = 'bicubic')
+   	plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+    	plt.show()
 
 	train_moments = np.zeros((len(tr_arr), 1))
 	for i in range(len(tr_arr)):

@@ -47,7 +47,7 @@ global_max_dim = 50
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.csv'
-model_file = 'bestWeights2.hdf5'
+model_file = 'bestWeights3.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
 np.random.seed(1)
@@ -88,7 +88,7 @@ def create_model_combined():
 	x = MaxPool2D(pool_size = (5, 5), strides = (2, 2))(x)
 	x = Dropout(0.2)(x)
 	x = Flatten()(x)
-	x = Dense(192, activation = "relu")(x)
+	x = Dense(320, activation = "relu")(x)
 	final_first_input_layer = Dropout(0.2)(x)
 
 	second_input = Input(shape=(input_layer, ))
@@ -239,7 +239,7 @@ test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim)
 
-# data_setup.more_features(train, test, train_list, test_list)
+data_setup.more_features(train, test, train_list, test_list)
 
 # fit_transform() calculates the mean and std and also centers and scales data
 x_train = StandardScaler().fit_transform(train)
@@ -264,7 +264,7 @@ model = create_model_combined()
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
 model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-# plot_model(model, to_file = 'modelCombined.png', show_shapes = True)
+# plot_model(model, to_file = 'modelCombinedPCA.png', show_shapes = True)
 
 '''
 Choose a fit for our model

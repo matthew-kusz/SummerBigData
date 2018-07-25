@@ -1,4 +1,4 @@
-#PBS -N CNNRework
+#PBS -N CNNPCA
 #PBS -l walltime=05:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u leaf_class.py 0 0 1 0 1005 25 >& CNNRework.log
+python -u leaf_class.py 1 1 1 0 1003 20 >& CNNPCA2.log
