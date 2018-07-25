@@ -1,4 +1,4 @@
-#PBS -N VAE_dim250_nn_E400
+#PBS -N VAE_dim100_nn_E150
 #PBS -l walltime=05:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u VAE_modified.py 0 0 400 128 >& VAE_dim250_nn_E400.log
+python -u VAE_modified.py 0 0 150 128 >& VAE_dim100_nn_E150.log

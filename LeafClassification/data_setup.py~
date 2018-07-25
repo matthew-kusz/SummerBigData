@@ -173,13 +173,10 @@ def apply_PCA(tr_mod_list, te_mod_list, max_dim):
 	for i in range(len(tr_mod_list)):
 		tr_flat[i] = tr_mod_list[i].ravel()
 
-	pca = PCA(n_components=500)
+	pca = PCA(n_components=50)
 	pca.fit(tr_flat)
+	print tr_flat[0].shape
 
-	plt.plot(np.cumsum(pca.explained_variance_ratio_))
-	plt.xlabel('Number of components')
-	plt.ylabel('Cumulative explained variance')
-	plt.show()
 	'''
 	pca = PCA(0.80)
 	pca.fit(tr_mod_list.reshape(len(train_mod_list), max_dim * max_dim))

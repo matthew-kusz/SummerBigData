@@ -607,7 +607,7 @@ hl2 = 280
 
 hl3 = 140
 
-dropouts = 7
+dropouts = 6
 
 epochs = 622
 
@@ -645,7 +645,7 @@ hl2 = 280
 
 hl3 = 140
 
-dropouts = 7
+dropouts = 6
 
 epochs = 175
 

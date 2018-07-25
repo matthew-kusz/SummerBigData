@@ -39,7 +39,7 @@ args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
-global_max_dim = 100
+global_max_dim = 250
 
 ####### Definitions #######
 # reparameterization trick
@@ -261,7 +261,7 @@ vae.compile(optimizer='adam', loss = None)
 vae.summary()
 plot_model(vae, to_file='VAE/vae_mlp.png', show_shapes=True)
 
-model_file = 'VAE/vae_mlp_leaves_weights_nn_dim100.h5'
+model_file = 'VAE/vae_mlp_leaves_weights_nn_dim250.h5'
 if args.load_model:
 	# load weights from a previous run
 	print 'Loading weights...'

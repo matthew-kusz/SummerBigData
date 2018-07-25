@@ -236,7 +236,7 @@ train, test = data_setup.engineered_features(train, test, train_list, test_list)
 train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
-data_setup.applit_PCA(train_mod_list, test_mod_list, global_max_dim)
+data_setup.apply_PCA(train_mod_list, test_mod_list, global_max_dim)
 
 #data_setup.more_features(train, test, train_list, test_list)
 

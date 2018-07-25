@@ -117,17 +117,21 @@ def engineered_features(train, test, tr_list, te_list):
 	test_mod - 2D array of pre-extracted features for the training set with engineered features
 	train_mod - 2D array of pre-extracted features for the test set with engineered features
 	'''
+
+	print 'Grabbing more features...'
 	# Initialize each array
 	tr_width = np.zeros((len(tr_list), 1)) 
 	tr_height = np.zeros((len(tr_list), 1))
 	tr_asp_ratio = np.zeros((len(tr_list), 1))
 	tr_square = np.zeros((len(tr_list), 1))
 	tr_mean = np.zeros((len(tr_list), 1))
+	tr_horiz = np.zeros((len(tr_list), 1))
 	te_width = np.zeros((len(te_list), 1))
 	te_height = np.zeros((len(te_list), 1))
 	te_asp_ratio = np.zeros((len(te_list), 1))
 	te_square = np.zeros((len(te_list), 1))
 	te_mean = np.zeros((len(te_list), 1))
+	te_horiz = np.zeros((len(te_list), 1))
 
 	# Calculate the features of the training images
 	for i in range(len(tr_list)):
@@ -136,6 +140,10 @@ def engineered_features(train, test, tr_list, te_list):
 		tr_asp_ratio[i] = tr_list[i].shape[1] / tr_list[i].shape[0]
 		tr_square[i] = tr_list[i].shape[1] * tr_list[i].shape[0]
 		tr_mean[i] = np.mean(tr_list[i])
+		if (tr_width[i] < tr_height[i]):
+			tr_horiz[i] = 1
+		else:
+			tr_horiz[i] = 0
 
 	# Calculate the features of the test images
 	for i in range(len(te_list)):
@@ -144,56 +152,123 @@ def engineered_features(train, test, tr_list, te_list):
 		te_asp_ratio[i] = te_list[i].shape[1] / te_list[i].shape[0]
 		te_square[i] = te_list[i].shape[1] * te_list[i].shape[0]
 		te_mean[i] = np.mean(te_list[i])
+		if (te_width[i] < te_height[i]):
+			te_horiz[i] = 1
+		else:
+			te_horiz[i] = 0
 
 	# Attach these features to the pre-extracted ones
-	train_mod = np.concatenate((train, tr_width, tr_height, tr_asp_ratio, tr_square, tr_mean), axis = 1)
-	test_mod = np.concatenate((test, te_width, te_height, te_asp_ratio, te_square, te_mean), axis = 1)
+	train_mod = np.concatenate((train, tr_width, tr_height, tr_asp_ratio, tr_square, tr_mean, tr_horiz),
+		axis = 1)
+	test_mod = np.concatenate((test, te_width, te_height, te_asp_ratio, te_square, te_mean, te_horiz),
+		axis = 1)
 
+	print 'Finished.'
 	return train_mod, test_mod
 
 def more_features(train, test, tr_arr, te_arr):
+
 	print tr_arr[0].max()
-	ret, thresh = cv2.threshold(tr_arr[0], 127, 255, 0)
-	contours = cv2.findContours(thresh, 1, 2)
-	print thresh[0]
+	ret, thresh = cv2.threshold(tr_arr[0], 127, 255, 1)
+	_, contours, _ = cv2.findContours(thresh, 2, 1)
 	plt.imshow(thresh, cmap = 'binary', interpolation = 'none')
 	plt.show()
-	
+	print contours[0].max()
 	cnt = contours[0]
 	M = cv2.moments(cnt)
-	print M
+
+	hull = cv2.convexHull(cnt)
+	
+
+	hull = cv2.convexHull(cnt,returnPoints = False)
+	defects = cv2.convexityDefects(cnt,hull)
+
+	for i in range(defects.shape[0]):
+    		s,e,f,d = defects[i,0]
+    		start = tuple(cnt[s][0])
+    		end = tuple(cnt[e][0])
+    		far = tuple(cnt[f][0])
+    		cv2.line(tr_arr[0],start,end,[0,255,0],2)
+    		cv2.circle(tr_arr[0],far,5,[0,0,255],-1)
+
+	cv2.imshow('img',tr_arr[0])
+
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
+
 	train_moments = np.zeros((len(tr_arr), 1))
 	for i in range(len(tr_arr)):
 		stop
 	return
 
-def apply_PCA(tr_mod_list, te_mod_list, max_dim):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
+	'''
+	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 
-	tr_flat = np.zeros((len(tr_mod_list), 50 * 50))
+	Parameters:
+	te_mod_list - list of the resized training images
+	tr_mod_list - list of the resized testing images
+	train - 2D array of pre-extracted features for the training set
+	test - 2D array of pre-extracted features for the testing set
+
+	Return:
+	train - 2D array of pre-extracted features for the training set with the flattened PCA features
+	test - 2D array of pre-extracted features for the testing set with the flattened PCA features
+	'''
+
+	print 'Applying PCA...'
+
+	tr_flat = np.zeros((len(tr_mod_list), max_dim * max_dim))
 	for i in range(len(tr_mod_list)):
 		tr_flat[i] = tr_mod_list[i].ravel()
+	print tr_flat.shape
 
-	pca = PCA(n_components=50)
+	te_flat = np.zeros((len(te_mod_list), max_dim * max_dim))
+	for i in range(len(te_mod_list)):
+		te_flat[i] = te_mod_list[i].ravel()
+	
+	pca = PCA(n_components = 40)
 	pca.fit(tr_flat)
-	print tr_flat[0].shape
+	tr_flat_pca = pca.transform(tr_flat)
+	te_flat_pca = pca.transform(te_flat)
+	print tr_flat_pca.shape
 
+	'''	
+	print pca.explained_variance_ratio_
+	print np.sum(pca.explained_variance_ratio_)
+	approximation = pca.inverse_transform(tr_flat_pca)
+	
+	plt.figure(figsize=(8,4))
+
+	# Original Image
+	plt.subplot(1, 2, 1)
+	plt.imshow(tr_mod_list[0].reshape(50,50),
+              	cmap = plt.cm.gray, interpolation='nearest',
+              	clim=(0, 1))
+	ax = plt.gca()
+	ax.axes.set_xticklabels([])
+	ax.axes.get_yaxis().set_visible(False)
+	plt.xlabel('2500 components', fontsize = 14)
+	plt.title('Original Image', fontsize = 20)
+
+	# 154 principal components
+	plt.subplot(1, 2, 2)
+	plt.imshow(approximation[0].reshape(50, 50),
+              	cmap = plt.cm.gray, interpolation='nearest',
+              	clim=(0, 1))
+	ax = plt.gca()
+	ax.axes.set_xticklabels([])
+	ax.axes.get_yaxis().set_visible(False)
+	plt.xlabel('300 components', fontsize = 14)
+	plt.title('PCA Image', fontsize = 20)
+	plt.show()
 	'''
-	pca = PCA(0.80)
-	pca.fit(tr_mod_list.reshape(len(train_mod_list), max_dim * max_dim))
-	global_input_layer += pca.n_components_
-	print pca.n_components_
-	train_PCA = pca.transform(train_mod_list.reshape(len(train_mod_list), max_dim * max_dim))
-	test_PCA = pca.transform(test_mod_list.reshape(len(test_mod_list), max_dim * max_dim))
 
-	train = np.concatenate((train, train_PCA), axis = 1)
-	test = np.concatenate((test, test_PCA), axis = 1)
-
-	train = np.concatenate((train, train_width, train_height, train_asp_ratio, train_square), axis = 1)
-	test = np.concatenate((test, test_width, test_height, test_asp_ratio, test_square), axis = 1)
-	global_input_layer += 4
-	'''
+	train = np.concatenate((train, tr_flat_pca), axis = 1)
+	test = np.concatenate((test, te_flat_pca), axis = 1)
 	stop
-	return
+	print 'Finished.'
+	return train, test
 
 def data():
 	'''

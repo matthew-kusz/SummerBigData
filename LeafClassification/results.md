@@ -579,7 +579,7 @@ momentum = 0.9
 
 decay = 1e-6
 
-kaggle score = 0.01763 (Best)
+kaggle score = 0.01763
 
 model_file = 'bestWeights.hdf5'
 
@@ -658,3 +658,29 @@ momentum = 0.9
 decay = 1e-6
 
 kaggle score = 0.02656
+
+------------------
+
+With added features + PCA (N = 40)
+
+Set patience to 300
+
+hl1 = 1000
+
+hl2 = 1000
+
+hl3 = 1000
+
+dropouts = 4
+
+epochs = 336
+
+batch = 20
+
+val_loss = 0.00161
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.01419 (best)
