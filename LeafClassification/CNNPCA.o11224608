@@ -1,0 +1,18 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/LeafClassification
+discarding /usr/local/anaconda/anaconda2/bin from PATH
+prepending /users/PAS1383/osu10173/.conda/envs/local/bin to PATH
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=00:01:26
+walltime=00:01:34
+mem=0.851 GB
+vmem=1.983 GB
+-----------------------
+Resource units charged (estimate):
+0.010 RUs
+-----------------------

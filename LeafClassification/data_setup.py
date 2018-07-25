@@ -221,25 +221,30 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
 	tr_flat = np.zeros((len(tr_mod_list), max_dim * max_dim))
 	for i in range(len(tr_mod_list)):
 		tr_flat[i] = tr_mod_list[i].ravel()
-	print tr_flat.shape
 
 	te_flat = np.zeros((len(te_mod_list), max_dim * max_dim))
 	for i in range(len(te_mod_list)):
 		te_flat[i] = te_mod_list[i].ravel()
 	
-	pca = PCA(n_components = 40)
+	pca = PCA(n_components = 500)
 	pca.fit(tr_flat)
 	tr_flat_pca = pca.transform(tr_flat)
 	te_flat_pca = pca.transform(te_flat)
-	print tr_flat_pca.shape
 
-	'''	
+	'''
 	print pca.explained_variance_ratio_
 	print np.sum(pca.explained_variance_ratio_)
 	approximation = pca.inverse_transform(tr_flat_pca)
 	
-	plt.figure(figsize=(8,4))
+	# Relationship of information retained vs. number of prinicpal components
+	mark = [15, 40, 70, 300]
+	plt.plot(np.cumsum(pca.explained_variance_ratio_), marker='o', color='b', markevery = mark)
+	plt.title('Information Retained vs. Principal Components')
+	plt.ylabel('Fraction of Information Retained')
+	plt.xlabel('Number of Principal Components')
+	plt.show()
 
+	plt.figure(figsize=(8,4))
 	# Original Image
 	plt.subplot(1, 2, 1)
 	plt.imshow(tr_mod_list[0].reshape(50,50),
@@ -263,10 +268,10 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
 	plt.title('PCA Image', fontsize = 20)
 	plt.show()
 	'''
-
+	
 	train = np.concatenate((train, tr_flat_pca), axis = 1)
 	test = np.concatenate((test, te_flat_pca), axis = 1)
-	stop
+	
 	print 'Finished.'
 	return train, test
 
