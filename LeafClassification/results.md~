@@ -738,3 +738,37 @@ Using sklearn's logreg on pre-extracted features + added features
 {'warm_start': False, 'C': 900.0, 'n_jobs': 1, 'verbose': 1, 'intercept_scaling': 1, 'fit_intercept': True, 'max_iter': 500, 'penalty': 'l2', 'multi_class': 'multinomial', 'random_state': None, 'dual': False, 'tol': 0.001, 'solver': 'lbfgs', 'class_weight': None}
 
 kaggle score = 0.02605
+
+------------------
+
+Using sklearn's logreg on pre-extracted features + added features + PCA(N = 30)
+
+{'warm_start': False, 'C': 10000.0, 'n_jobs': 1, 'verbose': 1, 'intercept_scaling': 1, 'fit_intercept': True, 'max_iter': 500, 'penalty': 'l2', 'multi_class': 'multinomial', 'random_state': None, 'dual': False, 'tol': 0.00001, 'solver': 'lbfgs', 'class_weight': None}
+
+kaggle score = 0.01194
+
+------------------
+
+With added features + PCA (N = 30)
+
+Set patience to 300
+
+hl1 = 1000
+
+hl2 = 1000
+
+hl3 = 1000
+
+dropouts = 4
+
+epochs = 336
+
+batch = 20
+
+val_loss = 0.00161
+
+momentum = 0.9
+
+decay = 1e-6
+
+kaggle score = 0.01419

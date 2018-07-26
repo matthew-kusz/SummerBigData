@@ -2,7 +2,7 @@
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import data_setup
 import pandas as pd                         	 	 # For reading in and writing files
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.preprocessing import StandardScaler 	 # Preprocessing
 from sklearn.model_selection import GridSearchCV
 
@@ -33,19 +33,12 @@ train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, g
 x_train = StandardScaler().fit_transform(train)
 x_test = StandardScaler().fit_transform(test)
 
-'''
-#fit calculates the mean and std
-scale = StandardScaler().fit(train)
-# transform centers and scales the data
-x_train = scale.transform(train)
-x_test = scale.transform(test)
-'''
 # We will use the solver 'lbfgs'
 log_reg = LogisticRegression(solver = 'lbfgs', verbose = 1, max_iter = 500, multi_class = 'multinomial')
 
 # Find the best parameters for our model
-gsCV = GridSearchCV(log_reg, param_grid = {'C': [1000.0, 10000.0, 100000.0], 'tol': [0.001, 0.0001, 0.00001]}, scoring = 'neg_log_loss', refit = True, verbose = 1, n_jobs = -1, cv = 5)
-print log_reg.get_params()
+gsCV = GridSearchCV(log_reg, param_grid = {'C': [10000.0], 'tol': [0.00001]}, scoring = 'neg_log_loss', refit = True, verbose = 1, n_jobs = -1, cv = 5)
+
 # FIT IT
 gsCV.fit(x_train, y)
 
@@ -57,8 +50,6 @@ for params, mean_score, scores in gsCV.grid_scores_:
 # Predict for One Observation (image)
 y_pred = gsCV.predict_proba(x_test)
 
-print y_pred.shape
-
 # Set up the predictions into the correct format to submit to Kaggle
 y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
 
@@ -69,3 +60,4 @@ fp = open(filename,'w')
 fp.write(y_pred.to_csv())
 
 print 'Finished.'
+

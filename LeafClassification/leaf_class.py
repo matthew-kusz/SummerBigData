@@ -39,7 +39,7 @@ args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
-global_hidden_layers = [1000, 800, 600]
+global_hidden_layers = [500, 250]
 global_output_layer = 99
 global_num_classes = 99
 global_max_dim = 50
@@ -47,7 +47,7 @@ global_max_dim = 50
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.csv'
-model_file = 'bestWeights4.hdf5'
+model_file = 'bestWeights3.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
 np.random.seed(1)
@@ -277,8 +277,8 @@ input_layer = x_train.shape[1]
 
 # Setting up the Keras neural network
 # Choose a model
-# model = create_model_softmax()
-model = create_model_combined()
+model = create_model_softmax()
+# model = create_model_combined()
 
 # Compile our model
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
@@ -294,8 +294,8 @@ Model checkpoint saves the best weights obtained during training
 '''
 
 # history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
-# history = nn_fit(model, model_file, x_train, y_train)
-history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
+history = nn_fit(model, model_file, x_train, y_train)
+# history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 
 # Check Keras' statistics
 if args.disp_stats:
@@ -308,7 +308,7 @@ if args.disp_stats:
 model.load_weights(model_file)
 
 # Test our model on the test set
-y_pred = model.predict([test_mod_list, x_test])
+y_pred = model.predict(x_test)
 print '\n'
 
 # FIXME ##################
@@ -343,7 +343,7 @@ for i in range(len(y_pred)):
 print 'Total number of < 0.5 predictions: %g' %(total)
 
 x2 = np.ones(global_num_classes)
-for i in range (len(x2)):
+for i in range(len(x2)):
 	x2[i] = i
 for i in range(len(x)):
 	for j in range(len(x2)):
@@ -354,9 +354,9 @@ for i in range(len(x)):
 			plt.title(classes[j])
 			plt.imshow(img, cmap = 'binary')
 			plt.show()
-'''
-##############################
 
+##############################
+'''
 # Set up the predictions into the correct format to submit to Kaggle
 y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
 
