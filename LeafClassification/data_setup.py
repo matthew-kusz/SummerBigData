@@ -225,7 +225,7 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
 	for i in range(len(te_mod_list)):
 		te_flat[i] = te_mod_list[i].ravel()
 	
-	pca = PCA(n_components = 500)
+	pca = PCA(n_components = 30)
 	pca.fit(tr_flat)
 	tr_flat_pca = pca.transform(tr_flat)
 	te_flat_pca = pca.transform(te_flat)

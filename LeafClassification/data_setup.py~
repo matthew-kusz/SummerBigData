@@ -195,9 +195,6 @@ def more_features(train, test, tr_arr, te_arr):
    	plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
     	plt.show()
 
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-
 	train_moments = np.zeros((len(tr_arr), 1))
 	for i in range(len(tr_arr)):
 		stop
@@ -228,7 +225,7 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
 	for i in range(len(te_mod_list)):
 		te_flat[i] = te_mod_list[i].ravel()
 	
-	pca = PCA(n_components = 500)
+	pca = PCA(n_components = 35)
 	pca.fit(tr_flat)
 	tr_flat_pca = pca.transform(tr_flat)
 	te_flat_pca = pca.transform(te_flat)

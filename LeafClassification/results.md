@@ -685,7 +685,7 @@ kaggle score = 0.01419
 
 ------------------
 
-With added features + PCA
+With added features + PCA (N = 40)
 
 Set patience to 300
 
@@ -722,3 +722,27 @@ decay = 1e-6
 kaggle score = 0.01340 (best)
 
 model_file = 'bestWeights2.hdf5'
+
+------------------
+
+Using sklearn's logreg on pre-extracted features
+
+{'warm_start': False, 'C': 1000.0, 'n_jobs': 1, 'verbose': 1, 'intercept_scaling': 1, 'fit_intercept': True, 'max_iter': 500, 'penalty': 'l2', 'multi_class': 'multinomial', 'random_state': None, 'dual': False, 'tol': 0.001, 'solver': 'lbfgs', 'class_weight': None}
+
+kaggle score = 0.03806
+
+------------------
+
+Using sklearn's logreg on pre-extracted features + added features
+
+{'warm_start': False, 'C': 900.0, 'n_jobs': 1, 'verbose': 1, 'intercept_scaling': 1, 'fit_intercept': True, 'max_iter': 500, 'penalty': 'l2', 'multi_class': 'multinomial', 'random_state': None, 'dual': False, 'tol': 0.001, 'solver': 'lbfgs', 'class_weight': None}
+
+kaggle score = 0.02605
+
+------------------
+
+Using sklearn's logreg on pre-extracted features + added features + PCA(N = 30)
+
+{'warm_start': False, 'C': 9\10000.0, 'n_jobs': 1, 'verbose': 1, 'intercept_scaling': 1, 'fit_intercept': True, 'max_iter': 500, 'penalty': 'l2', 'multi_class': 'multinomial', 'random_state': None, 'dual': False, 'tol': 0.00001, 'solver': 'lbfgs', 'class_weight': None}
+
+kaggle score = 0.01194

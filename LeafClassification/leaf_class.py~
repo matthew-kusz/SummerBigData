@@ -2,7 +2,7 @@
 # Misc
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import matplotlib                                	 # Imported for use of matplotlib.use('Agg') 
-# matplotlib.use('Agg')                            	 # Use if submitting job to the supercomputer
+matplotlib.use('Agg')                            	 # Use if submitting job to the supercomputer
 import pandas as pd                         	 	 # For reading in and writing files
 import scipy.ndimage as ndi            	   	 	 # Finding the center of the leaves
 import argparse                                  	 # For inputing values outside of the code
@@ -39,7 +39,7 @@ args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
-global_hidden_layers = [1000, 800, 600]
+global_hidden_layers = [1000, 1000, 1000]
 global_output_layer = 99
 global_num_classes = 99
 global_max_dim = 50
@@ -74,6 +74,18 @@ def create_model_softmax():
 	
 	return mod1
 
+def extra_layers(first):
+
+	x2 = Flatten()(first)
+	x2 = Dense(1000, activation = 'relu')(x2)
+	x2 = Dropout(0.2)(x2)
+	x2 = Dense(800, activation = 'relu')(x2)
+	x2 = Dropout(0.2)(x2)
+	x2 = Dense(600, activation = 'relu')(x2)
+	x2 = Dropout(0.2)(x2)
+
+	return  x2
+
 def create_model_combined():
 	'''
 	This model uses both the images and the and pre-extracted features of the leaves to create a CNN model
@@ -88,12 +100,19 @@ def create_model_combined():
 	x = MaxPool2D(pool_size = (5, 5), strides = (2, 2))(x)
 	x = Dropout(0.2)(x)
 	x = Flatten()(x)
-	x = Dense(320, activation = "relu")(x)
+	x = Dense(192, activation = 'relu')(x)
 	final_first_input_layer = Dropout(0.2)(x)
 
-	second_input = Input(shape=(input_layer, ))
+	'''
+	# Merging convolved features with nn features of images
+	x2 = extra_layers(first_input)
+	merge_prequel = concatenate([final_first_input_layer, x2])
+	
+	x = Dense(200, activation = 'relu')(merge_prequel)
+	'''	
 
 	# Merging features from images with pre-extracted features
+	second_input = Input(shape=(input_layer, ))
 	merge_one = concatenate([final_first_input_layer, second_input])
 
 	x = Dense(global_hidden_layers[0], activation = 'relu')(merge_one)
@@ -237,6 +256,7 @@ train, test = data_setup.engineered_features(train, test, train_list, test_list)
 train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
+# Let's apply PCA to the images and attach them to the pre-extracted features
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim)
 
 # data_setup.more_features(train, test, train_list, test_list)
@@ -257,14 +277,14 @@ input_layer = x_train.shape[1]
 
 # Setting up the Keras neural network
 # Choose a model
-# model = create_model_softmax()
-model = create_model_combined()
+model = create_model_softmax()
+# model = create_model_combined()
 
 # Compile our model
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
 model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-# plot_model(model, to_file = 'modelCombinedPCA.png', show_shapes = True)
+# plot_model(model, to_file = 'modelCombinedPCA2.png', show_shapes = True)
 
 '''
 Choose a fit for our model
@@ -274,8 +294,8 @@ Model checkpoint saves the best weights obtained during training
 '''
 
 # history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
-# history = nn_fit(model, model_file, x_train, y_train)
-history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
+history = nn_fit(model, model_file, x_train, y_train)
+# history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 
 # Check Keras' statistics
 if args.disp_stats:
@@ -288,7 +308,7 @@ if args.disp_stats:
 model.load_weights(model_file)
 
 # Test our model on the test set
-y_pred = model.predict([test_mod_list, x_test])
+y_pred = model.predict(x_test)
 print '\n'
 
 # FIXME ##################

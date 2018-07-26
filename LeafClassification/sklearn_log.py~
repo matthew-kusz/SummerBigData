@@ -1,9 +1,15 @@
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import data_setup
+import pandas as pd                         	 	 # For reading in and writing files
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler 	 # Preprocessing
+from sklearn.model_selection import GridSearchCV
 
 global_max_dim = 50
+filename = 'sklearn_log_reg.csv'
+
+# Set up a seed so that our results don't fluctuate over multiple tests
+np.random.seed(1)
 
 ####### Code #######
 # Set up the data given to us
@@ -16,6 +22,7 @@ train, test = data_setup.engineered_features(train, test, train_list, test_list)
 train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
+# Let's apply PCA to the images and attach them to the pre-extracted features
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim)
 
 # data_setup.more_features(train, test, train_list, test_list)
@@ -24,23 +31,38 @@ train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, g
 x_train = StandardScaler().fit_transform(train)
 x_test = StandardScaler().fit_transform(test)
 
+'''
+#fit calculates the mean and std
+scale = StandardScaler().fit(train)
+# transform centers and scales the data
+x_train = scale.transform(train)
+x_test = scale.transform(test)
+'''
 # all parameters not specified are set to their defaults
 # default solver is incredibly slow which is why it was changed to 'lbfgs'
-log_reg = LogisticRegression(solver = 'lbfgs')
+log_reg = LogisticRegression(solver = 'lbfgs', verbose = 1, max_iter = 500, multi_class = 'multinomial')
+gsCV = GridSearchCV(log_reg, param_grid = {'C': [1000.0, 10000.0, 100000.0], 'tol': [0.001, 0.0001, 0.00001]}, scoring = 'neg_log_loss', refit = True, verbose = 1, n_jobs = -1, cv = 5)
+print log_reg.get_params()
+# FIT IT
+gsCV.fit(x_train, y)
 
-
-log_reg.fit(x_train, y_train)
+print('best params: ' + str(gsCV.best_params_))
+for params, mean_score, scores in gsCV.grid_scores_:
+ 	print '%0.3f (+/-%0.03f) for %r' % (mean_score, scores.std(), params)
+ 	print scores
 
 # Predict for One Observation (image)
-logisticRegr.predict(x_test)
+y_pred = gsCV.predict_proba(x_test)
+
+print y_pred.shape
 
 # Set up the predictions into the correct format to submit to Kaggle
 y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
 
 # Save predictions to a csv file to submit
-if args.save_prob:
-	print 'Saving to file', filename3, '...'
-	fp = open(filename3,'w')
-	fp.write(y_pred.to_csv())
+
+print 'Saving to file', filename, '...'
+fp = open(filename,'w')
+fp.write(y_pred.to_csv())
 
 print 'Finished.'
