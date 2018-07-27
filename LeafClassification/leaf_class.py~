@@ -47,7 +47,7 @@ global_max_dim = 50
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.csv'
-model_file = 'bestWeights4.hdf5'
+model_file = 'bestWeights3.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
 np.random.seed(1)
@@ -284,7 +284,7 @@ model = create_model_softmax()
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
 model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-# plot_model(model, to_file = 'modelCombinedPCA2.png', show_shapes = True)
+plot_model(model, to_file = 'modelSoftmax2.png', show_shapes = True)
 
 '''
 Choose a fit for our model

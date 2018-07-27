@@ -39,7 +39,7 @@ args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
-global_max_dim = 100
+global_max_dim = 50
 
 ####### Definitions #######
 # reparameterization trick
@@ -212,8 +212,8 @@ x = Dense(512, activation='relu')(inputs)
 x = Dropout(0.2)(x)
 x = Dense(320, activation = "relu")(x)
 x = Dropout(0.2)(x)
-x = Dense(240, activation = "relu")(x)
-x = Dropout(0.2)(x)
+#x = Dense(240, activation = "relu")(x)
+#x = Dropout(0.2)(x)
 x = Dense(192, activation = "relu")(x)
 z_mean = Dense(latent_dim, name='z_mean')(x)
 z_log_var = Dense(latent_dim, name='z_log_var')(x)
@@ -225,14 +225,14 @@ z = Lambda(sampling, output_shape=(latent_dim,), name='z')([z_mean, z_log_var])
 # instantiate encoder model
 encoder = Model(inputs, [z_mean, z_log_var, z], name='encoder')
 encoder.summary()
-plot_model(encoder, to_file='VAE/vae_mlp_encoder.png', show_shapes=True)
+# plot_model(encoder, to_file='VAE/vae_mlp_encoder.png', show_shapes=True)
 
 # build decoder model
 latent_inputs = Input(shape=(latent_dim,), name='z_sampling')
 x = Dense(192, activation = "relu")(latent_inputs)
 x = Dropout(0.2)(x)
-x = Dense(240, activation = "relu")(x)
-x = Dropout(0.2)(x)
+#x = Dense(240, activation = "relu")(x)
+#x = Dropout(0.2)(x)
 x = Dense(320, activation = "relu")(x)
 x = Dropout(0.2)(x)
 x = Dense(512, activation='relu')(x)
@@ -241,7 +241,7 @@ outputs = Dense(original_dim, activation='sigmoid')(x)
 # instantiate decoder model
 decoder = Model(latent_inputs, outputs, name='decoder')
 decoder.summary()
-plot_model(decoder, to_file='VAE/vae_mlp_decoder.png', show_shapes=True)
+# plot_model(decoder, to_file='VAE/vae_mlp_decoder.png', show_shapes=True)
 
 # instantiate VAE model
 outputs = decoder(encoder(inputs)[2])
@@ -262,9 +262,9 @@ vae_loss = K.mean(reconstruction_loss + kl_loss)
 vae.add_loss(vae_loss)
 vae.compile(optimizer='adam', loss = None)
 vae.summary()
-plot_model(vae, to_file='VAE/vae_mlp.png', show_shapes=True)
+# plot_model(vae, to_file='VAE/vae_mlp.png', show_shapes=True)
 
-model_file = 'VAE/vae_mlp_leaves_weights_nn_dim100-2.h5'
+model_file = 'VAE/vae_mlp_leaves_weights_nn_dim50-2.h5'
 if args.load_model:
 	# load weights from a previous run
 	print 'Loading weights...'

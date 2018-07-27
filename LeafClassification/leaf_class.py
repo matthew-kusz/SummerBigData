@@ -284,8 +284,8 @@ model = create_model_softmax()
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
 model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-# plot_model(model, to_file = 'modelCombinedPCA2.png', show_shapes = True)
-
+plot_model(model, to_file = 'modelSoftmax2.png', show_shapes = True)
+stop
 '''
 Choose a fit for our model
 Early stopping helps prevent over fitting by stopping our fitting function 
