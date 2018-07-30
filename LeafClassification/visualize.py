@@ -1,6 +1,7 @@
 # Import the necessary packages
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
 from sklearn.metrics.pairwise import cosine_similarity
 
 ####### Definitions #######
@@ -195,4 +196,75 @@ def plt_perf(name, f1, f2, p_loss=False, p_acc=False, val=False, size=(15,9), sa
 	else:
 		print 'No plotting since all parameters set to false.'
 
+	return
+
+def confusion(y_pred, y, classes, test_ids, num_classes):
+
+	# Find the leaves that have lower probabilities 
+	x = []
+	x_val = []
+	y_val = []
+	total = 0
+	threshold = 0.99
+	for i in range(len(y_pred)):
+		if (np.amax(y_pred[i]) < threshold):
+			# Index where the highest probability is
+			x = np.append(x, np.argmax(y_pred[i]))
+			# ID of the leaf we are looking at
+			x_val = np.append(x_val, test_ids[i])
+			# Where the leaf is in the matrix (what row)
+			y_val = np.append(y_val, i)
+			# Tally up the total number of leaves
+			total += 1
+	print 'Total number of <', threshold, ' predictions: %g' %(total)
+
+	# Set up an array that ranges from 0 - 98 to set up the class numbers
+	x2 = np.ones(num_classes)
+	for i in range(len(x2)):
+		x2[i] = i
+
+	most_conf = np.zeros(len(x2))
+	# Cycle through each leaf that had a low probability
+	for i in range(len(x)):
+		# Cycle through each class number
+		for j in range(len(x2)):
+			# Display the leaves with the lower probabilities
+			if (x2[j] == x[i]):
+				# Find what the guess was
+				print 'Species guessed:', classes[j]
+				# Find the id of the corresponding image
+				print 'ID associated with leaf:', int(x_val[i])
+				
+				# Get top 3 predictions
+				most_conf = np.zeros(len(x2))
+    				top3_ind = y_pred[int(y_val[i])].argsort()[-5:]
+    				top3_species = np.array(classes)[top3_ind]
+    				top3_preds = y_pred[int(y_val[i])][top3_ind]
+				most_conf[top3_ind] += 1 
+
+    				# Display the top 3 predictions and the actual species
+    				print("Top 5 Predicitons:")
+    				for k in range(4, -1, -1):
+        				print "\t%s (%s): %s" % (top3_species[k], top3_ind[k], top3_preds[k])
+
+				# Display the image of the leaf
+				string1 = 'data_provided/unzip_images/images/' + str(int(x_val[i])) + '.jpg'
+				img = mpimg.imread(string1)
+				string2 = 'Species guessed: ' + classes[j] + ', ID: ' + str(int(x_val[i]))
+				plt.title(string2)
+				ax = plt.gca()
+				ax.axes.get_xaxis().set_visible(False)
+				ax.axes.get_yaxis().set_visible(False)
+				plt.imshow(img, cmap = 'binary')
+				plt.show()
+
+				# Display the probabilities for that leaf
+				plt.bar(x2, y_pred[int(y_val[i])])
+				plt.title('Probability of Each Class for ID: ' + str(int(x_val[i])))
+				plt.xlabel('Class Number')
+				plt.ylabel('Probability')
+				plt.show()
+
+				print '\n'
+	print most_conf	
 	return
