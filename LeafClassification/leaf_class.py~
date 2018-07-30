@@ -318,10 +318,10 @@ y_pred = model.predict(x_test)
 print '\n'
 
 # Let's see what leaves our network struggled the most with
-visualize.confusion(y_pred, classes, test_ids, global_num_classes)
+visualize.confusion(y_pred, y, classes, test_ids, global_num_classes)
 
 # Set up the predictions into the correct format to submit to Kaggle
-y_pred = pd.DataFrame(y_pred, y, index = test_ids, columns = classes)
+y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
 
 # Save predictions to a csv file to submit
 if args.save_prob:

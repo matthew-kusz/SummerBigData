@@ -198,14 +198,43 @@ def plt_perf(name, f1, f2, p_loss=False, p_acc=False, val=False, size=(15,9), sa
 
 	return
 
-def confusion(y_pred, y, classes, test_ids, num_classes):
+def display_conf(y, top3, tr_img, tot):
+
+	# Display the images in 2 rows
+	count = 0
+	for j in range(len(y)):
+		if y[j] == top3:
+			count += 1
+			# First row
+			if count < 6:
+				if (count == 1):
+					pics = tr_img[j,:,:,0]
+		
+				else:
+					temp = tr_img[j,:,:,0]
+					pics = np.concatenate((pics, temp), axis = 1)
+			# Second row
+			else:
+				if (count == 6):
+					pics2 = tr_img[j,:,:,0]
+	
+				else:
+					temp = tr_img[j,:,:,0]
+					pics2 = np.concatenate((pics2, temp), axis = 1)
+	
+	# Display the images
+	al = np.concatenate((pics, pics2), axis = 0)
+	print al.shape
+	return al
+
+def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 
 	# Find the leaves that have lower probabilities 
 	x = []
 	x_val = []
 	y_val = []
 	total = 0
-	threshold = 0.99
+	threshold = 0.95
 	for i in range(len(y_pred)):
 		if (np.amax(y_pred[i]) < threshold):
 			# Index where the highest probability is
@@ -226,6 +255,7 @@ def confusion(y_pred, y, classes, test_ids, num_classes):
 	most_conf = np.zeros(len(x2))
 	# Cycle through each leaf that had a low probability
 	for i in range(len(x)):
+		total = 0
 		# Cycle through each class number
 		for j in range(len(x2)):
 			# Display the leaves with the lower probabilities
@@ -237,33 +267,54 @@ def confusion(y_pred, y, classes, test_ids, num_classes):
 				
 				# Get top 3 predictions
 				most_conf = np.zeros(len(x2))
-    				top3_ind = y_pred[int(y_val[i])].argsort()[-5:]
+    				top3_ind = y_pred[int(y_val[i])].argsort()[-3:]
     				top3_species = np.array(classes)[top3_ind]
     				top3_preds = y_pred[int(y_val[i])][top3_ind]
 				most_conf[top3_ind] += 1 
 
     				# Display the top 3 predictions and the actual species
-    				print("Top 5 Predicitons:")
-    				for k in range(4, -1, -1):
+    				print("Top 3 Predicitons:")
+    				for k in range(2, -1, -1):
         				print "\t%s (%s): %s" % (top3_species[k], top3_ind[k], top3_preds[k])
 
 				# Display the image of the leaf
 				string1 = 'data_provided/unzip_images/images/' + str(int(x_val[i])) + '.jpg'
-				img = mpimg.imread(string1)
 				string2 = 'Species guessed: ' + classes[j] + ', ID: ' + str(int(x_val[i]))
+				
+				total += 1
+				a = plt.figure(total)
+				img = mpimg.imread(string1)
 				plt.title(string2)
 				ax = plt.gca()
 				ax.axes.get_xaxis().set_visible(False)
 				ax.axes.get_yaxis().set_visible(False)
 				plt.imshow(img, cmap = 'binary')
-				plt.show()
+				a.show()
 
 				# Display the probabilities for that leaf
+				total += 1
+				b = plt.figure(total)
 				plt.bar(x2, y_pred[int(y_val[i])])
 				plt.title('Probability of Each Class for ID: ' + str(int(x_val[i])))
 				plt.xlabel('Class Number')
 				plt.ylabel('Probability')
-				plt.show()
+				b.show()
+
+				images = np.zeros((3, 100, 250))
+				for z in range(len(top3_ind)): 
+					images[z] = display_conf(y, top3_ind[z], train_img, total)
+
+				all_img = np.concatenate((images[2], images[1], images[0]), axis = 0)
+				total += 1
+				c = plt.figure(total)
+				plt.imshow(all_img, cmap = 'binary')
+				plt.title('Top 3 Guesses')
+				ax = plt.gca()
+				ax.axes.get_xaxis().set_visible(False)
+				ax.axes.get_yaxis().set_visible(False)
+				c.show()
+				
+				raw_input()
 
 				print '\n'
 	print most_conf	
