@@ -737,7 +737,7 @@ Using sklearn's logreg on pre-extracted features + added features
 
 {'warm_start': False, 'C': 900.0, 'n_jobs': 1, 'verbose': 1, 'intercept_scaling': 1, 'fit_intercept': True, 'max_iter': 500, 'penalty': 'l2', 'multi_class': 'multinomial', 'random_state': None, 'dual': False, 'tol': 0.001, 'solver': 'lbfgs', 'class_weight': None}
 
-kaggle score = 0.02605
+kaggle score = 0.02225
 
 ------------------
 

@@ -47,7 +47,7 @@ global_max_dim = 50
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.csv'
-model_file = 'bestWeights3.hdf5'
+model_file = 'bestWeights4.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
 np.random.seed(1)
@@ -94,7 +94,7 @@ def create_model_combined():
 	# Obtaining features from the images
 	first_input = Input(shape=(global_max_dim, global_max_dim, 1))
 	x = Conv2D(filters = 32, kernel_size = (5, 5), activation ='relu', padding = 'Same')(first_input)
-	x = MaxPool2D(pool_size = (10, 10))(x)
+	x = MaxPool2D(pool_size = (5, 5))(x)
 	x = Dropout(0.2)(x)
 	x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same')(x)
 	x = MaxPool2D(pool_size = (5, 5), strides = (2, 2))(x)
@@ -277,14 +277,14 @@ input_layer = x_train.shape[1]
 
 # Setting up the Keras neural network
 # Choose a model
-model = create_model_softmax()
-# model = create_model_combined()
+# model = create_model_softmax()
+model = create_model_combined()
 
 # Compile our model
 sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
 model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 print model.summary()
-plot_model(model, to_file = 'modelSoftmax2.png', show_shapes = True)
+# plot_model(model, to_file = 'modelSoftmax2.png', show_shapes = True)
 
 '''
 Choose a fit for our model
@@ -294,8 +294,8 @@ Model checkpoint saves the best weights obtained during training
 '''
 
 # history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
-history = nn_fit(model, model_file, x_train, y_train)
-# history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
+# history = nn_fit(model, model_file, x_train, y_train)
+history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 
 # Check Keras' statistics
 if args.disp_stats:
@@ -308,7 +308,7 @@ if args.disp_stats:
 model.load_weights(model_file)
 
 # Test our model on the test set
-y_pred = model.predict(x_test)
+y_pred = model.predict([test_mod_list, x_test])
 print '\n'
 
 # FIXME ##################

@@ -753,22 +753,20 @@ With added features + PCA (N = 30)
 
 Set patience to 300
 
-hl1 = 1000
+hl1 = 500
 
-hl2 = 1000
+hl2 = 250
 
-hl3 = 1000
+dropouts = 3
 
-dropouts = 4
-
-epochs = 336
+epochs = 325
 
 batch = 20
 
-val_loss = 0.00161
+val_loss = 0.02119
 
 momentum = 0.9
 
 decay = 1e-6
 
-kaggle score = 0.01419
+kaggle score = 0.00554 (Best)

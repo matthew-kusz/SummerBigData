@@ -9,7 +9,7 @@ latent vector from a Gaussian distribution with mean=0 and std=1.
 "Auto-encoding variational bayes."
 https://arxiv.org/abs/1312.6114
 '''
-from keras.layers import Lambda, Input, Dense, UpSampling2D, Conv2D, Dropout, MaxPool2D, Flatten
+from keras.layers import Lambda, Input, Dense, Conv2DTranspose, Conv2D, Dropout, MaxPool2D, Flatten, Reshape
 from keras.callbacks import ModelCheckpoint
 from keras.models import Model
 from keras.losses import mse, binary_crossentropy
@@ -77,7 +77,7 @@ def plot_results(models,
     	x_test, y_test, te_test = data
 	print x_test.shape
 	print y_test.shape
-	'''
+	
     	# Give a list of the id associated with each species
     	for i in range(len(classes)):
 		print i, classes[i]
@@ -94,9 +94,8 @@ def plot_results(models,
     	for j in range(len(temp[0])):
 	 	temp1[j] = x_test[temp[0][j],:]
 
-	'''
-	temp2 = np.ones(len(te_test)) * 99
-	x_test = np.vstack((x_test, te_test))
+	# temp2 = np.ones(len(te_test)) * 99
+	x_test = np.vstack((x_test, temp1))
 	y_test = np.concatenate((y_test, temp2), axis = 0)
 
     	filename = 'VAE/vae_leaves/vae_mean.png'
@@ -108,7 +107,7 @@ def plot_results(models,
     	z_mean, _, _ = encoder.predict(x_test, batch_size=batch_size)
 
     	plt.figure(figsize=(12, 10))
-    	black_marker = mpatches.Circle(4, radius = 100, color = 'yellow', label = 'test set') #classes[species])
+    	black_marker = mpatches.Circle(4, radius = 100, color = 'yellow', label = classes[species])
 	plt.legend(handles=[black_marker], loc = 'best')
     	plt.scatter(z_mean[:, 0], z_mean[:, 1], c = y_test, cmap=custom_cmap)
 	plt.clim(0,98)
@@ -120,15 +119,15 @@ def plot_results(models,
 
 	filename = 'VAE/vae_leaves/vae_mean_zoomed.png'
 	plt.figure(figsize=(12, 10))
-   	black_marker = mpatches.Circle(8, radius = 100, color = 'yellow', label = 'test set') #classes[species])
+   	black_marker = mpatches.Circle(8, radius = 100, color = 'yellow', label = classes[species])
 	plt.legend(handles=[black_marker], loc = 'best')
     	plt.scatter(z_mean[:, 0], z_mean[:, 1], c = y_test, cmap=custom_cmap)
 	plt.clim(0,98)
     	plt.colorbar()
    	plt.xlabel("z[0]")
     	plt.ylabel("z[1]")
-	plt.xlim(-12, 5)
-	plt.ylim(-8, 15)
+	plt.xlim(-1, 1)
+	plt.ylim(-0.75, 0.5)
     	plt.savefig(filename)
     	# plt.show()
 
@@ -139,8 +138,8 @@ def plot_results(models,
     	figure = np.zeros((leaf_size * n, leaf_size * n))
     	# linearly spaced coordinates corresponding to the 2D plot
     	# of leaf classes in the latent space
-    	grid_x = np.linspace(-12, 5, n)
-    	grid_y = np.linspace(-8, 15, n)[::-1]
+    	grid_x = np.linspace(-1, 1, n)
+    	grid_y = np.linspace(-0.75, 0.5, n)[::-1]
 
     	for i, yi in enumerate(grid_y):
         	for j, xi in enumerate(grid_x):
@@ -212,8 +211,8 @@ x = Dense(512, activation='relu')(inputs)
 x = Dropout(0.2)(x)
 x = Dense(320, activation = "relu")(x)
 x = Dropout(0.2)(x)
-#x = Dense(240, activation = "relu")(x)
-#x = Dropout(0.2)(x)
+x = Dense(240, activation = "relu")(x)
+x = Dropout(0.2)(x)
 x = Dense(192, activation = "relu")(x)
 z_mean = Dense(latent_dim, name='z_mean')(x)
 z_log_var = Dense(latent_dim, name='z_log_var')(x)
@@ -231,8 +230,8 @@ encoder.summary()
 latent_inputs = Input(shape=(latent_dim,), name='z_sampling')
 x = Dense(192, activation = "relu")(latent_inputs)
 x = Dropout(0.2)(x)
-#x = Dense(240, activation = "relu")(x)
-#x = Dropout(0.2)(x)
+x = Dense(240, activation = "relu")(x)
+x = Dropout(0.2)(x)
 x = Dense(320, activation = "relu")(x)
 x = Dropout(0.2)(x)
 x = Dense(512, activation='relu')(x)
@@ -251,8 +250,8 @@ models = (encoder, decoder)
 data = (tr_train, y, te_test)
 
 # VAE loss = mse_loss or xent_loss + kl_loss
-# reconstruction_loss = mse(inputs, outputs)
-reconstruction_loss = binary_crossentropy(inputs, outputs)
+reconstruction_loss = mse(inputs, outputs)
+# reconstruction_loss = binary_crossentropy(inputs, outputs)
 
 reconstruction_loss *= original_dim
 kl_loss = 1 + z_log_var - K.square(z_mean) - K.exp(z_log_var)
@@ -264,7 +263,7 @@ vae.compile(optimizer='adam', loss = None)
 vae.summary()
 # plot_model(vae, to_file='VAE/vae_mlp.png', show_shapes=True)
 
-model_file = 'VAE/vae_mlp_leaves_weights_nn_dim50-2.h5'
+model_file = 'VAE/vae_mlp_leaves_weights_nn_dim50-3.h5'
 if args.load_model:
 	# load weights from a previous run
 	print 'Loading weights...'

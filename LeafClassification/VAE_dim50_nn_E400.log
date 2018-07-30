@@ -1,0 +1,476 @@
+Using TensorFlow backend.
+Loading images...
+Finished.
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+encoder_input (InputLayer)       (None, 2500)          0                                            
+____________________________________________________________________________________________________
+dense_1 (Dense)                  (None, 512)           1280512     encoder_input[0][0]              
+____________________________________________________________________________________________________
+dropout_1 (Dropout)              (None, 512)           0           dense_1[0][0]                    
+____________________________________________________________________________________________________
+dense_2 (Dense)                  (None, 320)           164160      dropout_1[0][0]                  
+____________________________________________________________________________________________________
+dropout_2 (Dropout)              (None, 320)           0           dense_2[0][0]                    
+____________________________________________________________________________________________________
+dense_3 (Dense)                  (None, 240)           77040       dropout_2[0][0]                  
+____________________________________________________________________________________________________
+dropout_3 (Dropout)              (None, 240)           0           dense_3[0][0]                    
+____________________________________________________________________________________________________
+dense_4 (Dense)                  (None, 192)           46272       dropout_3[0][0]                  
+____________________________________________________________________________________________________
+z_mean (Dense)                   (None, 2)             386         dense_4[0][0]                    
+____________________________________________________________________________________________________
+z_log_var (Dense)                (None, 2)             386         dense_4[0][0]                    
+____________________________________________________________________________________________________
+z (Lambda)                       (None, 2)             0           z_mean[0][0]                     
+                                                                   z_log_var[0][0]                  
+====================================================================================================
+Total params: 1,568,756
+Trainable params: 1,568,756
+Non-trainable params: 0
+____________________________________________________________________________________________________
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+z_sampling (InputLayer)      (None, 2)                 0         
+_________________________________________________________________
+dense_5 (Dense)              (None, 192)               576       
+_________________________________________________________________
+dropout_4 (Dropout)          (None, 192)               0         
+_________________________________________________________________
+dense_6 (Dense)              (None, 240)               46320     
+_________________________________________________________________
+dropout_5 (Dropout)          (None, 240)               0         
+_________________________________________________________________
+dense_7 (Dense)              (None, 320)               77120     
+_________________________________________________________________
+dropout_6 (Dropout)          (None, 320)               0         
+_________________________________________________________________
+dense_8 (Dense)              (None, 512)               164352    
+_________________________________________________________________
+dense_9 (Dense)              (None, 2500)              1282500   
+=================================================================
+Total params: 1,570,868
+Trainable params: 1,570,868
+Non-trainable params: 0
+_________________________________________________________________
+VAE_modified.py:263: UserWarning: Output "decoder" missing from loss dictionary. We assume this was done on purpose, and we will not be expecting any data to be passed to "decoder" during training.
+  vae.compile(optimizer='adam', loss = None)
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+encoder_input (InputLayer)   (None, 2500)              0         
+_________________________________________________________________
+encoder (Model)              [(None, 2), (None, 2), (N 1568756   
+_________________________________________________________________
+decoder (Model)              (None, 2500)              1570868   
+=================================================================
+Total params: 3,139,624
+Trainable params: 3,139,624
+Non-trainable params: 0
+_________________________________________________________________
+Training model...
+2018-07-27 14:05:10.637156: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2018-07-27 14:05:10.637195: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+Epoch 00000: val_loss improved from inf to 317.51889, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00001: val_loss improved from 317.51889 to 235.18517, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00002: val_loss improved from 235.18517 to 233.80563, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00003: val_loss improved from 233.80563 to 217.48402, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00004: val_loss improved from 217.48402 to 212.82703, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00005: val_loss improved from 212.82703 to 206.71565, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00006: val_loss improved from 206.71565 to 192.46745, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00007: val_loss improved from 192.46745 to 185.14258, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00008: val_loss improved from 185.14258 to 178.49374, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00009: val_loss improved from 178.49374 to 173.02386, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00010: val_loss improved from 173.02386 to 169.28638, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00011: val_loss improved from 169.28638 to 164.83337, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00012: val_loss improved from 164.83337 to 163.30159, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00013: val_loss improved from 163.30159 to 159.82465, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00014: val_loss improved from 159.82465 to 159.62509, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00015: val_loss improved from 159.62509 to 153.10997, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00016: val_loss improved from 153.10997 to 146.82487, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00017: val_loss improved from 146.82487 to 139.65245, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00018: val_loss improved from 139.65245 to 138.19470, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00019: val_loss improved from 138.19470 to 130.01834, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00020: val_loss improved from 130.01834 to 128.95912, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00021: val_loss improved from 128.95912 to 125.80513, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00022: val_loss improved from 125.80513 to 125.08231, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00023: val_loss improved from 125.08231 to 122.39998, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00024: val_loss did not improve
+Epoch 00025: val_loss did not improve
+Epoch 00026: val_loss improved from 122.39998 to 120.78185, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00027: val_loss did not improve
+Epoch 00028: val_loss improved from 120.78185 to 120.10635, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00029: val_loss did not improve
+Epoch 00030: val_loss improved from 120.10635 to 117.18443, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00031: val_loss did not improve
+Epoch 00032: val_loss did not improve
+Epoch 00033: val_loss improved from 117.18443 to 115.98692, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00034: val_loss improved from 115.98692 to 114.76957, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00035: val_loss did not improve
+Epoch 00036: val_loss improved from 114.76957 to 114.02527, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00037: val_loss improved from 114.02527 to 113.97971, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00038: val_loss improved from 113.97971 to 113.44111, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00039: val_loss improved from 113.44111 to 111.94659, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00040: val_loss did not improve
+Epoch 00041: val_loss did not improve
+Epoch 00042: val_loss did not improve
+Epoch 00043: val_loss improved from 111.94659 to 111.59709, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00044: val_loss improved from 111.59709 to 110.31322, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00045: val_loss did not improve
+Epoch 00046: val_loss improved from 110.31322 to 110.24361, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00047: val_loss did not improve
+Epoch 00048: val_loss improved from 110.24361 to 110.14911, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00049: val_loss improved from 110.14911 to 109.74511, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00050: val_loss did not improve
+Epoch 00051: val_loss improved from 109.74511 to 109.23074, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00052: val_loss did not improve
+Epoch 00053: val_loss did not improve
+Epoch 00054: val_loss did not improve
+Epoch 00055: val_loss did not improve
+Epoch 00056: val_loss improved from 109.23074 to 109.16941, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00057: val_loss did not improve
+Epoch 00058: val_loss improved from 109.16941 to 109.09315, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00059: val_loss did not improve
+Epoch 00060: val_loss improved from 109.09315 to 108.25467, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00061: val_loss did not improve
+Epoch 00062: val_loss did not improve
+Epoch 00063: val_loss did not improve
+Epoch 00064: val_loss improved from 108.25467 to 106.53618, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00065: val_loss did not improve
+Epoch 00066: val_loss did not improve
+Epoch 00067: val_loss did not improve
+Epoch 00068: val_loss did not improve
+Epoch 00069: val_loss improved from 106.53618 to 105.83082, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00070: val_loss did not improve
+Epoch 00071: val_loss did not improve
+Epoch 00072: val_loss did not improve
+Epoch 00073: val_loss did not improve
+Epoch 00074: val_loss improved from 105.83082 to 105.55199, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00075: val_loss did not improve
+Epoch 00076: val_loss improved from 105.55199 to 104.37629, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00077: val_loss did not improve
+Epoch 00078: val_loss did not improve
+Epoch 00079: val_loss did not improve
+Epoch 00080: val_loss improved from 104.37629 to 103.78259, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00081: val_loss did not improve
+Epoch 00082: val_loss did not improve
+Epoch 00083: val_loss improved from 103.78259 to 102.55613, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00084: val_loss did not improve
+Epoch 00085: val_loss did not improve
+Epoch 00086: val_loss did not improve
+Epoch 00087: val_loss did not improve
+Epoch 00088: val_loss did not improve
+Epoch 00089: val_loss improved from 102.55613 to 102.31556, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00090: val_loss did not improve
+Epoch 00091: val_loss did not improve
+Epoch 00092: val_loss did not improve
+Epoch 00093: val_loss did not improve
+Epoch 00094: val_loss did not improve
+Epoch 00095: val_loss improved from 102.31556 to 101.51184, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00096: val_loss did not improve
+Epoch 00097: val_loss did not improve
+Epoch 00098: val_loss improved from 101.51184 to 100.58893, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00099: val_loss did not improve
+Epoch 00100: val_loss did not improve
+Epoch 00101: val_loss did not improve
+Epoch 00102: val_loss did not improve
+Epoch 00103: val_loss did not improve
+Epoch 00104: val_loss did not improve
+Epoch 00105: val_loss did not improve
+Epoch 00106: val_loss did not improve
+Epoch 00107: val_loss did not improve
+Epoch 00108: val_loss did not improve
+Epoch 00109: val_loss did not improve
+Epoch 00110: val_loss did not improve
+Epoch 00111: val_loss did not improve
+Epoch 00112: val_loss did not improve
+Epoch 00113: val_loss improved from 100.58893 to 100.56415, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00114: val_loss did not improve
+Epoch 00115: val_loss did not improve
+Epoch 00116: val_loss did not improve
+Epoch 00117: val_loss did not improve
+Epoch 00118: val_loss improved from 100.56415 to 99.88582, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00119: val_loss did not improve
+Epoch 00120: val_loss did not improve
+Epoch 00121: val_loss did not improve
+Epoch 00122: val_loss did not improve
+Epoch 00123: val_loss improved from 99.88582 to 99.75880, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00124: val_loss did not improve
+Epoch 00125: val_loss did not improve
+Epoch 00126: val_loss did not improve
+Epoch 00127: val_loss did not improve
+Epoch 00128: val_loss did not improve
+Epoch 00129: val_loss did not improve
+Epoch 00130: val_loss did not improve
+Epoch 00131: val_loss did not improve
+Epoch 00132: val_loss did not improve
+Epoch 00133: val_loss did not improve
+Epoch 00134: val_loss did not improve
+Epoch 00135: val_loss did not improve
+Epoch 00136: val_loss improved from 99.75880 to 98.94300, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00137: val_loss improved from 98.94300 to 98.80441, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00138: val_loss improved from 98.80441 to 98.37675, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00139: val_loss did not improve
+Epoch 00140: val_loss did not improve
+Epoch 00141: val_loss did not improve
+Epoch 00142: val_loss did not improve
+Epoch 00143: val_loss did not improve
+Epoch 00144: val_loss did not improve
+Epoch 00145: val_loss did not improve
+Epoch 00146: val_loss did not improve
+Epoch 00147: val_loss did not improve
+Epoch 00148: val_loss did not improve
+Epoch 00149: val_loss did not improve
+Epoch 00150: val_loss did not improve
+Epoch 00151: val_loss did not improve
+Epoch 00152: val_loss did not improve
+Epoch 00153: val_loss did not improve
+Epoch 00154: val_loss improved from 98.37675 to 97.78781, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00155: val_loss did not improve
+Epoch 00156: val_loss did not improve
+Epoch 00157: val_loss did not improve
+Epoch 00158: val_loss did not improve
+Epoch 00159: val_loss did not improve
+Epoch 00160: val_loss did not improve
+Epoch 00161: val_loss did not improve
+Epoch 00162: val_loss did not improve
+Epoch 00163: val_loss did not improve
+Epoch 00164: val_loss did not improve
+Epoch 00165: val_loss did not improve
+Epoch 00166: val_loss did not improve
+Epoch 00167: val_loss did not improve
+Epoch 00168: val_loss did not improve
+Epoch 00169: val_loss improved from 97.78781 to 96.91396, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00170: val_loss did not improve
+Epoch 00171: val_loss did not improve
+Epoch 00172: val_loss did not improve
+Epoch 00173: val_loss did not improve
+Epoch 00174: val_loss did not improve
+Epoch 00175: val_loss did not improve
+Epoch 00176: val_loss did not improve
+Epoch 00177: val_loss did not improve
+Epoch 00178: val_loss did not improve
+Epoch 00179: val_loss did not improve
+Epoch 00180: val_loss did not improve
+Epoch 00181: val_loss did not improve
+Epoch 00182: val_loss did not improve
+Epoch 00183: val_loss did not improve
+Epoch 00184: val_loss did not improve
+Epoch 00185: val_loss did not improve
+Epoch 00186: val_loss did not improve
+Epoch 00187: val_loss improved from 96.91396 to 96.71101, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00188: val_loss improved from 96.71101 to 96.60093, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00189: val_loss did not improve
+Epoch 00190: val_loss did not improve
+Epoch 00191: val_loss did not improve
+Epoch 00192: val_loss did not improve
+Epoch 00193: val_loss did not improve
+Epoch 00194: val_loss did not improve
+Epoch 00195: val_loss did not improve
+Epoch 00196: val_loss did not improve
+Epoch 00197: val_loss did not improve
+Epoch 00198: val_loss did not improve
+Epoch 00199: val_loss did not improve
+Epoch 00200: val_loss did not improve
+Epoch 00201: val_loss did not improve
+Epoch 00202: val_loss did not improve
+Epoch 00203: val_loss did not improve
+Epoch 00204: val_loss did not improve
+Epoch 00205: val_loss did not improve
+Epoch 00206: val_loss did not improve
+Epoch 00207: val_loss did not improve
+Epoch 00208: val_loss did not improve
+Epoch 00209: val_loss did not improve
+Epoch 00210: val_loss did not improve
+Epoch 00211: val_loss improved from 96.60093 to 96.37302, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00212: val_loss did not improve
+Epoch 00213: val_loss did not improve
+Epoch 00214: val_loss improved from 96.37302 to 96.30264, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00215: val_loss did not improve
+Epoch 00216: val_loss improved from 96.30264 to 96.13024, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00217: val_loss did not improve
+Epoch 00218: val_loss did not improve
+Epoch 00219: val_loss did not improve
+Epoch 00220: val_loss did not improve
+Epoch 00221: val_loss did not improve
+Epoch 00222: val_loss improved from 96.13024 to 94.94446, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00223: val_loss did not improve
+Epoch 00224: val_loss did not improve
+Epoch 00225: val_loss did not improve
+Epoch 00226: val_loss did not improve
+Epoch 00227: val_loss did not improve
+Epoch 00228: val_loss did not improve
+Epoch 00229: val_loss did not improve
+Epoch 00230: val_loss did not improve
+Epoch 00231: val_loss did not improve
+Epoch 00232: val_loss did not improve
+Epoch 00233: val_loss did not improve
+Epoch 00234: val_loss did not improve
+Epoch 00235: val_loss did not improve
+Epoch 00236: val_loss did not improve
+Epoch 00237: val_loss did not improve
+Epoch 00238: val_loss did not improve
+Epoch 00239: val_loss improved from 94.94446 to 94.94419, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00240: val_loss did not improve
+Epoch 00241: val_loss did not improve
+Epoch 00242: val_loss did not improve
+Epoch 00243: val_loss did not improve
+Epoch 00244: val_loss did not improve
+Epoch 00245: val_loss improved from 94.94419 to 94.58935, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00246: val_loss did not improve
+Epoch 00247: val_loss did not improve
+Epoch 00248: val_loss did not improve
+Epoch 00249: val_loss did not improve
+Epoch 00250: val_loss did not improve
+Epoch 00251: val_loss did not improve
+Epoch 00252: val_loss did not improve
+Epoch 00253: val_loss did not improve
+Epoch 00254: val_loss did not improve
+Epoch 00255: val_loss did not improve
+Epoch 00256: val_loss did not improve
+Epoch 00257: val_loss did not improve
+Epoch 00258: val_loss did not improve
+Epoch 00259: val_loss did not improve
+Epoch 00260: val_loss did not improve
+Epoch 00261: val_loss did not improve
+Epoch 00262: val_loss did not improve
+Epoch 00263: val_loss improved from 94.58935 to 93.85807, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00264: val_loss did not improve
+Epoch 00265: val_loss did not improve
+Epoch 00266: val_loss did not improve
+Epoch 00267: val_loss did not improve
+Epoch 00268: val_loss did not improve
+Epoch 00269: val_loss did not improve
+Epoch 00270: val_loss did not improve
+Epoch 00271: val_loss did not improve
+Epoch 00272: val_loss did not improve
+Epoch 00273: val_loss did not improve
+Epoch 00274: val_loss did not improve
+Epoch 00275: val_loss did not improve
+Epoch 00276: val_loss did not improve
+Epoch 00277: val_loss did not improve
+Epoch 00278: val_loss did not improve
+Epoch 00279: val_loss did not improve
+Epoch 00280: val_loss did not improve
+Epoch 00281: val_loss did not improve
+Epoch 00282: val_loss did not improve
+Epoch 00283: val_loss did not improve
+Epoch 00284: val_loss did not improve
+Epoch 00285: val_loss did not improve
+Epoch 00286: val_loss did not improve
+Epoch 00287: val_loss did not improve
+Epoch 00288: val_loss did not improve
+Epoch 00289: val_loss did not improve
+Epoch 00290: val_loss did not improve
+Epoch 00291: val_loss did not improve
+Epoch 00292: val_loss did not improve
+Epoch 00293: val_loss did not improve
+Epoch 00294: val_loss did not improve
+Epoch 00295: val_loss improved from 93.85807 to 93.71356, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00296: val_loss did not improve
+Epoch 00297: val_loss did not improve
+Epoch 00298: val_loss did not improve
+Epoch 00299: val_loss did not improve
+Epoch 00300: val_loss did not improve
+Epoch 00301: val_loss did not improve
+Epoch 00302: val_loss did not improve
+Epoch 00303: val_loss did not improve
+Epoch 00304: val_loss did not improve
+Epoch 00305: val_loss did not improve
+Epoch 00306: val_loss did not improve
+Epoch 00307: val_loss did not improve
+Epoch 00308: val_loss did not improve
+Epoch 00309: val_loss did not improve
+Epoch 00310: val_loss did not improve
+Epoch 00311: val_loss did not improve
+Epoch 00312: val_loss did not improve
+Epoch 00313: val_loss did not improve
+Epoch 00314: val_loss did not improve
+Epoch 00315: val_loss did not improve
+Epoch 00316: val_loss did not improve
+Epoch 00317: val_loss did not improve
+Epoch 00318: val_loss did not improve
+Epoch 00319: val_loss did not improve
+Epoch 00320: val_loss did not improve
+Epoch 00321: val_loss did not improve
+Epoch 00322: val_loss did not improve
+Epoch 00323: val_loss did not improve
+Epoch 00324: val_loss did not improve
+Epoch 00325: val_loss did not improve
+Epoch 00326: val_loss did not improve
+Epoch 00327: val_loss did not improve
+Epoch 00328: val_loss did not improve
+Epoch 00329: val_loss improved from 93.71356 to 93.67111, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00330: val_loss did not improve
+Epoch 00331: val_loss did not improve
+Epoch 00332: val_loss did not improve
+Epoch 00333: val_loss did not improve
+Epoch 00334: val_loss did not improve
+Epoch 00335: val_loss did not improve
+Epoch 00336: val_loss did not improve
+Epoch 00337: val_loss did not improve
+Epoch 00338: val_loss did not improve
+Epoch 00339: val_loss improved from 93.67111 to 93.63810, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00340: val_loss did not improve
+Epoch 00341: val_loss did not improve
+Epoch 00342: val_loss did not improve
+Epoch 00343: val_loss did not improve
+Epoch 00344: val_loss did not improve
+Epoch 00345: val_loss did not improve
+Epoch 00346: val_loss did not improve
+Epoch 00347: val_loss did not improve
+Epoch 00348: val_loss did not improve
+Epoch 00349: val_loss improved from 93.63810 to 93.47443, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00350: val_loss did not improve
+Epoch 00351: val_loss did not improve
+Epoch 00352: val_loss did not improve
+Epoch 00353: val_loss did not improve
+Epoch 00354: val_loss improved from 93.47443 to 93.44733, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00355: val_loss did not improve
+Epoch 00356: val_loss improved from 93.44733 to 93.03368, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00357: val_loss did not improve
+Epoch 00358: val_loss did not improve
+Epoch 00359: val_loss did not improve
+Epoch 00360: val_loss improved from 93.03368 to 92.71261, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00361: val_loss did not improve
+Epoch 00362: val_loss did not improve
+Epoch 00363: val_loss did not improve
+Epoch 00364: val_loss improved from 92.71261 to 92.65193, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00365: val_loss did not improve
+Epoch 00366: val_loss did not improve
+Epoch 00367: val_loss did not improve
+Epoch 00368: val_loss did not improve
+Epoch 00369: val_loss did not improve
+Epoch 00370: val_loss did not improve
+Epoch 00371: val_loss did not improve
+Epoch 00372: val_loss did not improve
+Epoch 00373: val_loss did not improve
+Epoch 00374: val_loss did not improve
+Epoch 00375: val_loss did not improve
+Epoch 00376: val_loss did not improve
+Epoch 00377: val_loss did not improve
+Epoch 00378: val_loss did not improve
+Epoch 00379: val_loss did not improve
+Epoch 00380: val_loss did not improve
+Epoch 00381: val_loss did not improve
+Epoch 00382: val_loss did not improve
+Epoch 00383: val_loss did not improve
+Epoch 00384: val_loss did not improve
+Epoch 00385: val_loss did not improve
+Epoch 00386: val_loss did not improve
+Epoch 00387: val_loss did not improve
+Epoch 00388: val_loss improved from 92.65193 to 92.33633, saving model to VAE/vae_mlp_leaves_weights_nn_dim50-3.h5
+Epoch 00389: val_loss did not improve
+Epoch 00390: val_loss did not improve
+Epoch 00391: val_loss did not improve
+Epoch 00392: val_loss did not improve
+Epoch 00393: val_loss did not improve
+Epoch 00394: val_loss did not improve
+Epoch 00395: val_loss did not improve
+Epoch 00396: val_loss did not improve
+Epoch 00397: val_loss did not improve
+Epoch 00398: val_loss did not improve
+Epoch 00399: val_loss did not improve
