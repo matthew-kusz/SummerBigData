@@ -269,7 +269,7 @@ x_test = StandardScaler().fit_transform(test)
 if args.leaf_stats:
 	print 'Displaying images...'
 	visualize.image_similarity(train_mod_list, y, classes)
-	visualize.visualize_leaves(train_mod_list, y, classes, show1 = True, show2 = True)
+	visualize.visualize_leaves(train_mod_list, y, classes, show1 = False, show2 = True)
 	print 'Finished.'
 
 # Set up our input layer size

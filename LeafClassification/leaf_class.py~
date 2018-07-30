@@ -2,7 +2,7 @@
 # Misc
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import matplotlib                                	 # Imported for use of matplotlib.use('Agg') 
-matplotlib.use('Agg')                            	 # Use if submitting job to the supercomputer
+# matplotlib.use('Agg')                            	 # Use if submitting job to the supercomputer
 import pandas as pd                         	 	 # For reading in and writing files
 import scipy.ndimage as ndi            	   	 	 # Finding the center of the leaves
 import argparse                                  	 # For inputing values outside of the code
@@ -96,9 +96,9 @@ def create_model_combined():
 	x = Conv2D(filters = 32, kernel_size = (5, 5), activation ='relu', padding = 'Same')(first_input)
 	x = MaxPool2D(pool_size = (5, 5))(x)
 	x = Dropout(0.2)(x)
-	x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same')(x)
-	x = MaxPool2D(pool_size = (5, 5), strides = (2, 2))(x)
-	x = Dropout(0.2)(x)
+	#x = Conv2D(filters = 8, kernel_size = (5, 5), activation ='relu', padding = 'Same')(x)
+	#x = MaxPool2D(pool_size = (5, 5), strides = (2, 2))(x)
+	#x = Dropout(0.2)(x)
 	x = Flatten()(x)
 	x = Dense(192, activation = 'relu')(x)
 	final_first_input_layer = Dropout(0.2)(x)
@@ -269,9 +269,9 @@ x_test = StandardScaler().fit_transform(test)
 if args.leaf_stats:
 	print 'Displaying images...'
 	visualize.image_similarity(train_mod_list, y, classes)
-	visualize.visualize_leaves(train_mod_list, y, classes, show1 = True, show2 = True)
+	visualize.visualize_leaves(train_mod_list, y, classes, show1 = False, show2 = True)
 	print 'Finished.'
-
+stop
 # Set up our input layer size
 input_layer = x_train.shape[1]
 
