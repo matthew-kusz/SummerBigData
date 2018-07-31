@@ -234,7 +234,7 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 	x_val = []
 	y_val = []
 	total = 0
-	threshold = 0.95
+	threshold = 0.99
 	for i in range(len(y_pred)):
 		if (np.amax(y_pred[i]) < threshold):
 			# Index where the highest probability is
@@ -266,11 +266,13 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 				print 'ID associated with leaf:', int(x_val[i])
 				
 				# Get top 3 predictions
-				most_conf = np.zeros(len(x2))
     				top3_ind = y_pred[int(y_val[i])].argsort()[-3:]
     				top3_species = np.array(classes)[top3_ind]
     				top3_preds = y_pred[int(y_val[i])][top3_ind]
-				most_conf[top3_ind] += 1 
+				
+				for m in range (len(top3_ind)):	
+					print top3_ind[m]
+					most_conf[top3_ind[m] - 1] += 1 
 
     				# Display the top 3 predictions and the actual species
     				print("Top 3 Predicitons:")
@@ -289,7 +291,7 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 				ax.axes.get_xaxis().set_visible(False)
 				ax.axes.get_yaxis().set_visible(False)
 				plt.imshow(img, cmap = 'binary')
-				a.show()
+				#a.show()
 
 				# Display the probabilities for that leaf
 				total += 1
@@ -298,7 +300,7 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 				plt.title('Probability of Each Class for ID: ' + str(int(x_val[i])))
 				plt.xlabel('Class Number')
 				plt.ylabel('Probability')
-				b.show()
+				#b.show()
 
 				images = np.zeros((3, 100, 250))
 				for z in range(len(top3_ind)): 
@@ -312,10 +314,16 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 				ax = plt.gca()
 				ax.axes.get_xaxis().set_visible(False)
 				ax.axes.get_yaxis().set_visible(False)
-				c.show()
+				#c.show()
 				
-				raw_input()
+				#raw_input()
 
+				plt.close('all')
 				print '\n'
-	print most_conf	
+	print 'Classes confused'
+	total = 0
+	for i in range(len(x2)):
+		if most_conf[i]	> 0:
+			print classes[i] + '(' + str(i + 1) + ')' + ':' + str(most_conf[i])
+
 	return

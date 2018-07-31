@@ -39,7 +39,7 @@ args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
-global_hidden_layers = [500,250]
+global_hidden_layers = [500, 250] #[500, 250]
 global_output_layer = 99
 global_num_classes = 99
 global_max_dim = 50
@@ -47,7 +47,7 @@ global_max_dim = 50
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.csv'
-model_file = 'bestWeights.hdf5'
+model_file = 'bestWeights2.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
 np.random.seed(1)
@@ -256,10 +256,12 @@ train, test = data_setup.engineered_features(train, test, train_list, test_list)
 train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
+# train, test = data_setup.more_features(train, test, train_list, test_list)
+
 # Let's apply PCA to the images and attach them to the pre-extracted features
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim)
 
-# data_setup.more_features(train, test, train_list, test_list)
+
 
 '''
 # fit_transform() calculates the mean and std and also centers and scales data
@@ -300,7 +302,7 @@ Model checkpoint saves the best weights obtained during training
 '''
 
 # history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
-# history = nn_fit(model, model_file, x_train, y_train)
+history = nn_fit(model, model_file, x_train, y_train)
 # history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 
 # Check Keras' statistics
@@ -318,7 +320,7 @@ y_pred = model.predict(x_test)
 print '\n'
 
 # Let's see what leaves our network struggled the most with
-visualize.confusion(y_pred, y, classes, test_ids, global_num_classes, train_mod_list)
+# visualize.confusion(y_pred, y, classes, test_ids, global_num_classes, train_mod_list)
 
 # Set up the predictions into the correct format to submit to Kaggle
 y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
