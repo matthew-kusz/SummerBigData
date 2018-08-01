@@ -1,7 +1,9 @@
 # Import the necessary packages
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
+import matplotlib.cm as cm
 from sklearn.metrics.pairwise import cosine_similarity
 
 ####### Definitions #######
@@ -224,19 +226,17 @@ def display_conf(y, top3, tr_img, tot):
 	
 	# Display the images
 	al = np.concatenate((pics, pics2), axis = 0)
-	print al.shape
 	return al
 
-def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
+def confusion(y_pred, y, classes, test_ids, num_classes, train_img, thresh):
 
 	# Find the leaves that have lower probabilities 
 	x = []
 	x_val = []
 	y_val = []
 	total = 0
-	threshold = 0.99
 	for i in range(len(y_pred)):
-		if (np.amax(y_pred[i]) < threshold):
+		if (np.amax(y_pred[i]) < thresh):
 			# Index where the highest probability is
 			x = np.append(x, np.argmax(y_pred[i]))
 			# ID of the leaf we are looking at
@@ -245,7 +245,7 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 			y_val = np.append(y_val, i)
 			# Tally up the total number of leaves
 			total += 1
-	print 'Total number of <', threshold, ' predictions: %g' %(total)
+	print 'Total number of <', thresh, ' predictions: %g' %(total)
 
 	# Set up an array that ranges from 0 - 98 to set up the class numbers
 	x2 = np.ones(num_classes)
@@ -271,7 +271,6 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
     				top3_preds = y_pred[int(y_val[i])][top3_ind]
 				
 				for m in range (len(top3_ind)):	
-					print top3_ind[m]
 					most_conf[top3_ind[m] - 1] += 1 
 
     				# Display the top 3 predictions and the actual species
@@ -291,7 +290,7 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 				ax.axes.get_xaxis().set_visible(False)
 				ax.axes.get_yaxis().set_visible(False)
 				plt.imshow(img, cmap = 'binary')
-				#a.show()
+				a.show()
 
 				# Display the probabilities for that leaf
 				total += 1
@@ -300,7 +299,7 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 				plt.title('Probability of Each Class for ID: ' + str(int(x_val[i])))
 				plt.xlabel('Class Number')
 				plt.ylabel('Probability')
-				#b.show()
+				b.show()
 
 				images = np.zeros((3, 100, 250))
 				for z in range(len(top3_ind)): 
@@ -314,9 +313,9 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 				ax = plt.gca()
 				ax.axes.get_xaxis().set_visible(False)
 				ax.axes.get_yaxis().set_visible(False)
-				#c.show()
+				c.show()
 				
-				#raw_input()
+				raw_input()
 
 				plt.close('all')
 				print '\n'
@@ -326,4 +325,23 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img):
 		if most_conf[i]	> 0:
 			print classes[i] + '(' + str(i + 1) + ')' + ':' + str(most_conf[i])
 
+	return
+
+def visualize_tsne(images, ids, fig_size = (20, 20)):
+	# label_tp_id_dict = {v:i for i, v in enumerate(np.unique(labels))}
+	# id_to_label_dict = {v: k for k, v in label_to_id_dict.items()}
+
+	plt.figure(figsize = fig_size)
+	plt.grid()
+
+	nb_classes = len(np.unique(ids))
+	
+	for label in np.unique(ids):
+		plt.scatter(images[np.where(ids == label), 0], images[np.where(ids == label), 1],
+				marker = 'o', color = plt.cm.Set1(label / float(nb_classes)),
+				linewidth = '1', alpha = 0.8)
+
+	plt.legend(loc = 'best')
+	plt.show()
+	stop
 	return

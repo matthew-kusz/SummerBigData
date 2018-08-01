@@ -10,8 +10,9 @@ from sklearn.preprocessing import LabelEncoder  	 # Preprocessing
 
 import matplotlib.pyplot as plt
 
-#from skimage.morphology import disk
-#from skimage.filters import rank
+from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler
+import visualize
 
 ####### Definitions #######
 def grab_images(tr_ids, te_ids, tot_img):
@@ -174,8 +175,17 @@ def engineered_features(train, test, tr_list, te_list):
 
 def more_features(train, test, tr_list, te_list):
 	'''
-	hull = cv2.convexHull(cnt,returnPoints = False)
-	defects = cv2.convexityDefects(cnt,hull)
+	Grab for features to learn from using openCV
+
+	Parameters:
+	te_list - list of the training images
+	tr_list - list of the testing images
+	train - 2D array of pre-extracted features for the training set
+	test - 2D array of pre-extracted features for the testing set
+
+	Return:
+	test_mod - 2D array of pre-extracted features for the training set with additional features
+	train_mod - 2D array of pre-extracted features for the test set with additional features
 	'''
 
 	tr_area = np.zeros((len(tr_list), 1)) 
@@ -228,7 +238,7 @@ def more_features(train, test, tr_list, te_list):
 
 	return train_mod, test_mod
 
-def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids):
 	'''
 	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 
@@ -258,6 +268,12 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
 	print 'Number of components for PCA:', pca.n_components_
 	tr_flat_pca = pca.transform(tr_flat)
 	te_flat_pca = pca.transform(te_flat)
+
+	tsne = TSNE(n_components = 2, perplexity = 40.0)
+	tsne_result = tsne.fit_transform(tr_flat_pca)
+	tsne_scaled = StandardScaler().fit_transform(tsne_result)
+	print tsne_scaled.shape
+	visualize.visualize_tsne(tsne_scaled, ids)
 
 	'''
 	print pca.explained_variance_ratio_

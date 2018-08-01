@@ -10,11 +10,8 @@ from sklearn.model_selection import GridSearchCV
 ####### Global variables #######
 global_max_dim = 50
 global_num_classes = 99
-filename = 'sklearn_log_reg.csv'
-
-# Set up a seed so that our results don't fluctuate over multiple tests
-seed = 10
-np.random.seed(seed)
+threshold = 0.95
+filename = 'Sklearn_all_pred.npy'
 
 ####### Code #######
 # Set up the data given to us
@@ -28,9 +25,9 @@ train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
 # Let's apply PCA to the images and attach them to the pre-extracted features
-train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim, train_ids)
-
+train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim)
 train, test = data_setup.more_features(train, test, train_list, test_list)
+
 '''
 # fit_transform() calculates the mean and std and also centers and scales data
 x_train = StandardScaler().fit_transform(train)
@@ -42,35 +39,7 @@ scaler = StandardScaler().fit(train)
 x_train = scaler.transform(train)
 x_test = scaler.transform(test)
 
-# We will use the solver 'lbfgs'
-log_reg = LogisticRegression(solver = 'lbfgs', verbose = 1, max_iter = 500, multi_class = 'multinomial')
+y_pred = np.load(filename)
 
-# Find the best parameters for our model
-gsCV = GridSearchCV(log_reg, param_grid = {'C': [100000.0, 10000.0, 1000.0], 'tol': [0.001, 0.0001, 0.00001]}, scoring = 'neg_log_loss', refit = True, verbose = 1, n_jobs = -1, cv = 5)
-
-# FIT IT
-gsCV.fit(x_train, y)
-
-print('best params: ' + str(gsCV.best_params_))
-for params, mean_score, scores in gsCV.grid_scores_:
- 	print '%0.3f (+/-%0.03f) for %r' % (mean_score, scores.std(), params)
- 	print scores
-
-# Predict for One Observation (image)
-y_pred = gsCV.predict_proba(x_test)
-
-np.save('probabilities/sklearn' + str(seed), y_pred)
-
-# visualize.confusion(y_pred, y, classes, test_ids, global_num_classes, train_mod_list)
-
-# Set up the predictions into the correct format to submit to Kaggle
-y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
-
-# Save predictions to a csv file to submit
-
-print 'Saving to file', filename, '...'
-fp = open(filename,'w')
-fp.write(y_pred.to_csv())
-
-print 'Finished.'
-
+# Look at some of the lower probability leaves
+visualize.confusion(y_pred, y, classes, test_ids, global_num_classes, train_mod_list, threshold)

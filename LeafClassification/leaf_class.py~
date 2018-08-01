@@ -2,7 +2,7 @@
 # Misc
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import matplotlib                                	 # Imported for use of matplotlib.use('Agg')
-# matplotlib.use('Agg')                            	 # Use if submitting job to the supercomputer
+matplotlib.use('Agg')                            	 # Use if submitting job to the supercomputer
 import pandas as pd                         	 	 # For reading in and writing files
 import scipy.ndimage as ndi            	   	 	 # Finding the center of the leaves
 import argparse                                  	 # For inputing values outside of the code
@@ -11,6 +11,7 @@ import data_setup                                        # Python code for setin
 
 # sklearn
 from sklearn.preprocessing import StandardScaler 	 # Preprocessing
+from sklearn.model_selection import StratifiedKFold
 
 # Keras
 from keras.models import Sequential, Model      	 # Linearly sets up model, allows the use of keras' API
@@ -50,7 +51,8 @@ filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch
 model_file = 'bestWeights2.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
-np.random.seed(2)
+seed = 1
+np.random.seed(seed)
 
 ####### Definitions #######
 def create_model_softmax():
@@ -198,7 +200,7 @@ def augment_fit(mod, f1, t_list, x, y):
 	
 	return history
 
-def nn_fit(mod, f1, x, y):
+def nn_fit(mod, f1, x, y, tr, val, m_s, y_p, x_t):
 	'''
 	Fitting our model that uses only the pre-extracted features (Only applicable for the neural network model)
 
@@ -213,13 +215,20 @@ def nn_fit(mod, f1, x, y):
 
 	print 'Using the neural network fit.'
 	early_stopper= EarlyStopping(monitor = 'val_loss', patience =300, verbose = 1, mode = 'auto')
-	model_checkpoint = ModelCheckpoint(f1, monitor = 'val_loss', verbose = 1, save_best_only = True)
+	model_checkpoint = ModelCheckpoint(f1, monitor = 'val_loss', verbose = 0, save_best_only = True)
 
-	history = mod.fit(x, y, epochs = args.global_max_epochs, batch_size = args.global_batch_size,
-		verbose = 0, validation_split = 0.1, shuffle = True, 
-		callbacks = [early_stopper, model_checkpoint])	
+	history = mod.fit(x[tr], y[tr], epochs = args.global_max_epochs, batch_size = args.global_batch_size,
+		verbose = 0, validation_data = (x[val], y[val]), callbacks = [early_stopper, model_checkpoint])	
 
-	return history
+	model.load_weights(f1)
+	scores = mod.evaluate(x[val], y[val], verbose = 0)
+	print '%s: %.5g' % (model.metrics_names[0], scores[0])
+	m_s.append(scores[0])
+
+	y_p.append(model.predict(x_t))
+	
+
+	return history, m_s, y_p
 
 def combined_fit(mod, f1, t_list, x, y):
 	'''
@@ -261,8 +270,6 @@ test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 # Let's apply PCA to the images and attach them to the pre-extracted features
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim)
 
-
-
 '''
 # fit_transform() calculates the mean and std and also centers and scales data
 x_train = StandardScaler().fit_transform(train)
@@ -283,27 +290,36 @@ if args.leaf_stats:
 # Set up our input layer size
 input_layer = x_train.shape[1]
 
-# Setting up the Keras neural network
-# Choose a model
-model = create_model_softmax()
-# model = create_model_combined()
+# We will use 5-fold cross validation
+kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
 
-# Compile our model
-sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
-model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
+mean_score = []
+y_pred = []
+# Setting up the Keras neural network
+for training, validation in kfold.split(x_train, y):
+	print 'Training...'
+	# Choose a model
+	model = create_model_softmax()
+	# model = create_model_combined()
+
+	# Compile our model
+	sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
+	model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
+
+	'''
+	Choose a fit for our model
+	Early stopping helps prevent over fitting by stopping our fitting function 
+	if our val_loss doesn't decrease after a certain number of epochs (called patience)
+	Model checkpoint saves the best weights obtained during training
+	'''
+	# history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
+	history, mean_score, y_pred = nn_fit(model, model_file, x_train, y_train, training, validation,
+						mean_score, y_pred, x_test)
+	# history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
+
+print '%.5g (+/- %.3g)' % (np.mean(mean_score), np.std(mean_score))
 print model.summary()
 # plot_model(model, to_file = 'modelSoftmax2.png', show_shapes = True)
-
-'''
-Choose a fit for our model
-Early stopping helps prevent over fitting by stopping our fitting function 
-if our val_loss doesn't decrease after a certain number of epochs (called patience)
-Model checkpoint saves the best weights obtained during training
-'''
-
-# history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
-history = nn_fit(model, model_file, x_train, y_train)
-# history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 
 # Check Keras' statistics
 if args.disp_stats:
@@ -312,24 +328,26 @@ if args.disp_stats:
 		save = args.save_stats)
 	print 'Finished.'
 
-# Reload our best weights
-model.load_weights(model_file)
-
 # Test our model on the test set
-y_pred = model.predict(x_test)
-print '\n'
+all_pred = np.zeros((y_pred[0].shape[0], y_pred[0].shape[1]))
+for i in range(len(y_pred)):
+	all_pred += y_pred[i]
+
+all_pred /= 10
+
+np.save('NN_all_pred', all_pred)
 
 # Let's see what leaves our network struggled the most with
 # visualize.confusion(y_pred, y, classes, test_ids, global_num_classes, train_mod_list)
 
 # Set up the predictions into the correct format to submit to Kaggle
-y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
+all_pred = pd.DataFrame(all_pred, index = test_ids, columns = classes)
 
 # Save predictions to a csv file to submit
 if args.save_prob:
 	print 'Saving to file', filename3, '...'
 	fp = open(filename3,'w')
-	fp.write(y_pred.to_csv())
+	fp.write(all_pred.to_csv())
 
 print 'Finished.'
 
