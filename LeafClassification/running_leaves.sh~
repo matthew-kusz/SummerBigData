@@ -1,4 +1,4 @@
-#PBS -N CNNPCASmallNN2
+#PBS -N NNAveraged
 #PBS -l walltime=01:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
@@ -17,4 +17,4 @@ fi
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u leaf_class.py 0 0 1 0 1001 20 >& CNNPCASmallNN2.log
+python -u leaf_class.py 0 0 1 0 600 20 >& NNAveraged.log

@@ -2,7 +2,7 @@
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import pandas as pd                         	 	 # For reading in and writing files
 import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
-import cv2
+import cv2						 # For grabbing more features
 from keras.utils import np_utils			 # Used to set up one-hot scheme
 from scipy.misc import imresize                  	 # For resizing the images
 from sklearn.decomposition import PCA           	 # Preprocessing
@@ -238,7 +238,7 @@ def more_features(train, test, tr_list, te_list):
 
 	return train_mod, test_mod
 
-def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = False):
 	'''
 	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 
@@ -254,7 +254,6 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
 	'''
 
 	print 'Applying PCA...'
-
 	tr_flat = np.zeros((len(tr_mod_list), max_dim * max_dim))
 	for i in range(len(tr_mod_list)):
 		tr_flat[i] = tr_mod_list[i].ravel()
@@ -264,54 +263,23 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim):
 		te_flat[i] = te_mod_list[i].ravel()
 	
 	pca = PCA(n_components = 30)
-	pca.fit(tr_flat)
+
+	total_flat = np.concatenate((tr_flat, te_flat), axis = 0)	
+
+	pca.fit(total_flat)
 	print 'Number of components for PCA:', pca.n_components_
 	tr_flat_pca = pca.transform(tr_flat)
 	te_flat_pca = pca.transform(te_flat)
-
+	'''
+	# Using tsne to spot patterns in the data
 	tsne = TSNE(n_components = 2, perplexity = 40.0)
 	tsne_result = tsne.fit_transform(tr_flat_pca)
 	tsne_scaled = StandardScaler().fit_transform(tsne_result)
 	print tsne_scaled.shape
-	visualize.visualize_tsne(tsne_scaled)
-
+	visualize.visualize_tsne(tsne_scaled, ids)
 	'''
-	print pca.explained_variance_ratio_
-	print np.sum(pca.explained_variance_ratio_)
-	approximation = pca.inverse_transform(tr_flat_pca)
-	
-	# Relationship of information retained vs. number of prinicpal components
-	mark = [15, 40, 70, 300]
-	plt.plot(np.cumsum(pca.explained_variance_ratio_), marker='o', color='b', markevery = mark)
-	plt.title('Information Retained vs. Principal Components')
-	plt.ylabel('Fraction of Information Retained')
-	plt.xlabel('Number of Principal Components')
-	plt.show()
-
-	plt.figure(figsize=(8,4))
-	# Original Image
-	plt.subplot(1, 2, 1)
-	plt.imshow(tr_mod_list[0].reshape(50,50),
-              	cmap = plt.cm.gray, interpolation='nearest',
-              	clim=(0, 1))
-	ax = plt.gca()
-	ax.axes.set_xticklabels([])
-	ax.axes.get_yaxis().set_visible(False)
-	plt.xlabel('2500 components', fontsize = 14)
-	plt.title('Original Image', fontsize = 20)
-
-	# 154 principal components
-	plt.subplot(1, 2, 2)
-	plt.imshow(approximation[0].reshape(50, 50),
-              	cmap = plt.cm.gray, interpolation='nearest',
-              	clim=(0, 1))
-	ax = plt.gca()
-	ax.axes.set_xticklabels([])
-	ax.axes.get_yaxis().set_visible(False)
-	plt.xlabel('300 components', fontsize = 14)
-	plt.title('PCA Image', fontsize = 20)
-	plt.show()
-	'''
+	if vis_PCA:
+		visualize.visualize_PCA(tr_flat_pca, tr_mod_list, pca)
 	
 	train = np.concatenate((train, tr_flat_pca), axis = 1)
 	test = np.concatenate((test, te_flat_pca), axis = 1)

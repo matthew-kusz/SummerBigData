@@ -1,19 +1,20 @@
 # Import the necessary packages
 import numpy as np				 	 # Allow for easier use of arrays and linear algebra
-import data_setup
-import visualize
+import data_setup                                        # Python code for setting up the data
+import visualize					 # Python code for visualizing images
 import pandas as pd                         	 	 # For reading in and writing files
-from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.linear_model import LogisticRegression      # sklearn's log reg
 from sklearn.preprocessing import StandardScaler 	 # Preprocessing
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV         # Helps find the best parameters for our model
 
 ####### Global variables #######
 global_max_dim = 50
 global_num_classes = 99
 filename = 'sklearn_log_reg.csv'
+threshold = 0.95
 
 # Set up a seed so that our results don't fluctuate over multiple tests
-seed = 10
+seed = 2
 np.random.seed(seed)
 
 ####### Code #######
@@ -23,19 +24,15 @@ train_list, test_list, train_ids, test_ids, train, test, y, y_train, classes = d
 # Grab more features to train on
 train, test = data_setup.engineered_features(train, test, train_list, test_list)
 
+# Grab even more features with openCV
+train, test = data_setup.more_features(train, test, train_list, test_list)
+
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
 # Let's apply PCA to the images and attach them to the pre-extracted features
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim, y)
-
-train, test = data_setup.more_features(train, test, train_list, test_list)
-'''
-# fit_transform() calculates the mean and std and also centers and scales data
-x_train = StandardScaler().fit_transform(train)
-x_test = StandardScaler().fit_transform(test)
-'''
 
 # fit calculates the mean and transform centers and scales the data so we have 0 mean and unit variance
 scaler = StandardScaler().fit(train)
@@ -51,6 +48,7 @@ gsCV = GridSearchCV(log_reg, param_grid = {'C': [100000.0, 10000.0, 1000.0], 'to
 # FIT IT
 gsCV.fit(x_train, y)
 
+# Print the score from each run
 print('best params: ' + str(gsCV.best_params_))
 for params, mean_score, scores in gsCV.grid_scores_:
  	print '%0.3f (+/-%0.03f) for %r' % (mean_score, scores.std(), params)
@@ -59,15 +57,15 @@ for params, mean_score, scores in gsCV.grid_scores_:
 # Predict for One Observation (image)
 y_pred = gsCV.predict_proba(x_test)
 
+# Save our numpy array to a .npy file for later use
 np.save('probabilities/sklearn' + str(seed), y_pred)
 
-# visualize.confusion(y_pred, y, classes, test_ids, global_num_classes, train_mod_list)
+# visualize.confusion(y_pred, y, classes, test_ids, global_num_classes, train_mod_list, theshold)
 
 # Set up the predictions into the correct format to submit to Kaggle
 y_pred = pd.DataFrame(y_pred, index = test_ids, columns = classes)
 
 # Save predictions to a csv file to submit
-
 print 'Saving to file', filename, '...'
 fp = open(filename,'w')
 fp.write(y_pred.to_csv())

@@ -4,14 +4,13 @@ import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import matplotlib                                	 # Imported for use of matplotlib.use('Agg')
 matplotlib.use('Agg')                            	 # Use if submitting job to the supercomputer
 import pandas as pd                         	 	 # For reading in and writing files
-import scipy.ndimage as ndi            	   	 	 # Finding the center of the leaves
 import argparse                                  	 # For inputing values outside of the code
 import visualize                                 	 # Python code for visualizing images
-import data_setup                                        # Python code for seting up the data
+import data_setup                                        # Python code for setting up the data
 
 # sklearn
 from sklearn.preprocessing import StandardScaler 	 # Preprocessing
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold      # K-fold validation
 
 # Keras
 from keras.models import Sequential, Model      	 # Linearly sets up model, allows the use of keras' API
@@ -19,7 +18,6 @@ from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D, Activation,
 from keras.utils import plot_model            		 # Visualizing model
 from keras.callbacks import EarlyStopping 	         # Used to prevent overfitting
 from keras.callbacks import ModelCheckpoint              # Gives us the best weights obtained during fitting
-from keras.preprocessing.image import ImageDataGenerator, NumpyArrayIterator, array_to_img
 from keras.optimizers import SGD                         # Enable the modification of optimizer SGD
 
 
@@ -51,7 +49,7 @@ filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch
 model_file = 'bestWeights2.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
-seed = 1
+seed = 2
 np.random.seed(seed)
 
 ####### Definitions #######
@@ -76,21 +74,9 @@ def create_model_softmax():
 	
 	return mod1
 
-def extra_layers(first):
-
-	x2 = Flatten()(first)
-	x2 = Dense(1000, activation = 'relu')(x2)
-	x2 = Dropout(0.2)(x2)
-	x2 = Dense(800, activation = 'relu')(x2)
-	x2 = Dropout(0.2)(x2)
-	x2 = Dense(600, activation = 'relu')(x2)
-	x2 = Dropout(0.2)(x2)
-
-	return  x2
-
 def create_model_combined():
 	'''
-	This model uses both the images and the and pre-extracted features of the leaves to create a CNN model
+	This model uses both the images and the pre-extracted features of the leaves to create a CNN model
 	Returns the built model
 	'''
 	# Obtaining features from the images
@@ -103,15 +89,7 @@ def create_model_combined():
 	x = Dropout(0.2)(x)
 	x = Flatten()(x)
 	x = Dense(192, activation = 'relu')(x)
-	final_first_input_layer = Dropout(0.2)(x)
-
-	'''
-	# Merging convolved features with nn features of images
-	x2 = extra_layers(first_input)
-	merge_prequel = concatenate([final_first_input_layer, x2])
-	
-	x = Dense(200, activation = 'relu')(merge_prequel)
-	'''	
+	final_first_input_layer = Dropout(0.2)(x)	
 
 	# Merging features from images with pre-extracted features
 	second_input = Input(shape=(input_layer, ))
@@ -131,23 +109,6 @@ def create_model_combined():
 
 	return model
 
-def combined_generator(imgen, X):
-    '''
-    A generator to train our keras neural network. It
-    takes the image augmenter generator and the array
-    of the pre-extracted features.
-    It yields a minibatch and will run indefinitely
-    '''
-    while True:
-        for i in range(X.shape[0]):
-            # Get the image batch and labels
-            batch_img, batch_y = next(imgen)
-            # This is where that change to the source code we
-            # made will come in handy. We can now access the indicies
-            # of the images that imgen gave us.
-            x = X[i]
-            yield [batch_img, x], batch_y
-
 def augment_fit(mod, f1, t_list, x, y):
 	'''
 	Fitting our model that uses both augmented images and pre-extracted features 
@@ -164,19 +125,6 @@ def augment_fit(mod, f1, t_list, x, y):
 	'''
 
 	print 'Using the augmented data fit_generator.'
-
-	'''
-	Since fit_generator does not support validation_split we must create our 
-	own validation data first (10% of data)
-	'''
-	t_val = t_list[global_num_train - 99: global_num_train]
-	x_val = x[global_num_train - 99: global_num_train]
-	y_val = y[global_num_train - 99: global_num_train]
-	
-	# We need to remove the validation data from our test set
-	t_train = t_list[0: global_num_train - 99]
-	x_train = x[0: global_num_train - 99]
-	y_train = y[0 : global_num_train - 99]
 
 	# Creating our augmented data
 	# ImageDataGenerator generates batches of tensor image data with real-time data augmentation.
@@ -209,10 +157,23 @@ def nn_fit(mod, f1, x, y, tr, val, m_s, y_p, x_t):
 	f1 - file name the best model is saved under
 	x - matrix of training pre-extracted features
 	y - matrix of testing pre-extracted features
+	tr- indices for the data that will be used for the training set
+	val - indices for the data that will be used from the validation set
+	m_s - array of scores from each run
+	y_p - array of predictions from each run
+	x_t - matrix of testing set with pre-extracted features + any additional features
 
-	Returns the stats of the model
+	Returns:
+	history - stats of the model
+	m_s - array of scores from each run
+	y_p - array of predictions from each run
 	'''
 
+	'''
+	Early stopping helps prevent over fitting by stopping our fitting function 
+	if our val_loss doesn't decrease after a certain number of epochs (called patience)
+	Model checkpoint saves the best weights obtained during training
+	'''
 	print 'Using the neural network fit.'
 	early_stopper= EarlyStopping(monitor = 'val_loss', patience =300, verbose = 1, mode = 'auto')
 	model_checkpoint = ModelCheckpoint(f1, monitor = 'val_loss', verbose = 0, save_best_only = True)
@@ -220,14 +181,19 @@ def nn_fit(mod, f1, x, y, tr, val, m_s, y_p, x_t):
 	history = mod.fit(x[tr], y[tr], epochs = args.global_max_epochs, batch_size = args.global_batch_size,
 		verbose = 0, validation_data = (x[val], y[val]), callbacks = [early_stopper, model_checkpoint])	
 
+	# Grab the best weights from current run
 	model.load_weights(f1)
+
+	# Find the scores
 	scores = mod.evaluate(x[val], y[val], verbose = 0)
 	print '%s: %.5g' % (model.metrics_names[0], scores[0])
+
+	# Store the scores for later
 	m_s.append(scores[0])
 
+	# Store the predictions for later
 	y_p.append(model.predict(x_t))
 	
-
 	return history, m_s, y_p
 
 def combined_fit(mod, f1, t_list, x, y):
@@ -244,6 +210,11 @@ def combined_fit(mod, f1, t_list, x, y):
 	Returns the stats of the model
 	'''
 
+	'''
+	Early stopping helps prevent over fitting by stopping our fitting function 
+	if our val_loss doesn't decrease after a certain number of epochs (called patience)
+	Model checkpoint saves the best weights obtained during training
+	'''
 	print 'Using the combined network fit.'
 	early_stopper= EarlyStopping(monitor = 'val_loss', patience = 300, verbose = 1, mode = 'auto')
 	model_checkpoint = ModelCheckpoint(model_file, monitor = 'val_loss', verbose = 1, save_best_only = True)
@@ -261,20 +232,16 @@ train_list, test_list, train_ids, test_ids, train, test, y, y_train, classes = d
 # Grab more features to train on
 train, test = data_setup.engineered_features(train, test, train_list, test_list)
 
+# Grab even more features with openCV
+train, test = data_setup.more_features(train, test, train_list, test_list)
+
 # We need to reshape our images so they are all the same dimensions
 train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
-# train, test = data_setup.more_features(train, test, train_list, test_list)
-
 # Let's apply PCA to the images and attach them to the pre-extracted features
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim)
 
-'''
-# fit_transform() calculates the mean and std and also centers and scales data
-x_train = StandardScaler().fit_transform(train)
-x_test = StandardScaler().fit_transform(test)
-'''
 # fit calculates the mean and transform centers and scales the data so we have 0 mean and unit variance
 scaler = StandardScaler().fit(train)
 x_train = scaler.transform(train)
@@ -290,11 +257,13 @@ if args.leaf_stats:
 # Set up our input layer size
 input_layer = x_train.shape[1]
 
-# We will use 5-fold cross validation
+# We will use 10-fold cross validation
 kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
 
+# Set up arrays to store the score and predictions for each iteration
 mean_score = []
 y_pred = []
+
 # Setting up the Keras neural network
 for training, validation in kfold.split(x_train, y):
 	print 'Training...'
@@ -306,17 +275,13 @@ for training, validation in kfold.split(x_train, y):
 	sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
 	model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
-	'''
-	Choose a fit for our model
-	Early stopping helps prevent over fitting by stopping our fitting function 
-	if our val_loss doesn't decrease after a certain number of epochs (called patience)
-	Model checkpoint saves the best weights obtained during training
-	'''
+	#Choose a fit for our model
 	# history = augment_fit(model, model_file, train_mod_list, x_train, y_train)
 	history, mean_score, y_pred = nn_fit(model, model_file, x_train, y_train, training, validation,
 						mean_score, y_pred, x_test)
 	# history = combined_fit(model, model_file, train_mod_list, x_train, y_train)
 
+# Print the average validation lost and its standard deviation
 print '%.5g (+/- %.3g)' % (np.mean(mean_score), np.std(mean_score))
 print model.summary()
 # plot_model(model, to_file = 'modelSoftmax2.png', show_shapes = True)
@@ -328,17 +293,15 @@ if args.disp_stats:
 		save = args.save_stats)
 	print 'Finished.'
 
-# Test our model on the test set
+# Average our predictions over all of the runs
 all_pred = np.zeros((y_pred[0].shape[0], y_pred[0].shape[1]))
 for i in range(len(y_pred)):
 	all_pred += y_pred[i]
 
 all_pred /= 10
 
+# Save our numpy array to a .npy file for later use
 np.save('NN_all_pred', all_pred)
-
-# Let's see what leaves our network struggled the most with
-# visualize.confusion(y_pred, y, classes, test_ids, global_num_classes, train_mod_list)
 
 # Set up the predictions into the correct format to submit to Kaggle
 all_pred = pd.DataFrame(all_pred, index = test_ids, columns = classes)
