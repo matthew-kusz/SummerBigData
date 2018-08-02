@@ -38,7 +38,7 @@ args = parser.parse_args()
 
 global_num_train = 990
 global_num_test = 594
-global_hidden_layers = [200, 100] #[400, 200]
+global_hidden_layers = [100, 50] #[400, 200]
 global_output_layer = 99
 global_num_classes = 99
 global_max_dim = 50
@@ -46,10 +46,10 @@ global_max_dim = 50
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.csv'
-model_file = 'bestWeights.hdf5'
+model_file = 'bestWeights2.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
-seed = 2
+seed = 4
 np.random.seed(seed)
 
 ####### Definitions #######
@@ -225,7 +225,7 @@ def combined_fit(mod, f1, tr_list, te_list, x, y, tr, val, m_s, y_p, x_t):
 	'''
 	print 'Using the combined network fit.'
 	early_stopper= EarlyStopping(monitor = 'val_loss', patience = 300, verbose = 1, mode = 'auto')
-	model_checkpoint = ModelCheckpoint(model_file, monitor = 'val_loss', verbose = 0, save_best_only = True)
+	model_checkpoint = ModelCheckpoint(model_file, monitor = 'val_loss', verbose = 1, save_best_only = True)
 
 	history = mod.fit(([tr_list[tr], x[tr]]), y[tr], epochs = args.global_max_epochs,
 		batch_size = args.global_batch_size, verbose = 0,
@@ -302,8 +302,10 @@ for training, validation in kfold.split(x_train, y):
 	history, mean_score, y_pred = augment_fit(model, model_file, train_mod_list, x_train, y_train, training
 						validation, mean_score, y_pred, x_test)
 	'''
+	
 	history, mean_score, y_pred = nn_fit(model, model_file, x_train, y_train, training, validation,
 						mean_score, y_pred, x_test)
+	
 	'''
 	history = combined_fit(model, model_file, train_mod_list, test_mod_list, x_train, y_train, training,
 						validation, mean_score, y_pred, x_test)

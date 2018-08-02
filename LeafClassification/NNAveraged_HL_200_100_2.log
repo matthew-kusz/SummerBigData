@@ -1,0 +1,29 @@
+Using TensorFlow backend.
+Loading images...
+Finished.
+Grabbing more features...
+Finished.
+Applying PCA...
+Number of components for PCA: 30
+Finished.
+Training...
+Using the neural network fit.
+2018-08-02 16:00:10.639626: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2018-08-02 16:00:10.639661: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+loss: 0.0016183
+Training...
+Using the neural network fit.
+Epoch 00581: early stopping
+loss: 0.018681
+Training...
+Using the neural network fit.
+Traceback (most recent call last):
+  File "leaf_class.py", line 306, in <module>
+    history, mean_score, y_pred = nn_fit(model, model_file, x_train, y_train, training, validation,
+  File "leaf_class.py", line 185, in nn_fit
+    model.load_weights(f1)
+  File "/users/PAS1383/osu10173/.conda/envs/local/lib/python2.7/site-packages/keras/models.py", line 727, in load_weights
+    topology.load_weights_from_hdf5_group(f, layers)
+  File "/users/PAS1383/osu10173/.conda/envs/local/lib/python2.7/site-packages/keras/engine/topology.py", line 2981, in load_weights_from_hdf5_group
+    str(len(filtered_layers)) + ' layers.')
+ValueError: You are trying to load a weight file containing 6 layers into a model with 3 layers.

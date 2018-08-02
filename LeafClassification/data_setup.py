@@ -11,7 +11,7 @@ from sklearn.preprocessing import LabelEncoder  	 # Preprocessing
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 import visualize
-
+import matplotlib.pyplot as plt
 ####### Definitions #######
 def grab_images(tr_ids, te_ids, tot_img):
 	'''
@@ -176,8 +176,8 @@ def more_features(train, test, tr_list, te_list):
 	Grab for features to learn from using openCV
 
 	Parameters:
-	te_list - list of the training images
-	tr_list - list of the testing images
+	tr_list - list of the training images
+	te_list - list of the testing images
 	train - 2D array of pre-extracted features for the training set
 	test - 2D array of pre-extracted features for the testing set
 
@@ -189,17 +189,37 @@ def more_features(train, test, tr_list, te_list):
 	tr_area = np.zeros((len(tr_list), 1)) 
 	tr_per = np.zeros((len(tr_list), 1))
 	tr_hull = np.zeros((len(tr_list), 1))
+	tr_cx = np.zeros((len(tr_list), 1))
+	tr_cy = np.zeros((len(tr_list), 1))
 	te_area = np.zeros((len(te_list), 1)) 
 	te_per = np.zeros((len(te_list), 1))
 	te_hull = np.zeros((len(te_list), 1))
+	te_cx = np.zeros((len(te_list), 1))
+	te_cy = np.zeros((len(te_list), 1))
 
 	for i in range (len(tr_list)):
+		plt.imshow(tr_list[i], cmap = 'binary')
+		plt.show()
+
 		thresh = cv2.adaptiveThreshold(tr_list[i], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
 						cv2.THRESH_BINARY,7,2)
-		_ , contours, _ = cv2.findContours(thresh, 1, 2)
+
+		plt.imshow(thresh, cmap = 'binary')
+		plt.show()		
+	
+		image, contours, _ = cv2.findContours(thresh, 1, 2)
+		plt.imshow(image, cmap = 'binary')
+		plt.show()
+
 		cnt = contours[0]
 		tr_area[i] = cv2.contourArea(cnt)
 		tr_per[i] = cv2.arcLength(cnt,True)
+		M = cv2.moments(cnt)
+		print M
+		print cv2.contourArea(cnt)
+
+		tr_cx[i] =  int(M['m10'] / M['m00'])
+		tr_cy[i] =  int(M['m01'] / M['m00'])
 
 		hull = cv2.convexHull(cnt,returnPoints = False)
 		defects = cv2.convexityDefects(cnt,hull)
@@ -219,6 +239,9 @@ def more_features(train, test, tr_list, te_list):
 		cnt = contours[0]
 		te_area[i] = cv2.contourArea(cnt)
 		te_per[i] = cv2.arcLength(cnt,True)
+		M = cv2.moments(cnt)
+		te_cx[i] =  int(M['m10'] / M['m00'])
+		te_cy[i] =  int(M['m01'] / M['m00'])
 
 		hull = cv2.convexHull(cnt,returnPoints = False)
 		defects = cv2.convexityDefects(cnt,hull)
@@ -231,12 +254,12 @@ def more_features(train, test, tr_list, te_list):
 		else:
 			te_hull[i] = all_defects
 
-	train_mod = np.concatenate((train, tr_area, tr_per, tr_hull),axis = 1)
-	test_mod = np.concatenate((test, te_area, te_per, te_hull),axis = 1)
+	train_mod = np.concatenate((train, tr_area, tr_per, tr_hull, tr_cx, tr_cy),axis = 1)
+	test_mod = np.concatenate((test, te_area, te_per, te_hull, te_cx, te_cy),axis = 1)
 
 	return train_mod, test_mod
 
-def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = False, tsne = False):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = False, tsne = True):
 	'''
 	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 

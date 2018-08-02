@@ -8,25 +8,58 @@ Number of components for PCA: 30
 Finished.
 Training...
 Using the neural network fit.
-2018-08-02 15:33:29.248145: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
-2018-08-02 15:33:29.248180: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
-loss: 0.00012257
+2018-08-02 16:11:44.780750: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2018-08-02 16:11:44.780785: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+loss: 0.0016183
 Training...
 Using the neural network fit.
-Epoch 00545: early stopping
-loss: 0.056673
+Epoch 00418: early stopping
+loss: 0.0022899
 Training...
 Using the neural network fit.
-Epoch 00423: early stopping
-loss: 0.0069287
+loss: 8.3463e-05
 Training...
 Using the neural network fit.
-loss: 6.6848e-05
+loss: 0.00024582
 Training...
 Using the neural network fit.
-loss: 8.1061e-05
+loss: 7.6846e-05
 Training...
 Using the neural network fit.
-loss: 7.8935e-05
+Epoch 00436: early stopping
+loss: 0.019962
 Training...
 Using the neural network fit.
+loss: 0.00014423
+Training...
+Using the neural network fit.
+Epoch 00335: early stopping
+loss: 0.1119
+Training...
+Using the neural network fit.
+Epoch 00422: early stopping
+loss: 0.013215
+Training...
+Using the neural network fit.
+loss: 2.7472e-05
+0.014956 (+/- 0.033)
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+dense_28 (Dense)             (None, 200)               46400     
+_________________________________________________________________
+dropout_19 (Dropout)         (None, 200)               0         
+_________________________________________________________________
+dense_29 (Dense)             (None, 100)               20100     
+_________________________________________________________________
+dropout_20 (Dropout)         (None, 100)               0         
+_________________________________________________________________
+dense_30 (Dense)             (None, 99)                9999      
+=================================================================
+Total params: 76,499
+Trainable params: 76,499
+Non-trainable params: 0
+_________________________________________________________________
+None
+Saving to file submissions/submissionEpoch601Batch20Softmax.csv ...
+Finished.
