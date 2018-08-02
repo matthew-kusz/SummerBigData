@@ -16,7 +16,7 @@ global_num_train = 990
 global_num_test = 594
 NUM_LEAVES = 3
 global_max_dim = 50
-model_fn = 'bestWeights2.hdf5'
+model_fn = 'bestWeights3.hdf5'
 
 ####### Definitions #######
 # Function by gcalmettes from http://stackoverflow.com/questions/11159436/multiple-figures-in-a-single-window
@@ -69,10 +69,12 @@ test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 # Grab more features to train on
 train, test = data_setup.engineered_features(train, test, train_list, test_list)
 
-train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim)
+train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim, y)
 
-x_train = StandardScaler().fit_transform(train)
-x_test = StandardScaler().fit_transform(test)
+# fit calculates the mean and transform centers and scales the data so we have 0 mean and unit variance
+scaler = StandardScaler().fit(train)
+x_train = scaler.transform(train)
+x_test = scaler.transform(test)
 
 # Set up our input layer size
 global_input_layer = x_train.shape[1]

@@ -270,11 +270,11 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = Fal
 	if tsne:
 		# Using tsne to spot patterns in the data	
 		tsne = TSNE(n_components = 2, perplexity = 40.0)
-		tsne_result = tsne.fit_transform(te_flat_pca)
+		tsne_result = tsne.fit_transform(tr_flat_pca)
 		tsne_scaled = StandardScaler().fit_transform(tsne_result)
 		print tsne_scaled.shape
 		visualize.visualize_tsne(tsne_scaled, ids)
-		visualize.visualize_tsne_images(tsne_scaled, te_mod_list)
+		visualize.visualize_tsne_images(tsne_scaled, tr_mod_list)
 
 	if vis_PCA:
 		visualize.visualize_PCA(tr_flat_pca, tr_flat, pca)
