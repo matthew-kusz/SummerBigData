@@ -1,0 +1,19 @@
+/users/PAS1383/osu10173/work/GitHub/MattRepo/LeafClassification
+discarding /usr/local/anaconda/anaconda2/bin from PATH
+prepending /users/PAS1383/osu10173/.conda/envs/local/bin to PATH
+=>> PBS: job killed: walltime 3628 exceeded limit 3600
+
+-----------------------
+Resources requested:
+nodes=1:ppn=1
+mem=16gb
+-----------------------
+Resources used:
+cput=01:00:15
+walltime=01:00:38
+mem=0.829 GB
+vmem=1.911 GB
+-----------------------
+Resource units charged (estimate):
+0.404 RUs
+-----------------------

@@ -8,8 +8,6 @@ from scipy.misc import imresize                  	 # For resizing the images
 from sklearn.decomposition import PCA           	 # Preprocessing
 from sklearn.preprocessing import LabelEncoder  	 # Preprocessing
 
-import matplotlib.pyplot as plt
-
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 import visualize
@@ -238,7 +236,7 @@ def more_features(train, test, tr_list, te_list):
 
 	return train_mod, test_mod
 
-def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = False):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = False, tsne = True):
 	'''
 	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 
@@ -268,20 +266,22 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = Fal
 	print 'Number of components for PCA:', pca.n_components_
 	tr_flat_pca = pca.transform(tr_flat)
 	te_flat_pca = pca.transform(te_flat)
-	'''
-	# Using tsne to spot patterns in the data
-	tsne = TSNE(n_components = 2, perplexity = 40.0)
-	tsne_result = tsne.fit_transform(tr_flat_pca)
-	tsne_scaled = StandardScaler().fit_transform(tsne_result)
-	print tsne_scaled.shape
-	visualize.visualize_tsne(tsne_scaled, ids)
-	'''
+	
+	if tsne:
+		# Using tsne to spot patterns in the data	
+		tsne = TSNE(n_components = 2, perplexity = 40.0)
+		tsne_result = tsne.fit_transform(tr_flat_pca)
+		tsne_scaled = StandardScaler().fit_transform(tsne_result)
+		print tsne_scaled.shape
+		visualize.visualize_tsne(tsne_scaled, ids)
+		visualize.visualize_tsne_images(tsne_scaled, tr_mod_list)
+
 	if vis_PCA:
-		visualize.visualize_PCA(tr_flat_pca, tr_mod_list, pca)
+		visualize.visualize_PCA(tr_flat_pca, tr_flat, pca)
 	
 	train = np.concatenate((train, tr_flat_pca), axis = 1)
 	test = np.concatenate((test, te_flat_pca), axis = 1)
-	
+
 	print 'Finished.'
 	return train, test
 

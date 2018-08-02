@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt                          # For plotting
 import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
 import matplotlib.cm as cm                               # For matplotlib's cmap
 from sklearn.metrics.pairwise import cosine_similarity   # Used for checking how similar images are to one another
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 ####### Definitions #######
 def visualize_leaves(images, y, classes, show1, show2):
@@ -418,6 +419,18 @@ def visualize_tsne(images, ids, fig_size = (20, 20)):
 				linewidth = '1', alpha = 0.8)
 
 	plt.legend(loc = 'best')
-	plt.show()
-	stop
 	return
+
+def visualize_tsne_images(images, orig_images, fig_size = (50, 50), image_zoom = 0.2):
+	orig_images = orig_images.reshape(len(orig_images),50, 50)
+	fig, ax = plt.subplots(figsize=fig_size)
+    	artists = []
+	for xy, i in zip(images, orig_images):
+        	x0, y0 = xy
+        	img = OffsetImage(i, zoom=image_zoom)
+        	ab = AnnotationBbox(img, (x0, y0), xycoords='data', frameon=False)
+        	artists.append(ax.add_artist(ab))
+
+   	ax.update_datalim(images)
+    	ax.autoscale()
+    	plt.show()

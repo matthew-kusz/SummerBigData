@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt                          # For plotting
 import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
 import matplotlib.cm as cm                               # For matplotlib's cmap
 from sklearn.metrics.pairwise import cosine_similarity   # Used for checking how similar images are to one another
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 ####### Definitions #######
 def visualize_leaves(images, y, classes, show1, show2):
@@ -207,7 +208,7 @@ def visualize_PCA(tr_pca, tr_m_list, pca):
 	Visualize the PCA images and the explained_variance_ratio
 
 	Parameters:
-	tr_pca - matrix of the training set flattened pca images
+	tr_pca - 2D array of the training set flattened pca images
 	tr_m_list - list of the resized training images
 	pca - pca function that was set up in data_setup
 	'''
@@ -255,9 +256,9 @@ def display_conf(y, top3, tr_img, tot):
 	Displays images of the top 3 predicted species for the more confused species
 
 	Parameters:
-	y -
-	top3 -
-	tr_img -
+	y - 1D array that holds a label for each species ranging from 0 to n - 1
+	top3 - number representing the species of leaf
+	tr_img - list of the resized training images
 	tot - keeps track of how many images there are
 
 	Returns the images of the 3 species concatenated together
@@ -418,6 +419,18 @@ def visualize_tsne(images, ids, fig_size = (20, 20)):
 				linewidth = '1', alpha = 0.8)
 
 	plt.legend(loc = 'best')
-	plt.show()
-	stop
 	return
+
+def visualize_tsne_images(images, orig_images, fig_size = (50, 50), image_zoom = 0.7):
+	orig_images = orig_images.reshape(len(orig_images),50, 50)
+	fig, ax = plt.subplots(figsize=fig_size)
+    	artists = []
+	for xy, i in zip(images, orig_images):
+        	x0, y0 = xy
+        	img = OffsetImage(i, zoom=image_zoom)
+        	ab = AnnotationBbox(img, (x0, y0), xycoords='data', frameon=False)
+        	artists.append(ax.add_artist(ab))
+
+   	ax.update_datalim(images)
+    	ax.autoscale()
+    	plt.show()
