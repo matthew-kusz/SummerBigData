@@ -36,3 +36,29 @@ Using the neural network fit.
 loss: 0.029642
 Training...
 Using the neural network fit.
+loss: 0.0023037
+Training...
+Using the neural network fit.
+Epoch 00430: early stopping
+loss: 0.0035265
+0.01249 (+/- 0.0184)
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+dense_28 (Dense)             (None, 400)               92800     
+_________________________________________________________________
+dropout_19 (Dropout)         (None, 400)               0         
+_________________________________________________________________
+dense_29 (Dense)             (None, 200)               80200     
+_________________________________________________________________
+dropout_20 (Dropout)         (None, 200)               0         
+_________________________________________________________________
+dense_30 (Dense)             (None, 99)                19899     
+=================================================================
+Total params: 192,899
+Trainable params: 192,899
+Non-trainable params: 0
+_________________________________________________________________
+None
+Saving to file submissions/submissionEpoch602Batch20Softmax.csv ...
+Finished.

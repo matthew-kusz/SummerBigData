@@ -421,7 +421,7 @@ def visualize_tsne(images, ids, fig_size = (20, 20)):
 	plt.legend(loc = 'best')
 	return
 
-def visualize_tsne_images(images, orig_images, fig_size = (50, 50), image_zoom = 0.2):
+def visualize_tsne_images(images, orig_images, fig_size = (50, 50), image_zoom = 0.6):
 	orig_images = orig_images.reshape(len(orig_images),50, 50)
 	fig, ax = plt.subplots(figsize=fig_size)
     	artists = []
