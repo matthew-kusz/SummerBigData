@@ -14,7 +14,7 @@ filename = 'sklearn_log_reg.csv'
 threshold = 0.95
 
 # Set up a seed so that our results don't fluctuate over multiple tests
-seed = 2
+seed = 1
 np.random.seed(seed)
 
 ####### Code #######
@@ -32,7 +32,7 @@ train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
 test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
 # Let's apply PCA to the images and attach them to the pre-extracted features
-train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim, y)
+train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim, y, classes)
 
 # fit calculates the mean and transform centers and scales the data so we have 0 mean and unit variance
 scaler = StandardScaler().fit(train)

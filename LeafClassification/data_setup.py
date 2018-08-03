@@ -12,6 +12,7 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 import visualize
 import matplotlib.pyplot as plt
+from skimage.measure import regionprops
 ####### Definitions #######
 def grab_images(tr_ids, te_ids, tot_img):
 	'''
@@ -186,6 +187,10 @@ def more_features(train, test, tr_list, te_list):
 	train_mod - 2D array of pre-extracted features for the test set with additional features
 	'''
 
+	# We need to reshape our images so they are all the same dimensions
+	#train_m_list = reshape_img(tr_list, 1000).reshape(len(tr_list), 1000, 1000) * 255.0
+	#test_m_list = reshape_img(te_list, 1000).reshape(len(te_list), 1000, 1000) * 255.0
+
 	tr_area = np.zeros((len(tr_list), 1)) 
 	tr_per = np.zeros((len(tr_list), 1))
 	tr_hull = np.zeros((len(tr_list), 1))
@@ -196,30 +201,41 @@ def more_features(train, test, tr_list, te_list):
 	te_hull = np.zeros((len(te_list), 1))
 	te_cx = np.zeros((len(te_list), 1))
 	te_cy = np.zeros((len(te_list), 1))
-
-	for i in range (len(tr_list)):
-		plt.imshow(tr_list[i], cmap = 'binary')
-		plt.show()
-
-		thresh = cv2.adaptiveThreshold(tr_list[i], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-						cv2.THRESH_BINARY,7,2)
-
-		plt.imshow(thresh, cmap = 'binary')
-		plt.show()		
 	
-		image, contours, _ = cv2.findContours(thresh, 1, 2)
-		plt.imshow(image, cmap = 'binary')
-		plt.show()
+	count = 0
+	for i in range (len(tr_list)):
+		#tr = np.array(train_m_list[i], np.uint8)
+		#plt.imshow(tr_list[i], cmap = 'binary')
+		#plt.show()
+		# ret,thresh = cv2.threshold(tr,127,255,0)
+		thresh = cv2.adaptiveThreshold(tr_list[i], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+						cv2.THRESH_BINARY,3,2)
+
+		#plt.imshow(thresh, cmap = 'binary')
+		#plt.show()		
+	
+		image , contours, _ = cv2.findContours(thresh, mode = cv2.RETR_TREE,
+							method = cv2.CHAIN_APPROX_SIMPLE)
 
 		cnt = contours[0]
 		tr_area[i] = cv2.contourArea(cnt)
 		tr_per[i] = cv2.arcLength(cnt,True)
-		M = cv2.moments(cnt)
-		print M
-		print cv2.contourArea(cnt)
+		M = cv2.moments(cnt, binaryImage = True)
+		#print M #FIXME
+		#print cv2.contourArea(cnt) #FIXME
 
-		tr_cx[i] =  int(M['m10'] / M['m00'])
-		tr_cy[i] =  int(M['m01'] / M['m00'])
+		#plt.imshow(image, cmap = 'binary')
+		#plt.show()
+
+		if M['m10'] != 0:
+			#print regionprops(tr_list[i])
+			tr_cx[i] =  int(M['m10'] / M['m00'])
+			tr_cy[i] =  int(M['m01'] / M['m00'])
+		else: 
+			plt.imshow(tr_list[i], cmap = 'binary')
+			plt.show()
+			print cnt
+			count += 1 
 
 		hull = cv2.convexHull(cnt,returnPoints = False)
 		defects = cv2.convexityDefects(cnt,hull)
@@ -232,16 +248,24 @@ def more_features(train, test, tr_list, te_list):
 		else:	
 			tr_hull[i] = all_defects
 
+	print count #FIXME
+	count = 0
 	for i in range (len(te_list)):
 		thresh = cv2.adaptiveThreshold(te_list[i], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
 						cv2.THRESH_BINARY,7,2)
-		_ , contours, _ = cv2.findContours(thresh, 1, 2)
+		_ , contours, _ = cv2.findContours(thresh, mode = cv2.RETR_TREE, method = cv2.CHAIN_APPROX_SIMPLE)
 		cnt = contours[0]
 		te_area[i] = cv2.contourArea(cnt)
 		te_per[i] = cv2.arcLength(cnt,True)
 		M = cv2.moments(cnt)
-		te_cx[i] =  int(M['m10'] / M['m00'])
-		te_cy[i] =  int(M['m01'] / M['m00'])
+
+		if M['m10'] != 0:
+			te_cx[i] =  int(M['m10'] / M['m00'])
+			te_cy[i] =  int(M['m01'] / M['m00'])
+		else: 
+			plt.imshow(te_list[i], cmap = 'binary')
+			plt.show()
+			count += 1 
 
 		hull = cv2.convexHull(cnt,returnPoints = False)
 		defects = cv2.convexityDefects(cnt,hull)
@@ -254,12 +278,13 @@ def more_features(train, test, tr_list, te_list):
 		else:
 			te_hull[i] = all_defects
 
+	print count # FIXME
 	train_mod = np.concatenate((train, tr_area, tr_per, tr_hull, tr_cx, tr_cy),axis = 1)
 	test_mod = np.concatenate((test, te_area, te_per, te_hull, te_cx, te_cy),axis = 1)
 
 	return train_mod, test_mod
 
-def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = False, tsne = True):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = True):
 	'''
 	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 
@@ -268,6 +293,7 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = Fal
 	tr_mod_list - list of the resized testing images
 	train - 2D array of pre-extracted features for the training set
 	test - 2D array of pre-extracted features for the testing set
+	ids - 1D array of the training set leaves ids
 
 	Return:
 	train - 2D array of pre-extracted features for the training set with the flattened PCA features
@@ -296,7 +322,7 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, vis_PCA = Fal
 		tsne_result = tsne.fit_transform(tr_flat_pca)
 		tsne_scaled = StandardScaler().fit_transform(tsne_result)
 		print tsne_scaled.shape
-		visualize.visualize_tsne(tsne_scaled, ids)
+		visualize.visualize_tsne(tsne_scaled, ids, labels)
 		visualize.visualize_tsne_images(tsne_scaled, tr_mod_list)
 
 	if vis_PCA:
