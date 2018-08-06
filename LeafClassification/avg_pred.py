@@ -4,7 +4,7 @@ import pandas as pd
 import data_setup
 
 ####### Global variables #######
-num_probs = 10
+num_probs = 6
 filename = 'sklearn_log_reg.csv'
 threshold = 0.95
 
@@ -34,7 +34,7 @@ np.save('Sklearn_all_pred', all_pred)
 all_pred = pd.DataFrame(all_pred, index = test_ids, columns = classes)
 
 # Save predictions to a csv file to submit
-print 'Saving to file', filename3, '...'
+print 'Saving to file', filename, '...'
 fp = open(filename,'w')
 fp.write(all_pred.to_csv())
 
