@@ -484,12 +484,12 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 		t_pca_all = np.concatenate((tr_flat_pca, te_flat_pca), axis = 0)
 		t_mod_all = np.concatenate((tr_mod_list, te_mod_list))
 		# Using tsne to spot patterns in the data	
-		tsne = TSNE(n_components = 2, perplexity = 40.0, early_exaggeration = 500)
-		tsne_result = tsne.fit_transform(t_pca_all)
+		tsne = TSNE(n_components = 2, perplexity = 40.0, verbose = 1)
+		tsne_result = tsne.fit_transform(tr_flat_pca)
 		tsne_scaled = StandardScaler().fit_transform(tsne_result)
 		print tsne_scaled.shape
 		# visualize.visualize_tsne(tsne_scaled, ids, labels)
-		x_pt, y_pt = visualize.visualize_tsne_images(tsne_scaled, t_mod_all)
+		x_pt, y_pt = visualize.visualize_tsne_images(tsne_scaled, tr_mod_list)
 
 	if vis_PCA:
 		visualize.visualize_PCA(tr_flat_pca, tr_flat, pca)
