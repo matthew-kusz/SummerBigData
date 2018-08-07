@@ -21,6 +21,7 @@ def grab_images(tr_ids, te_ids, tot_img):
 	Parameters:
 	tr_ids - 1D array of training image ids
 	te_ids - 1D array of testing image ids
+	tot_img - number of images in total
 
 	Returns:
 	images_list - full list of images
@@ -187,10 +188,6 @@ def more_features(train, test, tr_list, te_list):
 	train_mod - 2D array of pre-extracted features for the test set with additional features
 	'''
 
-	# We need to reshape our images so they are all the same dimensions
-	#train_m_list = reshape_img(tr_list, 1000).reshape(len(tr_list), 1000, 1000) * 255.0
-	#test_m_list = reshape_img(te_list, 1000).reshape(len(te_list), 1000, 1000) * 255.0
-
 	tr_area = np.zeros((len(tr_list), 1)) 
 	tr_per = np.zeros((len(tr_list), 1))
 	tr_hull = np.zeros((len(tr_list), 1))
@@ -210,35 +207,7 @@ def more_features(train, test, tr_list, te_list):
 	te_angle = np.zeros((len(te_list), 1))
 	te_mom = np.zeros((len(te_list), 24))
 	
-	# 654
-	'''
-	_ , thresh2 = cv2.threshold(tr_list[5],127,255,0)
-
-	thresh = cv2.adaptiveThreshold(tr_list[1], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-						cv2.THRESH_BINARY,3,2)
-
-	image , contours, _ = cv2.findContours(thresh2, mode = cv2.RETR_TREE,
-							method = cv2.CHAIN_APPROX_SIMPLE)
-	print contours
-	cnt = contours[0]
-	print cv2.arcLength(cnt,True)
-	print cv2.contourArea(cnt)
-	#print cv2.moments(cnt, binaryImage = True)
-    	cv2.drawContours(image, [cnt], 0, (0,255,0), 3)
-	
-	for i in range(len(contours)):
-		print '# of contour points: ', len(contours[i])
-
-     		for j in range(len(contours[i])):
-     			print 'Point(x,y)=', contours[i][j]
-
-     		print "Area: ", cv2.contourArea(contours[i])
-
-	plt.imshow(image, cmap = 'binary')
-	plt.show()
-
-	stop
-	'''
+	# Find the moments of each leaf in the taining set
 	for i in range (len(tr_list)):
 		ret, thresh = cv2.threshold(tr_list[i],127,255,0)	
 	
@@ -349,6 +318,7 @@ def more_features(train, test, tr_list, te_list):
 			tr_hull[i] = all_defects
 		'''
 
+	# Find the moments of each leaf in the test set
 	for i in range (len(te_list)):
 		ret, thresh = cv2.threshold(te_list[i],127,255,0)	
 	
@@ -443,8 +413,7 @@ def more_features(train, test, tr_list, te_list):
 		'''
 
 	train_mod = np.concatenate((train, tr_mom), axis = 1)
-	test_mod = np.concatenate((test, te_mom), axis = 1)
-	# te_area, te_per, te_hull, te_cx, te_cy, 
+	test_mod = np.concatenate((test, te_mom), axis = 1) 
 
 	return train_mod, test_mod
 
@@ -457,13 +426,15 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 	tr_mod_list - list of the resized testing images
 	train - 2D array of pre-extracted features for the training set
 	test - 2D array of pre-extracted features for the testing set
-	ids - 1D array of the training set leaves ids
+	ids - 1D array that holds a label for each species ranging from 0 to n - 1
+	labels - 1D array of the name of each leaf species
 
 	Return:
 	train - 2D array of pre-extracted features for the training set with the flattened PCA features
 	test - 2D array of pre-extracted features for the testing set with the flattened PCA features
 	'''
 
+	# Images need to be flattened to apply PCA to them
 	print 'Applying PCA...'
 	tr_flat = np.zeros((len(tr_mod_list), max_dim * max_dim))
 	for i in range(len(tr_mod_list)):
@@ -475,22 +446,28 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 	
 	pca = PCA(n_components = 30)	
 
+	# Fit PCA to our training images and transform our training and tests images
 	pca.fit(tr_flat)
 	print 'Number of components for PCA:', pca.n_components_
 	tr_flat_pca = pca.transform(tr_flat)
 	te_flat_pca = pca.transform(te_flat)
 	
+	# Display a plot after t-SNE is applied to look at the relationships between leaves
 	if tsne:
+		# If we want to use the coordinates for each leaf from t-SNE
 		t_pca_all = np.concatenate((tr_flat_pca, te_flat_pca), axis = 0)
 		t_mod_all = np.concatenate((tr_mod_list, te_mod_list))
-		# Using tsne to spot patterns in the data	
+
+		# Using t-SNE to spot patterns in the data	
 		tsne = TSNE(n_components = 2, perplexity = 40.0, verbose = 1)
 		tsne_result = tsne.fit_transform(tr_flat_pca)
 		tsne_scaled = StandardScaler().fit_transform(tsne_result)
-		print tsne_scaled.shape
+
+		# visualize_tsne works only for the labeled images (training set)
 		# visualize.visualize_tsne(tsne_scaled, ids, labels)
 		x_pt, y_pt = visualize.visualize_tsne_images(tsne_scaled, tr_mod_list)
 
+	# Display what the PCA leaves look like
 	if vis_PCA:
 		visualize.visualize_PCA(tr_flat_pca, tr_flat, pca)
 	

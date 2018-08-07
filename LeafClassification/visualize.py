@@ -404,7 +404,18 @@ def confusion(y_pred, y, classes, test_ids, num_classes, train_img, thresh):
 
 	return
 
+# From https://www.kaggle.com/gaborvecsei/plants-t-sne
 def visualize_tsne(images, ids, labels, fig_size = (20, 20)):
+	'''
+	Plots the results from t-SNE on a grid for each leaf
+
+	Parameters:
+	images - 2D array of training set images after t-SNE is applied
+	ids - 1D array that holds a label for each species ranging from 0 to n - 1
+	labels - 1D array of the name of each leaf species
+	fig_size - size of the plot
+	'''
+
 	plt.figure(figsize = fig_size)
 	plt.grid()
 
@@ -420,7 +431,22 @@ def visualize_tsne(images, ids, labels, fig_size = (20, 20)):
 
 	return
 
+# From https://www.kaggle.com/gaborvecsei/plants-t-sne
 def visualize_tsne_images(images, orig_images, fig_size = (50, 50), image_zoom = 0.6):
+	'''
+	Similar to the function above, but plots the picture of each leaf at their corresponding coordinates
+
+	Parameters:
+	images - 2D array of images after t-SNE is applied
+	orig_images - the unmodified images of the leaves
+	fig_size - size of the images
+	image_zoom - how large the images show up on the plot
+
+	Returns:
+	x_pt - 2D array of the x-coordinate for each leaf on the plot
+	y_pt - 2D array of the y-coordinate for each leaf on the plot
+	'''
+
 	orig_images = orig_images.reshape(len(orig_images),50, 50)
 	orig_images = orig_images.reshape(len(orig_images),50, 50, 1)
 	opacity = np.ones((len(orig_images),50, 50, 1))

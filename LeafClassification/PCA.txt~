@@ -1,5 +1,4 @@
-PCA scales down images to speed up machine learning where N are the amount of principal components.
-Each component tells you how much information is retained.
+PCA scales down images to speed up machine learning where N are the amount of principal components. Each component tells you how much information is retained.
 
 For N = 15:
 [ 0.27077937  0.15213673  0.05290813  0.04035276  0.03598212  0.02932664

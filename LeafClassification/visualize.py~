@@ -435,7 +435,7 @@ def visualize_tsne_images(images, orig_images, fig_size = (50, 50), image_zoom =
         	x0, y0 = xy
 		x_pt[j] = x0
 		y_pt[j] = y0
-		print x0, y0, x_pt[j], y_pt[j]
+
         	img = OffsetImage(i, zoom=image_zoom, cmap = 'binary')
         	ab = AnnotationBbox(img, (x0, y0), xycoords='data', frameon=False)
         	artists.append(ax.add_artist(ab))
