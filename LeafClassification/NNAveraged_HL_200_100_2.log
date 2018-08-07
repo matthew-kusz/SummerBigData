@@ -8,22 +8,57 @@ Number of components for PCA: 30
 Finished.
 Training...
 Using the neural network fit.
-2018-08-02 16:00:10.639626: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
-2018-08-02 16:00:10.639661: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
-loss: 0.0016183
+2018-08-07 10:17:27.051593: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2018-08-07 10:17:27.051628: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+loss: 0.027509
 Training...
 Using the neural network fit.
-Epoch 00581: early stopping
-loss: 0.018681
+loss: 5.1514e-05
 Training...
 Using the neural network fit.
-Traceback (most recent call last):
-  File "leaf_class.py", line 306, in <module>
-    history, mean_score, y_pred = nn_fit(model, model_file, x_train, y_train, training, validation,
-  File "leaf_class.py", line 185, in nn_fit
-    model.load_weights(f1)
-  File "/users/PAS1383/osu10173/.conda/envs/local/lib/python2.7/site-packages/keras/models.py", line 727, in load_weights
-    topology.load_weights_from_hdf5_group(f, layers)
-  File "/users/PAS1383/osu10173/.conda/envs/local/lib/python2.7/site-packages/keras/engine/topology.py", line 2981, in load_weights_from_hdf5_group
-    str(len(filtered_layers)) + ' layers.')
-ValueError: You are trying to load a weight file containing 6 layers into a model with 3 layers.
+Epoch 00490: early stopping
+loss: 0.0018446
+Training...
+Using the neural network fit.
+loss: 0.00024792
+Training...
+Using the neural network fit.
+loss: 3.9025e-05
+Training...
+Using the neural network fit.
+loss: 0.0067127
+Training...
+Using the neural network fit.
+loss: 0.00035354
+Training...
+Using the neural network fit.
+Epoch 00364: early stopping
+loss: 0.073914
+Training...
+Using the neural network fit.
+Epoch 00369: early stopping
+loss: 0.0099461
+Training...
+Using the neural network fit.
+loss: 4.5744e-05
+0.012066 (+/- 0.0222)
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+dense_28 (Dense)             (None, 200)               50600     
+_________________________________________________________________
+dropout_19 (Dropout)         (None, 200)               0         
+_________________________________________________________________
+dense_29 (Dense)             (None, 100)               20100     
+_________________________________________________________________
+dropout_20 (Dropout)         (None, 100)               0         
+_________________________________________________________________
+dense_30 (Dense)             (None, 99)                9999      
+=================================================================
+Total params: 80,699
+Trainable params: 80,699
+Non-trainable params: 0
+_________________________________________________________________
+None
+Saving to file submissions/submissionEpoch600Batch20Softmax.csv ...
+Finished.

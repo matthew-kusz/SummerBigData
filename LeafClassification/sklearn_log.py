@@ -14,7 +14,7 @@ global_num_classes = 99
 filename = 'sklearn_log_reg.csv'
 threshold = 0.95
 
-seed = 1
+seed = 2
 np.random.seed(seed)
 
 ####### Code #######

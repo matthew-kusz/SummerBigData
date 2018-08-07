@@ -415,19 +415,34 @@ def visualize_tsne(images, ids, labels, fig_size = (20, 20)):
 				marker = 'o', color = plt.cm.Set1(label / float(nb_classes)),
 				linewidth = '1', alpha = 0.8, label = labels[label])
 
-	plt.legend(loc = 'best', bbox_to_anchor=(0.5, 0.5))
+	plt.legend(loc = 'best', prop = {'size': 6})
+	plt.show()
+
 	return
 
 def visualize_tsne_images(images, orig_images, fig_size = (50, 50), image_zoom = 0.6):
 	orig_images = orig_images.reshape(len(orig_images),50, 50)
+	orig_images = orig_images.reshape(len(orig_images),50, 50, 1)
+	opacity = np.ones((len(orig_images),50, 50, 1))
+	orig_images = np.concatenate((1 - orig_images, 1 - orig_images, 1 - orig_images, orig_images), axis = 3)
 	fig, ax = plt.subplots(figsize=fig_size)
     	artists = []
+	
+	x_pt = np.zeros((len(orig_images), 1))
+	y_pt = np.zeros((len(orig_images), 1))
+	j = 0
 	for xy, i in zip(images, orig_images):
         	x0, y0 = xy
+		x_pt[j] = x0
+		y_pt[j] = y0
+		print x0, y0, x_pt[j], y_pt[j]
         	img = OffsetImage(i, zoom=image_zoom, cmap = 'binary')
         	ab = AnnotationBbox(img, (x0, y0), xycoords='data', frameon=False)
         	artists.append(ax.add_artist(ab))
+		j += 1
 
    	ax.update_datalim(images)
     	ax.autoscale()
     	plt.show()
+
+	return x_pt, y_pt

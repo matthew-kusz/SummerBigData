@@ -211,7 +211,7 @@ def more_features(train, test, tr_list, te_list):
 	te_mom = np.zeros((len(te_list), 24))
 	
 	# 654
-	''''
+	'''
 	_ , thresh2 = cv2.threshold(tr_list[5],127,255,0)
 
 	thresh = cv2.adaptiveThreshold(tr_list[1], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
@@ -264,16 +264,42 @@ def more_features(train, test, tr_list, te_list):
 		'''
 		cnt = contours[0]
 		M = cv2.moments(cnt, binaryImage = True)
-
+	
 		k = 0
 		for key in M:
 			tr_mom[i][k] = M[key] / 255.0
-			k+= 1
-		
+			k += 1
+
+		tr_per[i] += cv2.arcLength(cnt,True) / 255.0
+		'''
+		hull = cv2.convexHull(cnt,returnPoints = False)
+		defects = cv2.convexityDefects(cnt,hull)
+		all_defects = 0	
+		for k in range(len(defects)):
+			all_defects += defects[k][0][3]
+		all_defects /= len(defects)
+		tr_hull[i] = all_defects / 255.0
+		'''
+		'''
+		(x, y),(MA, ma), angle = cv2.fitEllipse(cnt)
+		tr_MA[i] = MA / 255.0
+		tr_ma[i] = ma / 255.0
+		tr_angle[i] = angle		
+		'''
+		'''
  		for j in range(len(contours)):
 			cnt = contours[j]
-			tr_area[i] += cv2.contourArea(cnt) / 255.0
-			tr_per[i] += cv2.arcLength(cnt,True) / 255.0
+			M = cv2.moments(cnt, binaryImage = True)
+			if M['m00'] > 5000:
+				print M['m00']
+				k = 0
+				for key in M:
+					tr_mom[i][k] = M[key] / 255.0
+					k+= 1
+		'''
+		'''
+			#tr_area[i] += cv2.contourArea(cnt) / 255.0
+			#tr_per[i] += cv2.arcLength(cnt,True) / 255.0
 			
 			if cv2.contourArea(cnt) > 5000:
 				M = cv2.moments(cnt, binaryImage = True)
@@ -293,7 +319,7 @@ def more_features(train, test, tr_list, te_list):
 				tr_MA[i] = MA / 255.0
 				tr_ma[i] = ma / 255.0
 				tr_angle[i] = angle
-
+		'''
 		
 		'''
 		if M['m10'] != 0:
@@ -330,14 +356,40 @@ def more_features(train, test, tr_list, te_list):
 
 		cnt = contours[0]
 		M = cv2.moments(cnt, binaryImage = True)
-
+		
 		k = 0
 		for key in M:
 			te_mom[i][k] = M[key] / 255.0
 			k+= 1
+
+		te_per[i] += cv2.arcLength(cnt,True) / 255.0
 		'''
-		for j in range(len(contours)):
+		hull = cv2.convexHull(cnt,returnPoints = False)
+		defects = cv2.convexityDefects(cnt,hull)
+		all_defects = 0	
+		for k in range(len(defects)):
+			all_defects += defects[k][0][3]
+		all_defects /= len(defects)
+		te_hull[i] = all_defects / 255.0
+		'''
+		'''
+		(x, y),(MA, ma), angle = cv2.fitEllipse(cnt)
+		tr_MA[i] = MA / 255.0
+		tr_ma[i] = ma / 255.0
+		tr_angle[i] = angle
+		'''
+		'''
+ 		for j in range(len(contours)):
 			cnt = contours[j]
+			M = cv2.moments(cnt, binaryImage = True)
+			if M['m00'] > 5000:
+				k = 0
+				for key in M:
+					te_mom[i][k] = M[key] / 255.0
+					k+= 1
+		'''
+		'''
+
 			te_area[i] += cv2.contourArea(cnt) / 255.0
 			te_per[i] += cv2.arcLength(cnt,True) / 255.0
 
@@ -390,13 +442,13 @@ def more_features(train, test, tr_list, te_list):
 			te_hull[i] = all_defects
 		'''
 
-	train_mod = np.concatenate((train, tr_mom, tr_hull), axis = 1)
-	test_mod = np.concatenate((test, te_mom, te_hull), axis = 1)
+	train_mod = np.concatenate((train, tr_mom), axis = 1)
+	test_mod = np.concatenate((test, te_mom), axis = 1)
 	# te_area, te_per, te_hull, te_cx, te_cy, 
 
 	return train_mod, test_mod
 
-def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = False):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = True):
 	'''
 	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 
@@ -429,19 +481,22 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 	te_flat_pca = pca.transform(te_flat)
 	
 	if tsne:
+		t_pca_all = np.concatenate((tr_flat_pca, te_flat_pca), axis = 0)
+		t_mod_all = np.concatenate((tr_mod_list, te_mod_list))
 		# Using tsne to spot patterns in the data	
-		tsne = TSNE(n_components = 2, perplexity = 40.0)
-		tsne_result = tsne.fit_transform(tr_flat_pca)
+		tsne = TSNE(n_components = 2, perplexity = 40.0, early_exaggeration = 500)
+		tsne_result = tsne.fit_transform(t_pca_all)
 		tsne_scaled = StandardScaler().fit_transform(tsne_result)
 		print tsne_scaled.shape
-		visualize.visualize_tsne(tsne_scaled, ids, labels)
-		visualize.visualize_tsne_images(tsne_scaled, tr_mod_list)
+		# visualize.visualize_tsne(tsne_scaled, ids, labels)
+		x_pt, y_pt = visualize.visualize_tsne_images(tsne_scaled, t_mod_all)
 
 	if vis_PCA:
 		visualize.visualize_PCA(tr_flat_pca, tr_flat, pca)
 	
-	train = np.concatenate((train, tr_flat_pca), axis = 1)
-	test = np.concatenate((test, te_flat_pca), axis = 1)
+	train = np.concatenate((train, tr_flat_pca, x_pt[0: len(train)], y_pt[0: len(train)]), axis = 1)
+	test = np.concatenate((test, te_flat_pca, x_pt[len(train): len(test) + len(train)],
+				y_pt[len(train): len(test) + len(train)]), axis = 1)
 
 	print 'Finished.'
 	return train, test
