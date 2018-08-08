@@ -21,7 +21,11 @@ def augment():
 	test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 
 	# Let's create more images for us
-	datagen = ImageDataGenerator(rotation_range=20, zoom_range=0.2, fill_mode='nearest')
+	datagen = ImageDataGenerator(rotation_range=20,
+    					zoom_range=0.2,
+   					horizontal_flip=True,
+    					vertical_flip=True,
+    					fill_mode='nearest')
 
 	datagen.fit(train_mod_list)
 

@@ -206,7 +206,7 @@ def more_features(train, test, tr_list, te_list):
 	te_ma = np.zeros((len(te_list), 1))
 	te_angle = np.zeros((len(te_list), 1))
 	te_mom = np.zeros((len(te_list), 24))
-	
+	count = 0
 	# Find the moments of each leaf in the taining set
 	for i in range (len(tr_list)):
 		ret, thresh = cv2.threshold(tr_list[i],127,255,0)	
@@ -231,15 +231,18 @@ def more_features(train, test, tr_list, te_list):
 					plt.imshow(im, cmap = 'binary')
 					plt.show()
 		'''
+		
 		cnt = contours[0]
 		M = cv2.moments(cnt, binaryImage = True)
-	
 		k = 0
 		for key in M:
 			tr_mom[i][k] = M[key] / 255.0
 			k += 1
 
 		tr_per[i] += cv2.arcLength(cnt,True) / 255.0
+		
+		print tr_mom[i]
+		print '\n'
 		'''
 		hull = cv2.convexHull(cnt,returnPoints = False)
 		defects = cv2.convexityDefects(cnt,hull)
@@ -255,17 +258,19 @@ def more_features(train, test, tr_list, te_list):
 		tr_ma[i] = ma / 255.0
 		tr_angle[i] = angle		
 		'''
-		'''
+		
  		for j in range(len(contours)):
 			cnt = contours[j]
 			M = cv2.moments(cnt, binaryImage = True)
 			if M['m00'] > 5000:
-				print M['m00']
+				print 'Entered'
 				k = 0
 				for key in M:
 					tr_mom[i][k] = M[key] / 255.0
 					k+= 1
-		'''
+				print tr_mom[i]
+				print '\n'
+		
 		'''
 			#tr_area[i] += cv2.contourArea(cnt) / 255.0
 			#tr_per[i] += cv2.arcLength(cnt,True) / 255.0
@@ -323,7 +328,7 @@ def more_features(train, test, tr_list, te_list):
 		ret, thresh = cv2.threshold(te_list[i],127,255,0)	
 	
 		im , contours, _ = cv2.findContours(thresh, 1, 2)
-
+		
 		cnt = contours[0]
 		M = cv2.moments(cnt, binaryImage = True)
 		
@@ -333,6 +338,7 @@ def more_features(train, test, tr_list, te_list):
 			k+= 1
 
 		te_per[i] += cv2.arcLength(cnt,True) / 255.0
+		
 		'''
 		hull = cv2.convexHull(cnt,returnPoints = False)
 		defects = cv2.convexityDefects(cnt,hull)
@@ -417,7 +423,7 @@ def more_features(train, test, tr_list, te_list):
 
 	return train_mod, test_mod
 
-def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = True):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = False):
 	'''
 	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 
@@ -433,6 +439,8 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 	train - 2D array of pre-extracted features for the training set with the flattened PCA features
 	test - 2D array of pre-extracted features for the testing set with the flattened PCA features
 	'''
+	print tr_mod_list.shape
+	print te_mod_list.shape
 
 	# Images need to be flattened to apply PCA to them
 	print 'Applying PCA...'
@@ -452,6 +460,10 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 	tr_flat_pca = pca.transform(tr_flat)
 	te_flat_pca = pca.transform(te_flat)
 	
+	train = np.concatenate((train, tr_flat_pca), axis = 1)
+	test = np.concatenate((test, te_flat_pca), axis = 1)	
+
+
 	# Display a plot after t-SNE is applied to look at the relationships between leaves
 	if tsne:
 		# If we want to use the coordinates for each leaf from t-SNE
@@ -460,20 +472,21 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 
 		# Using t-SNE to spot patterns in the data	
 		tsne = TSNE(n_components = 2, perplexity = 40.0, verbose = 1)
-		tsne_result = tsne.fit_transform(tr_flat_pca)
+		tsne_result = tsne.fit_transform(t_pca_all)
 		tsne_scaled = StandardScaler().fit_transform(tsne_result)
 
 		# visualize_tsne works only for the labeled images (training set)
 		# visualize.visualize_tsne(tsne_scaled, ids, labels)
-		x_pt, y_pt = visualize.visualize_tsne_images(tsne_scaled, tr_mod_list)
+		x_pt, y_pt = visualize.visualize_tsne_images(tsne_scaled, t_mod_all)
+
+		train = np.concatenate((train, x_pt[0: len(train)], y_pt[0: len(train)]), axis = 1)
+		test = np.concatenate((test, x_pt[len(train): len(test) + len(train)],
+				y_pt[len(train): len(test) + len(train)]), axis = 1)
+		
 
 	# Display what the PCA leaves look like
 	if vis_PCA:
 		visualize.visualize_PCA(tr_flat_pca, tr_flat, pca)
-	
-	train = np.concatenate((train, tr_flat_pca, x_pt[0: len(train)], y_pt[0: len(train)]), axis = 1)
-	test = np.concatenate((test, te_flat_pca, x_pt[len(train): len(test) + len(train)],
-				y_pt[len(train): len(test) + len(train)]), axis = 1)
 
 	print 'Finished.'
 	return train, test
