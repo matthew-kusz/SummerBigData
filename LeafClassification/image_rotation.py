@@ -12,16 +12,9 @@ global_max_dim = 50
 seed = 2
 np.random.seed(seed)
 
-def augment():
-	# Set up the data given to us
-	train_list, test_list, train_ids, test_ids, train, test, y, y_train, classes = data_setup.data()
-
-	# We need to reshape our images so they are all the same dimensions
-	train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
-	test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
-
+def augment(train, train_mod_list, y, y_train, test_mod_list, test):
 	# Let's create more images for us
-	datagen = ImageDataGenerator(rotation_range=20, zoom_range=0.2, fill_mode='nearest')
+	datagen = ImageDataGenerator(rotation_range=20, fill_mode='nearest')
 
 	datagen.fit(train_mod_list)
 
@@ -31,30 +24,44 @@ def augment():
 	temp3 = []
 	temp4 = []
 	temp5 = []
+
+	te = []
+	te2 = []
 	for i in range(len(train_mod_list)):
 		j = 0
-		temp.append(train_mod_list[i].reshape(global_max_dim, global_max_dim))
+		temp.append(train_mod_list[i].ravel())
 		temp2.append(y_train[i])
 		temp3.append(train[i:i + 1])
-		temp4.append(train_list[i])
 		temp5.append(y[i])		
 		
-
+		
 		for X_batch, y_batch in datagen.flow(train_mod_list[i:i + 1], y_train[i:i + 1], batch_size=9):
-			temp.append(X_batch.reshape(global_max_dim, global_max_dim))
+			temp.append(X_batch.ravel())
 			temp2.append(y_batch)
 			temp3.append(train[i:i + 1])
-			temp4.append(train_list[i])
 			temp5.append(y[i])
 		
 			j += 1
 			if j == 9:
 				break
+
+	for i in range(len(test_mod_list)):
+		j = 0
+		te.append(test_mod_list[i].ravel())
+		te2.append(test[i:i+1])
+		for Z_batch in datagen.flow(test_mod_list[i:i + 1], batch_size=9):
+			te.append(Z_batch.ravel())
+			te2.append(test[i:i + 1])
+
+			j += 1
+			if j == 9:
+				break		
+
 	
-	temp_arr = np.zeros((len(temp), global_max_dim, global_max_dim))
+	temp_arr = np.zeros((len(temp), global_max_dim * global_max_dim))
 	temp2_arr = np.zeros((len(temp2), 99))
-	temp3_arr = np.zeros((len(temp3), 192))
-	temp5_arr = np.zeros(len(temp5))
+	temp3_arr = np.zeros((len(temp3), 222))
+	temp5_arr = np.zeros((len(temp5), 1))
 	print temp5_arr.shape
 
 	for i in range(len(temp)):
@@ -62,12 +69,27 @@ def augment():
 		temp2_arr[i] = temp2[i]
 		temp3_arr[i] = temp3[i]
 		temp5_arr[i] = temp5[i]
-
+	
+	all_all = np.concatenate((temp_arr, temp2_arr, temp3_arr, temp5_arr), axis = 1)
+	np.random.shuffle(all_all)
+	
+	for i in range(len(temp)):
+		temp_arr[i] = all_all[i][0: temp_arr.shape[1]]
+		temp2_arr[i] = all_all[i][temp_arr.shape[1]: temp_arr.shape[1] + 99]
+		temp3_arr[i] = all_all[i][temp_arr.shape[1] + 99: temp_arr.shape[1] + 99 + 222]
+		temp5_arr[i] = all_all[i][temp_arr.shape[1] + 99 + 222: temp_arr.shape[1] + 99 + 222 + 1]
+	
 	train_mod_list = temp_arr.reshape(len(temp_arr), global_max_dim, global_max_dim, 1)
 	y_train = temp2_arr
 	train = temp3_arr
 	train_list = temp4
-	y = temp5_arr
+	y = temp5_arr.ravel()
 
-	return train_mod_list, y_train, train, train_list, y
+	te_arr = np.zeros((len(te), global_max_dim * global_max_dim))
+	te2_arr = np.zeros((len(te2), 222))
+	for i in range(len(te)):
+		te_arr[i] = te[i]
+		te2_arr[i] =te2[i]
+
+	return train, y , y_train, train_mod_list, te_arr.reshape(len(te_arr), global_max_dim, global_max_dim, 1), te2_arr
 

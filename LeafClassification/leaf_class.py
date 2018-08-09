@@ -7,6 +7,7 @@ import pandas as pd                         	 	 # For reading in and writing fil
 import argparse                                  	 # For inputing values outside of the code
 import visualize                                 	 # Python code for visualizing images
 import data_setup                                        # Python code for setting up the data
+import image_rotation
 
 # sklearn
 from sklearn.preprocessing import StandardScaler 	 # Preprocessing
@@ -251,15 +252,17 @@ def combined_fit(mod, f1, tr_list, te_list, x, y, tr, val, m_s, y_p, x_t):
 # Set up the data given to us
 train_list, test_list, train_ids, test_ids, train, test, y, y_train, classes = data_setup.data()
 
+# We need to reshape our images so they are all the same dimensions
+train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
+test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
+
 # Grab more features to train on
 train, test = data_setup.engineered_features(train, test, train_list, test_list)
 
 # Grab even more features with openCV
-train, test = data_setup.more_features(train, test, train_list, test_list)
+train, test , _ = data_setup.more_features(train, test, train_list, test_list, y, classes)
 
-# We need to reshape our images so they are all the same dimensions
-train_mod_list = data_setup.reshape_img(train_list, global_max_dim)
-test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
+train, y , y_train, train_mod_list, _ , _ = image_rotation.augment(train, train_mod_list, y, y_train, test_mod_list, test)
 
 # Let's apply PCA to the images and attach them to the pre-extracted features
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim, y, classes)
@@ -280,7 +283,7 @@ if args.leaf_stats:
 input_layer = x_train.shape[1]
 
 # We will use 10-fold cross validation
-kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
 
 # Set up arrays to store the score and predictions for each iteration
 mean_score = []
@@ -290,8 +293,8 @@ y_pred = []
 for training, validation in kfold.split(x_train, y):
 	print 'Training...'
 	# Choose a model
-	model = create_model_softmax()
-	# model = create_model_combined()
+	# model = create_model_softmax()
+	model = create_model_combined()
 
 	# Compile our model
 	sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
@@ -302,14 +305,14 @@ for training, validation in kfold.split(x_train, y):
 	history, mean_score, y_pred = augment_fit(model, model_file, train_mod_list, x_train, y_train, training
 						validation, mean_score, y_pred, x_test)
 	'''
-	
+	'''
 	history, mean_score, y_pred = nn_fit(model, model_file, x_train, y_train, training, validation,
 						mean_score, y_pred, x_test)
-	
 	'''
+	
 	history = combined_fit(model, model_file, train_mod_list, test_mod_list, x_train, y_train, training,
 						validation, mean_score, y_pred, x_test)
-	'''
+	
 
 # Print the average validation lost and its standard deviation
 print '%.5g (+/- %.3g)' % (np.mean(mean_score), np.std(mean_score))
@@ -328,7 +331,7 @@ all_pred = np.zeros((y_pred[0].shape[0], y_pred[0].shape[1]))
 for i in range(len(y_pred)):
 	all_pred += y_pred[i]
 
-all_pred /= 10
+all_pred /= 5
 
 # Save our numpy array to a .npy file for later use
 np.save('NN_all_pred', all_pred)

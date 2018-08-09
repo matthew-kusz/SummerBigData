@@ -1,5 +1,5 @@
-#PBS -N NNAveraged_HL_200_100_2
-#PBS -l walltime=01:00:00
+#PBS -N CNNAveraged_HL_200_100_Aug
+#PBS -l walltime=12:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=16GB
 #PBS -j oe
@@ -17,4 +17,4 @@ fi
 # module load python/2.7.8
 source activate local
 # This is the command the runs the python script
-python -u leaf_class.py 0 0 1 0 600 20 >& NNAveraged_HL_200_100_2.log
+python -u leaf_class.py 0 0 1 0 150 20 >& CNNAveraged_HL_200_100_Aug.log

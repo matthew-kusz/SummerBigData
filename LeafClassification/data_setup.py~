@@ -173,7 +173,7 @@ def engineered_features(train, test, tr_list, te_list):
 	print 'Finished.'
 	return train_mod, test_mod
 
-def more_features(train, test, tr_list, te_list):
+def more_features(train, test, tr_list, te_list, y, classes):
 	'''
 	Grab for features to learn from using openCV
 
@@ -206,7 +206,15 @@ def more_features(train, test, tr_list, te_list):
 	te_ma = np.zeros((len(te_list), 1))
 	te_angle = np.zeros((len(te_list), 1))
 	te_mom = np.zeros((len(te_list), 24))
+	
+	tr_mom2 = np.zeros((len(tr_list), 24))
+	te_mom2 = np.zeros((len(te_list), 24))
 	count = 0
+	temp = []
+	temp2 = []
+	temp3 = []
+	arr1 = np.zeros(99)
+	arr2 = np.zeros(99)
 	# Find the moments of each leaf in the taining set
 	for i in range (len(tr_list)):
 		ret, thresh = cv2.threshold(tr_list[i],127,255,0)	
@@ -231,18 +239,28 @@ def more_features(train, test, tr_list, te_list):
 					plt.imshow(im, cmap = 'binary')
 					plt.show()
 		'''
-		
+		'''
 		cnt = contours[0]
 		M = cv2.moments(cnt, binaryImage = True)
 		k = 0
 		for key in M:
 			tr_mom[i][k] = M[key] / 255.0
 			k += 1
-
+		'''
+		'''
 		tr_per[i] += cv2.arcLength(cnt,True) / 255.0
 		
-		print tr_mom[i]
-		print '\n'
+		if M['m00'] > 0:
+			temp.append(train[i])
+			temp2.append(tr_mom[i])
+			temp3.append(y[i])
+
+		if M['m00'] == 0:
+			count += 1
+			arr1[y[i]] += 1 
+			print M['m00']
+			print classes[y[i]]
+		'''
 		'''
 		hull = cv2.convexHull(cnt,returnPoints = False)
 		defects = cv2.convexityDefects(cnt,hull)
@@ -258,7 +276,8 @@ def more_features(train, test, tr_list, te_list):
 		tr_ma[i] = ma / 255.0
 		tr_angle[i] = angle		
 		'''
-		
+		'''
+		count += 1
  		for j in range(len(contours)):
 			cnt = contours[j]
 			M = cv2.moments(cnt, binaryImage = True)
@@ -267,9 +286,13 @@ def more_features(train, test, tr_list, te_list):
 				for key in M:
 					tr_mom[i][k] = M[key] / 255.0
 					k+= 1
-				print tr_mom[i]
-				print '\n'
-		
+		if count % 10 == 0:
+			print 'Here!'
+			k = 0
+			for key in M:
+				tr_mom[i][k] = 0
+				k+= 1
+		'''
 		'''
 			#tr_area[i] += cv2.contourArea(cnt) / 255.0
 			#tr_per[i] += cv2.arcLength(cnt,True) / 255.0
@@ -321,7 +344,12 @@ def more_features(train, test, tr_list, te_list):
 		else:	
 			tr_hull[i] = all_defects
 		'''
+	print arr1
+	print '\n'
+	print count 
+	print '\n'
 
+	count = 0
 	# Find the moments of each leaf in the test set
 	for i in range (len(te_list)):
 		ret, thresh = cv2.threshold(te_list[i],127,255,0)	
@@ -335,9 +363,15 @@ def more_features(train, test, tr_list, te_list):
 		for key in M:
 			te_mom[i][k] = M[key] / 255.0
 			k+= 1
-
+		
+		'''
 		te_per[i] += cv2.arcLength(cnt,True) / 255.0
 		
+		if M['m00'] == 0:
+			count += 1
+			arr2[y[i]] += 1
+			print classes[y[i]]
+		'''
 		'''
 		hull = cv2.convexHull(cnt,returnPoints = False)
 		defects = cv2.convexityDefects(cnt,hull)
@@ -354,6 +388,7 @@ def more_features(train, test, tr_list, te_list):
 		tr_angle[i] = angle
 		'''
 		'''
+		count += 1
  		for j in range(len(contours)):
 			cnt = contours[j]
 			M = cv2.moments(cnt, binaryImage = True)
@@ -362,6 +397,12 @@ def more_features(train, test, tr_list, te_list):
 				for key in M:
 					te_mom[i][k] = M[key] / 255.0
 					k+= 1
+
+		if count % 10 == 0:
+			k = 0
+			for key in M:
+				te_mom[i][k] = 0
+				k+= 1
 		'''
 		'''
 
@@ -417,10 +458,22 @@ def more_features(train, test, tr_list, te_list):
 			te_hull[i] = all_defects
 		'''
 
+	print arr2
+	print '\n'
+	print count 
+
+	tr = np.zeros((len(temp), train.shape[1]))
+	trm = np.zeros((len(temp), tr_mom.shape[1]))
+	tryy = np.zeros(len(temp))
+	for i in range(len(temp)):
+		tr[i] = temp[i]
+		trm[i] = temp2[i]
+		tryy[i] = temp3[i]
+
 	train_mod = np.concatenate((train, tr_mom), axis = 1)
 	test_mod = np.concatenate((test, te_mom), axis = 1) 
 
-	return train_mod, test_mod
+	return train_mod, test_mod, y
 
 def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = False):
 	'''
