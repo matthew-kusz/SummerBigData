@@ -239,14 +239,14 @@ def more_features(train, test, tr_list, te_list, y, classes):
 					plt.imshow(im, cmap = 'binary')
 					plt.show()
 		'''
-		'''
+		
 		cnt = contours[0]
 		M = cv2.moments(cnt, binaryImage = True)
 		k = 0
 		for key in M:
 			tr_mom[i][k] = M[key] / 255.0
 			k += 1
-		'''
+		
 		'''
 		tr_per[i] += cv2.arcLength(cnt,True) / 255.0
 		

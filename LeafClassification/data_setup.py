@@ -475,7 +475,7 @@ def more_features(train, test, tr_list, te_list, y, classes):
 
 	return train_mod, test_mod, y
 
-def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = False):
+def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = True):
 	'''
 	Use PCA to create lower dimensional images that can be used with the pre-extracted features
 
