@@ -684,3 +684,21 @@ Epoch 00232: val_loss did not improve
 Epoch 00233: val_loss did not improve
 Epoch 00234: val_loss did not improve
 Epoch 00235: val_loss did not improve
+Epoch 00236: val_loss did not improve
+Epoch 00237: val_loss did not improve
+Epoch 00238: val_loss did not improve
+Epoch 00239: val_loss did not improve
+Epoch 00240: val_loss did not improve
+Epoch 00241: val_loss did not improve
+Epoch 00242: val_loss did not improve
+Epoch 00243: val_loss did not improve
+Epoch 00244: val_loss did not improve
+Epoch 00245: val_loss did not improve
+Epoch 00246: val_loss did not improve
+Epoch 00247: val_loss did not improve
+Epoch 00248: val_loss did not improve
+Epoch 00249: val_loss did not improve
+loss: 0.00013455
+Training...
+Using the combined network fit.
+Epoch 00000: val_loss improved from inf to 3.09349, saving model to bestWeights.hdf5

@@ -371,3 +371,17 @@ Epoch 00062: val_loss did not improve
 Epoch 00063: val_loss improved from 0.00000 to 0.00000, saving model to bestWeights2.hdf5
 Epoch 00064: val_loss improved from 0.00000 to 0.00000, saving model to bestWeights2.hdf5
 Epoch 00065: val_loss improved from 0.00000 to 0.00000, saving model to bestWeights2.hdf5
+Epoch 00066: val_loss did not improve
+Epoch 00067: val_loss did not improve
+Epoch 00068: val_loss did not improve
+Epoch 00069: val_loss did not improve
+Epoch 00070: val_loss improved from 0.00000 to 0.00000, saving model to bestWeights2.hdf5
+Epoch 00071: val_loss improved from 0.00000 to 0.00000, saving model to bestWeights2.hdf5
+Epoch 00072: val_loss improved from 0.00000 to 0.00000, saving model to bestWeights2.hdf5
+Epoch 00073: val_loss did not improve
+Epoch 00074: val_loss did not improve
+Epoch 00075: val_loss did not improve
+Epoch 00076: val_loss did not improve
+Epoch 00077: val_loss did not improve
+Epoch 00078: val_loss did not improve
+Epoch 00079: val_loss did not improve
