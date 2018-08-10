@@ -1,0 +1,686 @@
+Using TensorFlow backend.
+Loading images...
+Finished.
+Grabbing more features...
+Finished.
+0.0
+Quercus_Variabilis
+2.0
+Quercus_Pontica
+2.0
+Quercus_Trojana
+0.0
+Quercus_Variabilis
+2.0
+Quercus_Kewensis
+2.0
+Quercus_Alnifolia
+2.0
+Quercus_Trojana
+0.0
+Celtis_Koraiensis
+2.0
+Quercus_Semecarpifolia
+18.0
+Celtis_Koraiensis
+0.0
+Quercus_Variabilis
+2.0
+Quercus_Phellos
+0.0
+Quercus_Alnifolia
+10.0
+Quercus_Coccinea
+0.0
+Quercus_Semecarpifolia
+0.0
+Quercus_Variabilis
+2.0
+Acer_Capillipes
+4.0
+Quercus_Kewensis
+0.0
+Quercus_Crassifolia
+0.0
+Quercus_Trojana
+0.0
+Quercus_Variabilis
+0.0
+Quercus_Chrysolepis
+0.0
+Quercus_Trojana
+0.0
+Quercus_Variabilis
+2.0
+Quercus_Kewensis
+0.0
+Acer_Pictum
+9.0
+Populus_Adenopoda
+2.0
+Callicarpa_Bodinieri
+1.0
+Quercus_Crassifolia
+4.0
+Arundinaria_Simonii
+2.0
+Quercus_Trojana
+4.0
+Quercus_Chrysolepis
+23.0
+Ginkgo_Biloba
+2.0
+Quercus_Semecarpifolia
+2.0
+Quercus_Kewensis
+2.0
+Quercus_Trojana
+2.0
+Acer_Capillipes
+5.5
+Quercus_Semecarpifolia
+2.0
+Quercus_Afares
+0.0
+Quercus_Coccinea
+2.0
+Lithocarpus_Edulis
+0.0
+Populus_Adenopoda
+2.0
+Alnus_Maximowiczii
+2.0
+Quercus_Cerris
+0.0
+Quercus_Variabilis
+4.0
+Crataegus_Monogyna
+2.0
+Sorbus_Aria
+2.0
+Quercus_Trojana
+23.0
+Alnus_Sieboldiana
+2.0
+Quercus_Phellos
+2.0
+Quercus_Hartwissiana
+2.0
+Alnus_Maximowiczii
+2.0
+Quercus_Kewensis
+0.0
+Quercus_Pontica
+0.0
+Quercus_Variabilis
+2.0
+Alnus_Maximowiczii
+0.0
+Alnus_Maximowiczii
+0.0
+Quercus_Dolicholepis
+4.0
+Quercus_Trojana
+6.0
+Prunus_Avium
+2.0
+Quercus_Kewensis
+2.0
+Quercus_Afares
+0.0
+Acer_Pictum
+0.0
+Quercus_Variabilis
+18.5
+Quercus_Rubra
+0.0
+Quercus_Kewensis
+2.0
+Acer_Capillipes
+2.0
+Quercus_Semecarpifolia
+2.0
+Quercus_Trojana
+2.0
+Salix_Fragilis
+0.0
+Arundinaria_Simonii
+1.0
+Quercus_Chrysolepis
+2.0
+Salix_Fragilis
+1.0
+Quercus_Pontica
+2.0
+Quercus_Rubra
+2.0
+Quercus_Trojana
+2.0
+Quercus_Kewensis
+16.5
+Quercus_Cerris
+0.0
+Alnus_Maximowiczii
+0.0
+Quercus_Phellos
+2.0
+Alnus_Maximowiczii
+4.0
+Cornus_Controversa
+2.0
+Quercus_Semecarpifolia
+2.0
+Crataegus_Monogyna
+2.0
+Acer_Capillipes
+2.0
+Quercus_Semecarpifolia
+2.0
+Quercus_Ellipsoidalis
+2.0
+Quercus_Kewensis
+2.0
+Salix_Fragilis
+2.0
+Quercus_Chrysolepis
+2.0
+Arundinaria_Simonii
+9.5
+Quercus_Texana
+45.5
+Cornus_Controversa
+0.0
+Quercus_Kewensis
+2.0
+Quercus_Coccinea
+2.0
+Tilia_Tomentosa
+2.0
+Quercus_Texana
+2.0
+Acer_Capillipes
+0.0
+Acer_Pictum
+2.0
+Alnus_Maximowiczii
+[  5.   0.   0.   0.   0.   3.   0.   0.   0.   0.   0.   7.   0.   1.   0.
+   3.   0.   0.   1.   0.   2.   0.   0.   2.   0.   0.   2.   0.   0.   0.
+   0.   0.   1.   0.   0.   0.   0.   0.   1.   0.   0.   0.   0.   0.   2.
+   0.   0.   1.   0.   0.   2.   0.   2.   0.   0.   0.   2.   4.   0.   3.
+   2.   0.   1.   1.   0.   1.   0.   0.   0.  10.   0.   0.   3.   0.   3.
+   0.   0.   0.   2.   7.   0.   0.   2.  10.   9.   0.   0.   0.   0.   3.
+   0.   1.   0.   0.   1.   0.   0.   0.   0.]
+
+
+100
+
+
+Acer_Capillipes 5.0
+Acer_Pictum 3.0
+Alnus_Maximowiczii 7.0
+Alnus_Sieboldiana 1.0
+Arundinaria_Simonii 3.0
+Callicarpa_Bodinieri 1.0
+Celtis_Koraiensis 2.0
+Cornus_Controversa 2.0
+Crataegus_Monogyna 2.0
+Ginkgo_Biloba 1.0
+Lithocarpus_Edulis 1.0
+Populus_Adenopoda 2.0
+Prunus_Avium 1.0
+Quercus_Afares 2.0
+Quercus_Alnifolia 2.0
+Quercus_Cerris 2.0
+Quercus_Chrysolepis 4.0
+Quercus_Coccinea 3.0
+Quercus_Crassifolia 2.0
+Quercus_Dolicholepis 1.0
+Quercus_Ellipsoidalis 1.0
+Quercus_Hartwissiana 1.0
+Quercus_Kewensis 10.0
+Quercus_Phellos 3.0
+Quercus_Pontica 3.0
+Quercus_Rubra 2.0
+Quercus_Semecarpifolia 7.0
+Quercus_Texana 2.0
+Quercus_Trojana 10.0
+Quercus_Variabilis 9.0
+Salix_Fragilis 3.0
+Sorbus_Aria 1.0
+Tilia_Tomentosa 1.0
+
+
+Quercus_Brantii
+Betula_Austrosinensis
+Quercus_Suber
+Rhododendron_x_Russellianum
+Quercus_Texana
+Quercus_Afares
+Quercus_Canariensis
+Viburnum_x_Rhytidophylloides
+Celtis_Koraiensis
+Betula_Austrosinensis
+Quercus_Coccinea
+Acer_Saccharinum
+Populus_Nigra
+Eucalyptus_Glaucescens
+Alnus_Rubra
+Quercus_Imbricaria
+Quercus_Suber
+Quercus_Pyrenaica
+Quercus_Shumardii
+Quercus_Rubra
+Alnus_Sieboldiana
+Quercus_Shumardii
+Quercus_x_Turneri
+Quercus_Rubra
+Morus_Nigra
+Quercus_Ellipsoidalis
+Ginkgo_Biloba
+Cornus_Macrophylla
+Quercus_Coccinea
+Betula_Austrosinensis
+Olea_Europaea
+Phildelphus
+Quercus_Pubescens
+Salix_Intergra
+Populus_Grandidentata
+Cotinus_Coggygria
+Ilex_Aquifolium
+Eucalyptus_Neglecta
+Lithocarpus_Edulis
+Betula_Pendula
+Ulmus_Bergmanniana
+Alnus_Maximowiczii
+Populus_Adenopoda
+Quercus_Crassifolia
+Quercus_Ilex
+Quercus_Ellipsoidalis
+Cytisus_Battandieri
+Quercus_Suber
+Viburnum_Tinus
+Ulmus_Bergmanniana
+Magnolia_Heptapeta
+Alnus_Rubra
+Acer_Pictum
+Castanea_Sativa
+[  5.   0.   0.   0.   0.   3.   0.   0.   0.   0.   0.   7.   0.   1.   0.
+   3.   0.   0.   1.   0.   2.   0.   0.   2.   0.   0.   2.   0.   0.   0.
+   0.   0.   1.   0.   0.   0.   0.   0.   1.   0.   0.   0.   0.   0.   2.
+   0.   0.   1.   0.   0.   2.   0.   2.   0.   0.   0.   2.   4.   0.   3.
+   2.   0.   1.   1.   0.   1.   0.   0.   0.  10.   0.   0.   3.   0.   3.
+   0.   0.   0.   2.   7.   0.   0.   2.  10.   9.   0.   0.   0.   0.   3.
+   0.   1.   0.   0.   1.   0.   0.   0.   0.]
+[ 0.  0.  0.  0.  0.  1.  0.  0.  0.  1.  0.  1.  2.  1.  0.  0.  3.  1.
+  0.  1.  1.  0.  0.  0.  1.  1.  0.  1.  1.  1.  0.  0.  1.  1.  0.  0.
+  0.  0.  1.  1.  0.  1.  1.  1.  1.  1.  1.  0.  0.  0.  1.  0.  0.  1.
+  1.  0.  0.  0.  0.  2.  1.  0.  0.  2.  0.  0.  1.  1.  0.  0.  0.  0.
+  0.  0.  0.  1.  1.  0.  2.  0.  2.  3.  1.  0.  0.  0.  0.  1.  1.  0.
+  1.  0.  0.  0.  0.  2.  1.  1.  0.]
+
+
+54
+5.0 0.0
+0.0 0.0
+0.0 0.0
+0.0 0.0
+0.0 0.0
+3.0 1.0
+0.0 0.0
+0.0 0.0
+0.0 0.0
+0.0 1.0
+0.0 0.0
+7.0 1.0
+0.0 2.0
+1.0 1.0
+0.0 0.0
+3.0 0.0
+0.0 3.0
+0.0 1.0
+1.0 0.0
+0.0 1.0
+2.0 1.0
+0.0 0.0
+0.0 0.0
+2.0 0.0
+0.0 1.0
+0.0 1.0
+2.0 0.0
+0.0 1.0
+0.0 1.0
+0.0 1.0
+0.0 0.0
+0.0 0.0
+1.0 1.0
+0.0 1.0
+0.0 0.0
+0.0 0.0
+0.0 0.0
+0.0 0.0
+1.0 1.0
+0.0 1.0
+0.0 0.0
+0.0 1.0
+0.0 1.0
+0.0 1.0
+2.0 1.0
+0.0 1.0
+0.0 1.0
+1.0 0.0
+0.0 0.0
+0.0 0.0
+2.0 1.0
+0.0 0.0
+2.0 0.0
+0.0 1.0
+0.0 1.0
+0.0 0.0
+2.0 0.0
+4.0 0.0
+0.0 0.0
+3.0 2.0
+2.0 1.0
+0.0 0.0
+1.0 0.0
+1.0 2.0
+0.0 0.0
+1.0 0.0
+0.0 1.0
+0.0 1.0
+0.0 0.0
+10.0 0.0
+0.0 0.0
+0.0 0.0
+3.0 0.0
+0.0 0.0
+3.0 0.0
+0.0 1.0
+0.0 1.0
+0.0 0.0
+2.0 2.0
+7.0 0.0
+0.0 2.0
+0.0 3.0
+2.0 1.0
+10.0 0.0
+9.0 0.0
+0.0 0.0
+0.0 0.0
+0.0 1.0
+0.0 1.0
+3.0 0.0
+0.0 1.0
+1.0 0.0
+0.0 0.0
+0.0 0.0
+1.0 0.0
+0.0 2.0
+0.0 1.0
+0.0 1.0
+0.0 0.0
+/users/PAS1383/osu10173/.conda/envs/local/lib/python2.7/site-packages/keras/preprocessing/image.py:648: UserWarning: Expected input to be images (as Numpy array) following the data format convention "channels_last" (channels on axis 3), i.e. expected either 1, 3 or 4 channels on axis 3. However, it was passed an array with shape (990, 50, 50, 1) (1 channels).
+  ' (' + str(x.shape[self.channel_axis]) + ' channels).')
+(9900, 1)
+(9900, 50, 50, 1)
+(594, 50, 50, 1)
+Applying PCA...
+Number of components for PCA: 30
+[t-SNE] Computing 121 nearest neighbors...
+[t-SNE] Indexed 10494 samples in 0.016s...
+[t-SNE] Computed neighbors for 10494 samples in 3.629s...
+[t-SNE] Computed conditional probabilities for sample 1000 / 10494
+[t-SNE] Computed conditional probabilities for sample 2000 / 10494
+[t-SNE] Computed conditional probabilities for sample 3000 / 10494
+[t-SNE] Computed conditional probabilities for sample 4000 / 10494
+[t-SNE] Computed conditional probabilities for sample 5000 / 10494
+[t-SNE] Computed conditional probabilities for sample 6000 / 10494
+[t-SNE] Computed conditional probabilities for sample 7000 / 10494
+[t-SNE] Computed conditional probabilities for sample 8000 / 10494
+[t-SNE] Computed conditional probabilities for sample 9000 / 10494
+[t-SNE] Computed conditional probabilities for sample 10000 / 10494
+[t-SNE] Computed conditional probabilities for sample 10494 / 10494
+[t-SNE] Mean sigma: 2.505501
+[t-SNE] KL divergence after 250 iterations with early exaggeration: 74.171417
+[t-SNE] Error after 1000 iterations: 1.010750
+Finished.
+Training...
+Using the combined network fit.
+2018-08-10 11:53:09.440114: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2018-08-10 11:53:09.440546: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+Epoch 00000: val_loss improved from inf to 3.30191, saving model to bestWeights.hdf5
+Epoch 00001: val_loss improved from 3.30191 to 0.97317, saving model to bestWeights.hdf5
+Epoch 00002: val_loss improved from 0.97317 to 0.22902, saving model to bestWeights.hdf5
+Epoch 00003: val_loss improved from 0.22902 to 0.08882, saving model to bestWeights.hdf5
+Epoch 00004: val_loss improved from 0.08882 to 0.04566, saving model to bestWeights.hdf5
+Epoch 00005: val_loss improved from 0.04566 to 0.03398, saving model to bestWeights.hdf5
+Epoch 00006: val_loss improved from 0.03398 to 0.02157, saving model to bestWeights.hdf5
+Epoch 00007: val_loss improved from 0.02157 to 0.01845, saving model to bestWeights.hdf5
+Epoch 00008: val_loss improved from 0.01845 to 0.01234, saving model to bestWeights.hdf5
+Epoch 00009: val_loss improved from 0.01234 to 0.00935, saving model to bestWeights.hdf5
+Epoch 00010: val_loss improved from 0.00935 to 0.00782, saving model to bestWeights.hdf5
+Epoch 00011: val_loss improved from 0.00782 to 0.00727, saving model to bestWeights.hdf5
+Epoch 00012: val_loss improved from 0.00727 to 0.00532, saving model to bestWeights.hdf5
+Epoch 00013: val_loss improved from 0.00532 to 0.00455, saving model to bestWeights.hdf5
+Epoch 00014: val_loss improved from 0.00455 to 0.00392, saving model to bestWeights.hdf5
+Epoch 00015: val_loss improved from 0.00392 to 0.00355, saving model to bestWeights.hdf5
+Epoch 00016: val_loss improved from 0.00355 to 0.00316, saving model to bestWeights.hdf5
+Epoch 00017: val_loss improved from 0.00316 to 0.00249, saving model to bestWeights.hdf5
+Epoch 00018: val_loss did not improve
+Epoch 00019: val_loss improved from 0.00249 to 0.00215, saving model to bestWeights.hdf5
+Epoch 00020: val_loss improved from 0.00215 to 0.00191, saving model to bestWeights.hdf5
+Epoch 00021: val_loss improved from 0.00191 to 0.00176, saving model to bestWeights.hdf5
+Epoch 00022: val_loss improved from 0.00176 to 0.00162, saving model to bestWeights.hdf5
+Epoch 00023: val_loss improved from 0.00162 to 0.00151, saving model to bestWeights.hdf5
+Epoch 00024: val_loss improved from 0.00151 to 0.00137, saving model to bestWeights.hdf5
+Epoch 00025: val_loss improved from 0.00137 to 0.00125, saving model to bestWeights.hdf5
+Epoch 00026: val_loss improved from 0.00125 to 0.00122, saving model to bestWeights.hdf5
+Epoch 00027: val_loss improved from 0.00122 to 0.00109, saving model to bestWeights.hdf5
+Epoch 00028: val_loss improved from 0.00109 to 0.00098, saving model to bestWeights.hdf5
+Epoch 00029: val_loss did not improve
+Epoch 00030: val_loss improved from 0.00098 to 0.00091, saving model to bestWeights.hdf5
+Epoch 00031: val_loss did not improve
+Epoch 00032: val_loss improved from 0.00091 to 0.00081, saving model to bestWeights.hdf5
+Epoch 00033: val_loss improved from 0.00081 to 0.00074, saving model to bestWeights.hdf5
+Epoch 00034: val_loss did not improve
+Epoch 00035: val_loss improved from 0.00074 to 0.00061, saving model to bestWeights.hdf5
+Epoch 00036: val_loss did not improve
+Epoch 00037: val_loss improved from 0.00061 to 0.00060, saving model to bestWeights.hdf5
+Epoch 00038: val_loss improved from 0.00060 to 0.00060, saving model to bestWeights.hdf5
+Epoch 00039: val_loss improved from 0.00060 to 0.00054, saving model to bestWeights.hdf5
+Epoch 00040: val_loss did not improve
+Epoch 00041: val_loss improved from 0.00054 to 0.00051, saving model to bestWeights.hdf5
+Epoch 00042: val_loss improved from 0.00051 to 0.00049, saving model to bestWeights.hdf5
+Epoch 00043: val_loss improved from 0.00049 to 0.00047, saving model to bestWeights.hdf5
+Epoch 00044: val_loss improved from 0.00047 to 0.00046, saving model to bestWeights.hdf5
+Epoch 00045: val_loss improved from 0.00046 to 0.00036, saving model to bestWeights.hdf5
+Epoch 00046: val_loss did not improve
+Epoch 00047: val_loss did not improve
+Epoch 00048: val_loss did not improve
+Epoch 00049: val_loss improved from 0.00036 to 0.00034, saving model to bestWeights.hdf5
+Epoch 00050: val_loss did not improve
+Epoch 00051: val_loss did not improve
+Epoch 00052: val_loss did not improve
+Epoch 00053: val_loss improved from 0.00034 to 0.00028, saving model to bestWeights.hdf5
+Epoch 00054: val_loss improved from 0.00028 to 0.00026, saving model to bestWeights.hdf5
+Epoch 00055: val_loss did not improve
+Epoch 00056: val_loss did not improve
+Epoch 00057: val_loss improved from 0.00026 to 0.00026, saving model to bestWeights.hdf5
+Epoch 00058: val_loss did not improve
+Epoch 00059: val_loss improved from 0.00026 to 0.00023, saving model to bestWeights.hdf5
+Epoch 00060: val_loss did not improve
+Epoch 00061: val_loss did not improve
+Epoch 00062: val_loss did not improve
+Epoch 00063: val_loss did not improve
+Epoch 00064: val_loss improved from 0.00023 to 0.00021, saving model to bestWeights.hdf5
+Epoch 00065: val_loss improved from 0.00021 to 0.00019, saving model to bestWeights.hdf5
+Epoch 00066: val_loss did not improve
+Epoch 00067: val_loss did not improve
+Epoch 00068: val_loss did not improve
+Epoch 00069: val_loss did not improve
+Epoch 00070: val_loss improved from 0.00019 to 0.00019, saving model to bestWeights.hdf5
+Epoch 00071: val_loss improved from 0.00019 to 0.00018, saving model to bestWeights.hdf5
+Epoch 00072: val_loss improved from 0.00018 to 0.00018, saving model to bestWeights.hdf5
+Epoch 00073: val_loss did not improve
+Epoch 00074: val_loss did not improve
+Epoch 00075: val_loss did not improve
+Epoch 00076: val_loss did not improve
+Epoch 00077: val_loss improved from 0.00018 to 0.00018, saving model to bestWeights.hdf5
+Epoch 00078: val_loss improved from 0.00018 to 0.00017, saving model to bestWeights.hdf5
+Epoch 00079: val_loss improved from 0.00017 to 0.00016, saving model to bestWeights.hdf5
+Epoch 00080: val_loss improved from 0.00016 to 0.00016, saving model to bestWeights.hdf5
+Epoch 00081: val_loss improved from 0.00016 to 0.00016, saving model to bestWeights.hdf5
+Epoch 00082: val_loss did not improve
+Epoch 00083: val_loss did not improve
+Epoch 00084: val_loss improved from 0.00016 to 0.00016, saving model to bestWeights.hdf5
+Epoch 00085: val_loss improved from 0.00016 to 0.00015, saving model to bestWeights.hdf5
+Epoch 00086: val_loss did not improve
+Epoch 00087: val_loss improved from 0.00015 to 0.00015, saving model to bestWeights.hdf5
+Epoch 00088: val_loss did not improve
+Epoch 00089: val_loss did not improve
+Epoch 00090: val_loss did not improve
+Epoch 00091: val_loss improved from 0.00015 to 0.00015, saving model to bestWeights.hdf5
+Epoch 00092: val_loss improved from 0.00015 to 0.00014, saving model to bestWeights.hdf5
+Epoch 00093: val_loss did not improve
+Epoch 00094: val_loss improved from 0.00014 to 0.00014, saving model to bestWeights.hdf5
+Epoch 00095: val_loss did not improve
+Epoch 00096: val_loss did not improve
+Epoch 00097: val_loss did not improve
+Epoch 00098: val_loss did not improve
+Epoch 00099: val_loss improved from 0.00014 to 0.00014, saving model to bestWeights.hdf5
+Epoch 00100: val_loss improved from 0.00014 to 0.00014, saving model to bestWeights.hdf5
+Epoch 00101: val_loss improved from 0.00014 to 0.00013, saving model to bestWeights.hdf5
+Epoch 00102: val_loss did not improve
+Epoch 00103: val_loss did not improve
+Epoch 00104: val_loss did not improve
+Epoch 00105: val_loss did not improve
+Epoch 00106: val_loss did not improve
+Epoch 00107: val_loss did not improve
+Epoch 00108: val_loss did not improve
+Epoch 00109: val_loss did not improve
+Epoch 00110: val_loss did not improve
+Epoch 00111: val_loss did not improve
+Epoch 00112: val_loss did not improve
+Epoch 00113: val_loss did not improve
+Epoch 00114: val_loss improved from 0.00013 to 0.00013, saving model to bestWeights.hdf5
+Epoch 00115: val_loss did not improve
+Epoch 00116: val_loss did not improve
+Epoch 00117: val_loss did not improve
+Epoch 00118: val_loss did not improve
+Epoch 00119: val_loss did not improve
+Epoch 00120: val_loss did not improve
+Epoch 00121: val_loss did not improve
+Epoch 00122: val_loss did not improve
+Epoch 00123: val_loss did not improve
+Epoch 00124: val_loss did not improve
+Epoch 00125: val_loss did not improve
+Epoch 00126: val_loss did not improve
+Epoch 00127: val_loss did not improve
+Epoch 00128: val_loss did not improve
+Epoch 00129: val_loss did not improve
+Epoch 00130: val_loss did not improve
+Epoch 00131: val_loss did not improve
+Epoch 00132: val_loss did not improve
+Epoch 00133: val_loss did not improve
+Epoch 00134: val_loss did not improve
+Epoch 00135: val_loss did not improve
+Epoch 00136: val_loss did not improve
+Epoch 00137: val_loss did not improve
+Epoch 00138: val_loss did not improve
+Epoch 00139: val_loss did not improve
+Epoch 00140: val_loss did not improve
+Epoch 00141: val_loss did not improve
+Epoch 00142: val_loss did not improve
+Epoch 00143: val_loss did not improve
+Epoch 00144: val_loss did not improve
+Epoch 00145: val_loss did not improve
+Epoch 00146: val_loss did not improve
+Epoch 00147: val_loss did not improve
+Epoch 00148: val_loss did not improve
+Epoch 00149: val_loss did not improve
+Epoch 00150: val_loss did not improve
+Epoch 00151: val_loss did not improve
+Epoch 00152: val_loss did not improve
+Epoch 00153: val_loss did not improve
+Epoch 00154: val_loss did not improve
+Epoch 00155: val_loss did not improve
+Epoch 00156: val_loss did not improve
+Epoch 00157: val_loss did not improve
+Epoch 00158: val_loss did not improve
+Epoch 00159: val_loss did not improve
+Epoch 00160: val_loss did not improve
+Epoch 00161: val_loss did not improve
+Epoch 00162: val_loss did not improve
+Epoch 00163: val_loss did not improve
+Epoch 00164: val_loss did not improve
+Epoch 00165: val_loss did not improve
+Epoch 00166: val_loss did not improve
+Epoch 00167: val_loss did not improve
+Epoch 00168: val_loss did not improve
+Epoch 00169: val_loss did not improve
+Epoch 00170: val_loss did not improve
+Epoch 00171: val_loss did not improve
+Epoch 00172: val_loss did not improve
+Epoch 00173: val_loss did not improve
+Epoch 00174: val_loss did not improve
+Epoch 00175: val_loss did not improve
+Epoch 00176: val_loss did not improve
+Epoch 00177: val_loss did not improve
+Epoch 00178: val_loss did not improve
+Epoch 00179: val_loss did not improve
+Epoch 00180: val_loss did not improve
+Epoch 00181: val_loss did not improve
+Epoch 00182: val_loss did not improve
+Epoch 00183: val_loss did not improve
+Epoch 00184: val_loss did not improve
+Epoch 00185: val_loss did not improve
+Epoch 00186: val_loss did not improve
+Epoch 00187: val_loss did not improve
+Epoch 00188: val_loss did not improve
+Epoch 00189: val_loss did not improve
+Epoch 00190: val_loss did not improve
+Epoch 00191: val_loss did not improve
+Epoch 00192: val_loss did not improve
+Epoch 00193: val_loss did not improve
+Epoch 00194: val_loss did not improve
+Epoch 00195: val_loss did not improve
+Epoch 00196: val_loss did not improve
+Epoch 00197: val_loss did not improve
+Epoch 00198: val_loss did not improve
+Epoch 00199: val_loss did not improve
+Epoch 00200: val_loss did not improve
+Epoch 00201: val_loss did not improve
+Epoch 00202: val_loss did not improve
+Epoch 00203: val_loss did not improve
+Epoch 00204: val_loss did not improve
+Epoch 00205: val_loss did not improve
+Epoch 00206: val_loss did not improve
+Epoch 00207: val_loss did not improve
+Epoch 00208: val_loss did not improve
+Epoch 00209: val_loss did not improve
+Epoch 00210: val_loss did not improve
+Epoch 00211: val_loss did not improve
+Epoch 00212: val_loss did not improve
+Epoch 00213: val_loss did not improve
+Epoch 00214: val_loss did not improve
+Epoch 00215: val_loss did not improve
+Epoch 00216: val_loss did not improve
+Epoch 00217: val_loss did not improve
+Epoch 00218: val_loss did not improve
+Epoch 00219: val_loss did not improve
+Epoch 00220: val_loss did not improve
+Epoch 00221: val_loss did not improve
+Epoch 00222: val_loss did not improve
+Epoch 00223: val_loss did not improve
+Epoch 00224: val_loss did not improve
+Epoch 00225: val_loss did not improve
+Epoch 00226: val_loss did not improve
+Epoch 00227: val_loss did not improve
+Epoch 00228: val_loss did not improve
+Epoch 00229: val_loss did not improve
+Epoch 00230: val_loss did not improve
+Epoch 00231: val_loss did not improve
+Epoch 00232: val_loss did not improve
+Epoch 00233: val_loss did not improve
+Epoch 00234: val_loss did not improve
+Epoch 00235: val_loss did not improve

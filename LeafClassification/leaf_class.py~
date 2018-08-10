@@ -7,7 +7,7 @@ import pandas as pd                         	 	 # For reading in and writing fil
 import argparse                                  	 # For inputing values outside of the code
 import visualize                                 	 # Python code for visualizing images
 import data_setup                                        # Python code for setting up the data
-import image_rotation
+import image_rotation                                    # Python code for augmenting data
 
 # sklearn
 from sklearn.preprocessing import StandardScaler 	 # Preprocessing
@@ -47,10 +47,10 @@ global_max_dim = 50
 filename1 = 'graphs/lossEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename2 = 'graphs/accEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.png'
 filename3 = 'submissions/submissionEpoch' + str(args.global_max_epochs) + 'Batch' + str(args.global_batch_size) + 'Softmax.csv'
-model_file = 'bestWeights2.hdf5'
+model_file = 'bestWeights3.hdf5'
 
 # Set up a seed so that our results don't fluctuate over multiple tests
-seed = 4
+seed = 1
 np.random.seed(seed)
 
 ####### Definitions #######
@@ -177,10 +177,11 @@ def nn_fit(mod, f1, x, y, tr, val, m_s, y_p, x_t):
 	'''
 	print 'Using the neural network fit.'
 	early_stopper= EarlyStopping(monitor = 'val_loss', patience =300, verbose = 1, mode = 'auto')
-	model_checkpoint = ModelCheckpoint(f1, monitor = 'val_loss', verbose = 0, save_best_only = True)
+	model_checkpoint = ModelCheckpoint(f1, monitor = 'val_loss', verbose = 1, save_best_only = True)
 
 	history = mod.fit(x[tr], y[tr], epochs = args.global_max_epochs, batch_size = args.global_batch_size,
-		verbose = 0, validation_data = (x[val], y[val]), callbacks = [early_stopper, model_checkpoint])	
+		verbose = 0, validation_data = (x[val], y[val]),
+		callbacks = [early_stopper, model_checkpoint])	
 
 	# Grab the best weights from current run
 	model.load_weights(f1)
@@ -260,9 +261,10 @@ test_mod_list = data_setup.reshape_img(test_list, global_max_dim)
 train, test = data_setup.engineered_features(train, test, train_list, test_list)
 
 # Grab even more features with openCV
-train, test , _ = data_setup.more_features(train, test, train_list, test_list, y, classes)
+train, test = data_setup.more_features(train, test, train_list, test_list)
 
-train, y , y_train, train_mod_list, _ , _ = image_rotation.augment(train, train_mod_list, y, y_train, test_mod_list, test)
+# Add in augmented data
+#train, y , y_train, train_mod_list, _ , _ = image_rotation.augment(train, train_mod_list, y, y_train, test_mod_list, test)
 
 # Let's apply PCA to the images and attach them to the pre-extracted features
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim, y, classes)
@@ -275,7 +277,7 @@ x_test = scaler.transform(test)
 # Look at images and some stats of leaves
 if args.leaf_stats:
 	print 'Displaying images...'
-	visualize.image_similarity(train_mod_list, y, classes)
+	# visualize.image_similarity(train_mod_list, y, classes)
 	visualize.visualize_leaves(train_mod_list, y, classes, show1 = False, show2 = True)
 	print 'Finished.'
 
@@ -283,7 +285,7 @@ if args.leaf_stats:
 input_layer = x_train.shape[1]
 
 # We will use 10-fold cross validation
-kfold = StratifiedKFold(n_splits=2, shuffle=True, random_state=seed)
+kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
 
 # Set up arrays to store the score and predictions for each iteration
 mean_score = []
@@ -293,8 +295,8 @@ y_pred = []
 for training, validation in kfold.split(x_train, y):
 	print 'Training...'
 	# Choose a model
-	# model = create_model_softmax()
-	model = create_model_combined()
+	model = create_model_softmax()
+	# model = create_model_combined()
 
 	# Compile our model
 	sgd = SGD(lr=0.01, momentum=0.9, decay=1e-6, nesterov=False)
@@ -302,17 +304,18 @@ for training, validation in kfold.split(x_train, y):
 
 	#Choose a fit for our model
 	'''
+	DOES NOT WORK
 	history, mean_score, y_pred = augment_fit(model, model_file, train_mod_list, x_train, y_train, training
 						validation, mean_score, y_pred, x_test)
 	'''
-	'''
+	
 	history, mean_score, y_pred = nn_fit(model, model_file, x_train, y_train, training, validation,
 						mean_score, y_pred, x_test)
-	'''
 	
+	'''
 	history = combined_fit(model, model_file, train_mod_list, test_mod_list, x_train, y_train, training,
 						validation, mean_score, y_pred, x_test)
-	
+	'''
 
 # Print the average validation lost and its standard deviation
 print '%.5g (+/- %.3g)' % (np.mean(mean_score), np.std(mean_score))
@@ -331,7 +334,7 @@ all_pred = np.zeros((y_pred[0].shape[0], y_pred[0].shape[1]))
 for i in range(len(y_pred)):
 	all_pred += y_pred[i]
 
-all_pred /= 10
+all_pred /= 5
 
 # Save our numpy array to a .npy file for later use
 np.save('NN_all_pred', all_pred)

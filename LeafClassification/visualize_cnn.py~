@@ -71,8 +71,10 @@ train, test = data_setup.engineered_features(train, test, train_list, test_list)
 
 train, test = data_setup.apply_PCA(train, test, train_mod_list, test_mod_list, global_max_dim, y)
 
-x_train = StandardScaler().fit_transform(train)
-x_test = StandardScaler().fit_transform(test)
+# fit calculates the mean and transform centers and scales the data so we have 0 mean and unit variance
+scaler = StandardScaler().fit(train)
+x_train = scaler.transform(train)
+x_test = scaler.transform(test)
 
 # Set up our input layer size
 global_input_layer = x_train.shape[1]

@@ -1,4 +1,4 @@
-# From: https://www.kaggle.com/abhmul/keras-convnet-lb-0-0052-w-visualization/notebook
+# Most of code is from: https://www.kaggle.com/abhmul/keras-convnet-lb-0-0052-w-visualization/notebook
 from math import sqrt
 
 import matplotlib.pyplot as plt

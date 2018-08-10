@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt                          # For plotting
 import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
 import matplotlib.cm as cm                               # For matplotlib's cmap
+
 from sklearn.metrics.pairwise import cosine_similarity   # Used for checking how similar images are to one another
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
@@ -469,6 +470,6 @@ def visualize_tsne_images(images, orig_images, fig_size = (50, 50), image_zoom =
 
    	ax.update_datalim(images)
     	ax.autoscale()
-    	plt.show()
+    	# plt.show()
 
 	return x_pt, y_pt

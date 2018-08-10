@@ -3,16 +3,17 @@ import numpy as np				 	 # Allow for easier use of arrays and linear algebra
 import pandas as pd                         	 	 # For reading in and writing files
 import matplotlib.image as mpimg           	 	 # Reading images to numpy arrays
 import cv2						 # For grabbing more features
+import visualize                                         # Python code for visualizing images
+import matplotlib.pyplot as plt				 # Visualizing data
+
 from keras.utils import np_utils			 # Used to set up one-hot scheme
 from scipy.misc import imresize                  	 # For resizing the images
 from sklearn.decomposition import PCA           	 # Preprocessing
 from sklearn.preprocessing import LabelEncoder  	 # Preprocessing
+from sklearn.manifold import TSNE                        # Enable use of t-SNE
+from sklearn.preprocessing import StandardScaler         # Scale the data
 
-from sklearn.manifold import TSNE
-from sklearn.preprocessing import StandardScaler
-import visualize
-import matplotlib.pyplot as plt
-from skimage.measure import regionprops
+
 ####### Definitions #######
 def grab_images(tr_ids, te_ids, tot_img):
 	'''
@@ -49,6 +50,7 @@ def grab_images(tr_ids, te_ids, tot_img):
 
 	return images_list, train_list, test_list
 
+# From: https://www.kaggle.com/abhmul/keras-convnet-lb-0-0052-w-visualization/notebook
 def resize_img(img, max_dim):
 	'''
 	Resize the image so the maximum side is of size max_dim
@@ -69,6 +71,7 @@ def resize_img(img, max_dim):
 
     	return np.resize(img, (int(img.shape[0] * scale), int(img.shape[1] * scale)))
 
+# From: https://www.kaggle.com/abhmul/keras-convnet-lb-0-0052-w-visualization/notebook
 def reshape_img(images, max_dim, center = True):
 	'''
 	Reshapes images to the requested dimensions
@@ -173,7 +176,7 @@ def engineered_features(train, test, tr_list, te_list):
 	print 'Finished.'
 	return train_mod, test_mod
 
-def more_features(train, test, tr_list, te_list, y, classes):
+def more_features(train, test, tr_list, te_list):
 	'''
 	Grab for features to learn from using openCV
 
@@ -188,57 +191,18 @@ def more_features(train, test, tr_list, te_list, y, classes):
 	train_mod - 2D array of pre-extracted features for the test set with additional features
 	'''
 
-	tr_area = np.zeros((len(tr_list), 1)) 
+ 
 	tr_per = np.zeros((len(tr_list), 1))
-	tr_hull = np.zeros((len(tr_list), 1))
-	tr_cx = np.zeros((len(tr_list), 1))
-	tr_cy = np.zeros((len(tr_list), 1))
-	tr_MA = np.zeros((len(tr_list), 1))
-	tr_ma = np.zeros((len(tr_list), 1))
-	tr_angle = np.zeros((len(tr_list), 1))
 	tr_mom = np.zeros((len(tr_list), 24))
-	te_area = np.zeros((len(te_list), 1)) 
+
 	te_per = np.zeros((len(te_list), 1))
-	te_hull = np.zeros((len(te_list), 1))
-	te_cx = np.zeros((len(te_list), 1))
-	te_cy = np.zeros((len(te_list), 1))
-	te_MA = np.zeros((len(te_list), 1))
-	te_ma = np.zeros((len(te_list), 1))
-	te_angle = np.zeros((len(te_list), 1))
 	te_mom = np.zeros((len(te_list), 24))
 	
-	tr_mom2 = np.zeros((len(tr_list), 24))
-	te_mom2 = np.zeros((len(te_list), 24))
-	count = 0
-	temp = []
-	temp2 = []
-	temp3 = []
-	arr1 = np.zeros(99)
-	arr2 = np.zeros(99)
 	# Find the moments of each leaf in the taining set
 	for i in range (len(tr_list)):
 		ret, thresh = cv2.threshold(tr_list[i],127,255,0)	
 	
 		im , contours, _ = cv2.findContours(thresh, 1, 2)
-		'''
-		FOR DEBUGGING
-		for j in range(len(contours)):
-			if j + 1 == len(contours):
-				print len(contours)
-				if len(contours) > 5:
-					print 'New Leaf'
-					for k in range(len(contours)):
-						print '# of contour points: ', len(contours[k])
-
-				     		for h in range(len(contours[k])):
-				     			print 'Point(x,y)=', contours[k][h]
-
-				     		print 'Area: ', cv2.contourArea(contours[k])
-						print 'perimeter', cv2.arcLength(contours[k],True)
-
-					plt.imshow(im, cmap = 'binary')
-					plt.show()
-		'''
 		
 		cnt = contours[0]
 		M = cv2.moments(cnt, binaryImage = True)
@@ -247,109 +211,8 @@ def more_features(train, test, tr_list, te_list, y, classes):
 			tr_mom[i][k] = M[key] / 255.0
 			k += 1
 		
-		'''
 		tr_per[i] += cv2.arcLength(cnt,True) / 255.0
 		
-		if M['m00'] > 0:
-			temp.append(train[i])
-			temp2.append(tr_mom[i])
-			temp3.append(y[i])
-
-		if M['m00'] == 0:
-			count += 1
-			arr1[y[i]] += 1 
-			print M['m00']
-			print classes[y[i]]
-		'''
-		'''
-		hull = cv2.convexHull(cnt,returnPoints = False)
-		defects = cv2.convexityDefects(cnt,hull)
-		all_defects = 0	
-		for k in range(len(defects)):
-			all_defects += defects[k][0][3]
-		all_defects /= len(defects)
-		tr_hull[i] = all_defects / 255.0
-		'''
-		'''
-		(x, y),(MA, ma), angle = cv2.fitEllipse(cnt)
-		tr_MA[i] = MA / 255.0
-		tr_ma[i] = ma / 255.0
-		tr_angle[i] = angle		
-		'''
-		'''
-		count += 1
- 		for j in range(len(contours)):
-			cnt = contours[j]
-			M = cv2.moments(cnt, binaryImage = True)
-			if M['m00'] > 5000:
-				k = 0
-				for key in M:
-					tr_mom[i][k] = M[key] / 255.0
-					k+= 1
-		if count % 10 == 0:
-			print 'Here!'
-			k = 0
-			for key in M:
-				tr_mom[i][k] = 0
-				k+= 1
-		'''
-		'''
-			#tr_area[i] += cv2.contourArea(cnt) / 255.0
-			#tr_per[i] += cv2.arcLength(cnt,True) / 255.0
-			
-			if cv2.contourArea(cnt) > 5000:
-				M = cv2.moments(cnt, binaryImage = True)
-
-				tr_cx[i] =  int(M['m10'] / M['m00']) / 255.0
-				tr_cy[i] =  int(M['m01'] / M['m00']) / 255.0
-			
-				hull = cv2.convexHull(cnt,returnPoints = False)
-				defects = cv2.convexityDefects(cnt,hull)
-				all_defects = 0	
-				for k in range(len(defects)):
-					all_defects += defects[k][0][3]
-				all_defects /= len(defects)
-				tr_hull[i] = all_defects / 255.0
-
-				(x, y),(MA, ma), angle = cv2.fitEllipse(cnt)
-				tr_MA[i] = MA / 255.0
-				tr_ma[i] = ma / 255.0
-				tr_angle[i] = angle
-		'''
-		
-		'''
-		if M['m10'] != 0:
-			#print regionprops(tr_list[i])
-			tr_cx[i] =  int(M['m10'] / M['m00'])
-			tr_cy[i] =  int(M['m01'] / M['m00'])
-		else:
-			print 'Printing...'
-			#print contours[1]
-			print 'Printing...'
-			#print contours
-			print i
-			plt.imshow(tr_list[i], cmap = 'binary')
-			plt.show()
-			print cnt
-			count += 1 
-
-		hull = cv2.convexHull(cnt,returnPoints = False)
-		defects = cv2.convexityDefects(cnt,hull)
-		all_defects = 0
-		if hull.all() != 0:
-			for j in range(len(defects)):
-				all_defects += defects[j][0][3]
-			all_defects /= len(defects)
-			tr_hull[i] /= all_defects
-		else:	
-			tr_hull[i] = all_defects
-		'''
-	print arr1
-	print '\n'
-	print count 
-	print '\n'
-
-	count = 0
 	# Find the moments of each leaf in the test set
 	for i in range (len(te_list)):
 		ret, thresh = cv2.threshold(te_list[i],127,255,0)	
@@ -364,116 +227,13 @@ def more_features(train, test, tr_list, te_list, y, classes):
 			te_mom[i][k] = M[key] / 255.0
 			k+= 1
 		
-		'''
 		te_per[i] += cv2.arcLength(cnt,True) / 255.0
 		
-		if M['m00'] == 0:
-			count += 1
-			arr2[y[i]] += 1
-			print classes[y[i]]
-		'''
-		'''
-		hull = cv2.convexHull(cnt,returnPoints = False)
-		defects = cv2.convexityDefects(cnt,hull)
-		all_defects = 0	
-		for k in range(len(defects)):
-			all_defects += defects[k][0][3]
-		all_defects /= len(defects)
-		te_hull[i] = all_defects / 255.0
-		'''
-		'''
-		(x, y),(MA, ma), angle = cv2.fitEllipse(cnt)
-		tr_MA[i] = MA / 255.0
-		tr_ma[i] = ma / 255.0
-		tr_angle[i] = angle
-		'''
-		'''
-		count += 1
- 		for j in range(len(contours)):
-			cnt = contours[j]
-			M = cv2.moments(cnt, binaryImage = True)
-			if M['m00'] > 5000:
-				k = 0
-				for key in M:
-					te_mom[i][k] = M[key] / 255.0
-					k+= 1
 
-		if count % 10 == 0:
-			k = 0
-			for key in M:
-				te_mom[i][k] = 0
-				k+= 1
-		'''
-		'''
-
-			te_area[i] += cv2.contourArea(cnt) / 255.0
-			te_per[i] += cv2.arcLength(cnt,True) / 255.0
-
-			if cv2.contourArea(cnt) > 5000:
-				M = cv2.moments(cnt, binaryImage = True)
-				te_cx[i] =  int(M['m10'] / M['m00']) / 255.0
-				te_cy[i] =  int(M['m01'] / M['m00']) / 255.0
-			
-				hull = cv2.convexHull(cnt,returnPoints = False)
-				defects = cv2.convexityDefects(cnt,hull)
-				all_defects = 0				
-				for k in range(len(defects)):
-					all_defects += defects[k][0][3]
-				all_defects /= len(defects)
-				te_hull[i] = all_defects / 255.0
-
-				(x, y),(MA, ma), angle = cv2.fitEllipse(cnt)
-				te_MA[i] = MA / 255.0
-				te_ma[i] = ma / 255.0
-				te_angle[i] = angle
-		'''
-		'''
-		cnt = contours[0]
-		te_area[i] = cv2.contourArea(cnt)
-		te_per[i] = cv2.arcLength(cnt,True)
-		M = cv2.moments(cnt)
-
-		if M['m10'] != 0:
-			te_cx[i] =  int(M['m10'] / M['m00'])
-			te_cy[i] =  int(M['m01'] / M['m00'])
-		else: 
-			#print i
-			#plt.imshow(im, cmap = 'binary')
-			#plt.show()
-			#plt.imshow(te_list[i], cmap = 'binary')
-			#plt.show()
-			print cnt
-			count += 1
-			stop 
-
-		hull = cv2.convexHull(cnt,returnPoints = False)
-		defects = cv2.convexityDefects(cnt,hull)
-		all_defects = 0
-		if hull.all() != 0:
-			for j in range(len(defects)):
-				all_defects += defects[j][0][3]	
-			all_defects /= len(defects)
-			te_hull[i] = all_defects
-		else:
-			te_hull[i] = all_defects
-		'''
-
-	print arr2
-	print '\n'
-	print count 
-
-	tr = np.zeros((len(temp), train.shape[1]))
-	trm = np.zeros((len(temp), tr_mom.shape[1]))
-	tryy = np.zeros(len(temp))
-	for i in range(len(temp)):
-		tr[i] = temp[i]
-		trm[i] = temp2[i]
-		tryy[i] = temp3[i]
-
-	train_mod = np.concatenate((train, tr_mom), axis = 1)
-	test_mod = np.concatenate((test, te_mom), axis = 1) 
-
-	return train_mod, test_mod, y
+	train_mod = np.concatenate((train, tr_per, tr_mom), axis = 1)
+	test_mod = np.concatenate((test, te_per, te_mom), axis = 1) 
+	
+	return train_mod, test_mod
 
 def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_PCA = False, tsne = True):
 	'''
@@ -491,8 +251,6 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 	train - 2D array of pre-extracted features for the training set with the flattened PCA features
 	test - 2D array of pre-extracted features for the testing set with the flattened PCA features
 	'''
-	print tr_mod_list.shape
-	print te_mod_list.shape
 
 	# Images need to be flattened to apply PCA to them
 	print 'Applying PCA...'
@@ -518,6 +276,7 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 
 	# Display a plot after t-SNE is applied to look at the relationships between leaves
 	if tsne:
+		print 'Applying t-SNE...'
 		# If we want to use the coordinates for each leaf from t-SNE
 		t_pca_all = np.concatenate((tr_flat_pca, te_flat_pca), axis = 0)
 		t_mod_all = np.concatenate((tr_mod_list, te_mod_list))
@@ -534,6 +293,7 @@ def apply_PCA(train, test, tr_mod_list, te_mod_list, max_dim, ids, labels, vis_P
 		train = np.concatenate((train, x_pt[0: len(train)], y_pt[0: len(train)]), axis = 1)
 		test = np.concatenate((test, x_pt[len(train): len(test) + len(train)],
 				y_pt[len(train): len(test) + len(train)]), axis = 1)
+		print 'Finished.'
 		
 
 	# Display what the PCA leaves look like
@@ -584,7 +344,7 @@ def data():
 	# Extract the id of each leaf
 	test_ids = test.pop('id')
 
-	# Find our how many images we have
+	# Find out how many images we have
 	total_img = len(train_ids) + len(test_ids)
 
 	# Load up all of the images
